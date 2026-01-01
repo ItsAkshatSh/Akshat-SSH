@@ -1,0 +1,23 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html, body, #__next {
+  height: 100%;
+}
+
+.custom-scrollbar::-webkit-scrollbar { width: 8px; height: 8px; }
+.custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.06); border-radius: 9999px; }
+.custom-scrollbar { scrollbar-width: thin; scrollbar-color: rgba(255,255,255,0.06) transparent; }
+
+/* Fallback small utilities used by the app (keeps it viewable without Tailwind fully applied) */
+body { margin: 0; font-family: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial; }
+
+/* Force custom cursor everywhere - override browser defaults */
+button, a, input, [role="button"], .interactive {
+  cursor: none !important;
+}
+
+button:hover, a:hover, input:hover, [role="button"]:hover, .interactive:hover {
+  cursor: none !important;
+}
