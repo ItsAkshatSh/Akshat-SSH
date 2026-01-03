@@ -1,62 +1,93 @@
-# personal-web (Next.js)
+---
+title: Markdown Examples
+date: 2024-01-20
+tags: [markdown, examples, reference]
+excerpt: A reference guide showing all supported Markdown features.
+---
 
-This scaffolds a minimal Next.js app using the React code you provided in `web.txt`.
+This post demonstrates all the Markdown features supported by the blog system.
 
-Quick setup (Windows PowerShell):
+## Headings
 
+You can use different heading levels to structure your content:
+
+# H1 Heading
+## H2 Heading
+### H3 Heading
+
+## Text Formatting
+
+**Bold text** and *italic text* work as expected. You can also use ***bold and italic*** together.
+
+## Lists
+
+### Unordered Lists
+- Item one
+- Item two
+  - Nested item
+  - Another nested item
+- Item three
+
+### Ordered Lists
+1. First item
+2. Second item
+3. Third item
+
+## Code
+
+Inline code like `const example = true;` works seamlessly.
+
+Code blocks with syntax highlighting:
+
+```javascript
+function greet(name) {
+  return `Hello, ${name}!`;
+}
+
+console.log(greet('World'));
 ```
-cd "c:\Users\USER\Desktop\personal-web"
-npm install
-npm run dev
+
+```python
+def fibonacci(n):
+    if n <= 1:
+        return n
+    return fibonacci(n-1) + fibonacci(n-2)
 ```
 
-Notes:
+## Links
 
-If you'd like, I can run `npm install` for you here (I won't run commands without your approval), or switch this to the new Next.js `app/` router structure.
-# personal-web
+Here's a [link to Google](https://google.com) and a [relative link](/blog).
 
-hey — welcome to my messy little Next.js corner. this repo holds a quirky, client-heavy portfolio built from a single-file React sketch (shoutout to `web.txt`). it's equal parts website and sandbox.
+## Images
 
-Quick start (Windows PowerShell):
+Images can be embedded like this:
 
-```powershell
-cd "c:\Users\USER\Desktop\personal-web"
-npm install
-npm run dev
-```
+![Alt text](/images/icon.ico)
 
-Open http://localhost:3000 after `npm run dev`.
+## Blockquotes
 
-What this is
-- A Next.js pages-router site that deliberately keeps the interactive app client-only to avoid server-side hydration tantrums.
-- The full interactive UI is in `components/AppClient.jsx` and is dynamically imported from `pages/index.jsx` with `ssr: false`.
-- Photos live in `public/images/photography/` and are displayed with a lightbox.
-- Favicon at `public/images/icon.ico`.
+> This is a blockquote. It's perfect for highlighting important quotes or excerpts from other sources.
 
-Why it looks weird
-- The original app uses canvas, direct DOM access, and other browser-only APIs — so we load it only on the client. This keeps Next.js from trying to pre-render things it can't.
+> You can also have
+> multi-line blockquotes
+> like this one.
 
-Files you care about
-- `components/AppClient.jsx`: the entire UI and interactive bits.
-- `pages/index.jsx`: small loader that dynamically imports the client app.
-- `pages/_app.jsx`: global CSS + head (favicon link).
-- `public/images/*`: where portraits and gallery images live.
+## Horizontal Rules
 
-Run a production build
-```powershell
-npm run build
-npm start
-```
+You can separate sections with horizontal rules:
 
-Deploy
-- There's a `vercel.json` already; connecting this repo to Vercel should work.
+---
 
-To-do / Nice-to-have
-- Improve accessibility: alt text, keyboard navigation for the lightbox, and focus management.
-- Lazy-load big photos and add blur-up placeholders.
-- Split `AppClient.jsx` into smaller components for readability.
+## Tables
 
-If you want me to:
-- tweak styles, add keyboard nav to the gallery, or generate optimized image variants, say the word and I'll patch it right in.
+| Feature | Status | Notes |
+|---------|--------|-------|
+| Markdown | ✅ | Fully supported |
+| Frontmatter | ✅ | Optional metadata |
+| Images | ✅ | Native support |
+| Code blocks | ✅ | Syntax highlighting |
 
-— ash (quirky dev helper)
+---
+
+That's it! The blog system supports all standard Markdown features, making it easy to write rich, formatted content.
+

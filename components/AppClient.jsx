@@ -11,6 +11,7 @@ import StaggerItem from './utilities/StaggerItem';
 import StarField from './StarField';
 import SnakeGame from './SnakeGame';
 import TerminalModal from './TerminalModal';
+import BlogWindow from './blog/BlogWindow';
 
 // Content
 import ProjectsContent from './content/ProjectsContent';
@@ -32,6 +33,7 @@ const App = () => {
   const [activeSection, setActiveSection] = useState(null);
   const [hoveredNav, setHoveredNav] = useState(null);
   const [isTerminalOpen, setIsTerminalOpen] = useState(false);
+  const [isBlogOpen, setIsBlogOpen] = useState(false);
 
   useEffect(() => {
     const timer = setInterval(() => setTime(new Date()), 1000);
@@ -93,14 +95,14 @@ const App = () => {
          </h1>
       </div>
 
-      <div
-        className="fixed pointer-events-none z-50 transition-all duration-100 ease-out mix-blend-exclusion"
-        style={{
-          left: cursorState.active ? cursorState.x : mousePos.x,
-          top: cursorState.active ? cursorState.y : mousePos.y,
-          transform: 'translate(-50%, -50%)',
-        }}
-      >
+       <div
+         className="fixed pointer-events-none z-[200] transition-all duration-100 ease-out mix-blend-exclusion"
+         style={{
+           left: cursorState.active ? cursorState.x : mousePos.x,
+           top: cursorState.active ? cursorState.y : mousePos.y,
+           transform: 'translate(-50%, -50%)',
+         }}
+       >
         <div className={`absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-1 h-1 bg-white rounded-full transition-opacity duration-300 ${cursorState.active ? 'opacity-0' : 'opacity-100'}`} />
         <div
           className="border-[1px] border-white transition-all duration-500 cubic-bezier(0.16, 1, 0.3, 1)"
@@ -135,16 +137,18 @@ const App = () => {
                <circle cx="200" cy="200" r="100" stroke="currentColor" fill="none" strokeDasharray="2 4" strokeWidth="0.5" />
             </svg>
 
-            {['Projects', 'Photography', 'Experience'].map((item, index) => {
+            {['Projects', 'Photography', 'Experience', 'Blog'].map((item, index) => {
                const positions = [
                   'top-[50px] left-[120px]',
-                  'top-[180px] -translate-y-1/2 right-[40px]',
-                  'bottom-[50px] left-[120px]'
+                  'top-[130px] -translate-y-1/2 right-[-35px]',
+                  'bottom-[50px] left-[120px]',
+                  'top-[235px] -translate-y-1/2 right-[50px]'
                ];
+               const isBlog = item === 'Blog';
                return (
                 <MagneticButton 
                   key={item}
-                  onClick={() => setActiveSection(item.toLowerCase())}
+                  onClick={() => isBlog ? setIsBlogOpen(true) : setActiveSection(item.toLowerCase())}
                   className={`interactive pointer-events-auto absolute ${positions[index]} group flex items-center gap-4 transition-all duration-300`}
                 >
                    <div className="w-2 h-2 bg-neutral-600 group-hover:bg-white transition-colors" />
@@ -188,6 +192,10 @@ const App = () => {
           onClose={() => setIsTerminalOpen(false)} 
           onNavigate={setActiveSection} 
         />
+      )}
+
+      {isBlogOpen && (
+        <BlogWindow onClose={() => setIsBlogOpen(false)} />
       )}
 
       {activeSection && (

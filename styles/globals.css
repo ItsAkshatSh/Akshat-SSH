@@ -21,3 +21,38 @@ button, a, input, [role="button"], .interactive {
 button:hover, a:hover, input:hover, [role="button"]:hover, .interactive:hover {
   cursor: none !important;
 }
+
+/* Blog typography enhancements */
+.prose-wrapper {
+  font-family: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  font-size: 1.125rem;
+  line-height: 1.75;
+  color: #d4d4d4;
+}
+
+.prose-wrapper strong {
+  font-weight: 600;
+  color: #e5e5e5;
+}
+
+.prose-wrapper em {
+  font-style: italic;
+}
+
+.prose-wrapper table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1.5rem 0;
+}
+
+.prose-wrapper table th,
+.prose-wrapper table td {
+  border: 1px solid #262626;
+  padding: 0.75rem;
+  text-align: left;
+}
+
+.prose-wrapper table th {
+  background-color: #171717;
+  font-weight: 600;
+}

@@ -69,7 +69,6 @@ const ExperienceContent = () => {
 
   return (
     <div className="relative space-y-12">
-      {/* Education */}
       <section>
         <h3 className="text-2xl font-light uppercase tracking-widest text-white mb-6 border-b border-neutral-700 pb-3">Education</h3>
         {education.map((edu, i) => (
@@ -83,7 +82,6 @@ const ExperienceContent = () => {
         ))}
       </section>
 
-      {/* Work Experience */}
       <section>
         <h3 className="text-2xl font-light uppercase tracking-widest text-white mb-6 border-b border-neutral-700 pb-3">Work Experience</h3>
         {jobs.map((job, i) => (
@@ -109,7 +107,6 @@ const ExperienceContent = () => {
         ))}
       </section>
 
-      {/* Skills */}
       <section>
         <h3 className="text-2xl font-light uppercase tracking-widest text-white mb-6 border-b border-neutral-700 pb-3">Skills</h3>
         <div className="flex flex-wrap gap-2">
@@ -121,7 +118,6 @@ const ExperienceContent = () => {
         </div>
       </section>
 
-      {/* Accomplishments */}
       <section>
         <h3 className="text-2xl font-light uppercase tracking-widest text-white mb-6 border-b border-neutral-700 pb-3">Accomplishments</h3>
         <ul className="space-y-4">
@@ -136,7 +132,6 @@ const ExperienceContent = () => {
         </ul>
       </section>
 
-      {/* Links */}
       <section className="border-t border-neutral-800 pt-8">
         <h3 className="text-2xl font-light uppercase tracking-widest text-white mb-6">Links</h3>
         <div className="space-y-2">
