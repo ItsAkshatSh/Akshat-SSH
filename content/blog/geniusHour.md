@@ -23,3 +23,4 @@ Seeing people actually *understand* and appreciate what I built felt unreal
 it kirkenuily was pretty nice to see people appreciate and i couldn't do this without my hb Briyan, he ***carried*** the UI, while I did the features, it was fun but draining asw, so i honestly don't know if i will be doing this again in the future
 
 Thanks for reading!
+
