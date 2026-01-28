@@ -10,3 +10,5 @@ lowkey i don't what to type right now, but when something comes up i will surely
 
 - well this basically parses throuugh a MarkDown file for content, and then converts it into html, hence you can see this page
 - this basically makes it easy for me to be able to write everyday or most of the days i hope
+
+

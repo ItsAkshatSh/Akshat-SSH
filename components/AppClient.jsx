@@ -6,6 +6,7 @@ import { X } from 'lucide-react';
 import ScrambleText from './utilities/ScrambleText';
 import MagneticButton from './utilities/MagneticButton';
 import StaggerItem from './utilities/StaggerItem';
+import InfoCard from './utilities/InfoCard';
 
 // Components
 import StarField from './StarField';
@@ -34,6 +35,7 @@ const App = () => {
   const [hoveredNav, setHoveredNav] = useState(null);
   const [isTerminalOpen, setIsTerminalOpen] = useState(false);
   const [isBlogOpen, setIsBlogOpen] = useState(false);
+  const [showInfoCard, setShowInfoCard] = useState(false);
 
   useEffect(() => {
     const timer = setInterval(() => setTime(new Date()), 1000);
@@ -41,9 +43,17 @@ const App = () => {
   }, []);
 
   useEffect(() => {
-    const handleMouseMove = (e) => setMousePos({ x: e.clientX, y: e.clientY });
-    window.addEventListener('mousemove', handleMouseMove);
-    return () => window.removeEventListener('mousemove', handleMouseMove);
+    let rafId;
+    const handleMouseMove = (e) => {
+      rafId = requestAnimationFrame(() => {
+        setMousePos({ x: e.clientX, y: e.clientY });
+      });
+    };
+    window.addEventListener('mousemove', handleMouseMove, { passive: true });
+    return () => {
+      window.removeEventListener('mousemove', handleMouseMove);
+      cancelAnimationFrame(rafId);
+    };
   }, []);
 
   useEffect(() => {
@@ -63,7 +73,7 @@ const App = () => {
         setCursorState((prev) => ({ ...prev, active: false }));
       }
     };
-    document.addEventListener('mouseover', handleMouseOver);
+    document.addEventListener('mouseover', handleMouseOver, { passive: true });
     return () => document.removeEventListener('mouseover', handleMouseOver);
   }, []);
 
@@ -86,7 +96,7 @@ const App = () => {
         .scanline { background: linear-gradient(to bottom, transparent 50%, rgba(0, 0, 0, 0.5) 51%); background-size: 100% 4px; }
       `}</style>
 
-      <div className="fixed top-8 left-8 z-30 mix-blend-difference pointer-events-none select-none">
+      <div className="fixed top-8 left-8 z-30 mix-blend-difference select-none pointer-events-none">
          <h1 
            className="text-3xl md:text-4xl text-white tracking-tighter opacity-90"
            style={{ fontFamily: '"Silkscreen", cursive' }}
@@ -120,7 +130,7 @@ const App = () => {
       <main className={`relative z-10 w-full h-screen flex items-center justify-center transition-opacity duration-500 ${activeSection ? 'opacity-10 blur-sm pointer-events-none' : 'opacity-100'}`}>
         
         <div className="relative w-[800px] h-[600px] max-w-full flex items-center">
-          <div className="interactive relative z-10 group w-[300px] h-[400px] flex-shrink-0 grayscale hover:grayscale-0 transition-all duration-500">
+          <div className="interactive relative z-10 group w-[300px] h-[400px] flex-shrink-0 grayscale hover:grayscale-0 transition-all duration-500" onMouseEnter={() => setShowInfoCard(true)} onMouseLeave={() => setShowInfoCard(false)}>
             <div className="w-full h-full bg-[#050505] border border-neutral-800 overflow-hidden flex items-center justify-center relative group-hover:border-white/20 transition-colors">
                <img 
                   src="/images/ascii/ascii.png"
@@ -197,6 +207,8 @@ const App = () => {
       {isBlogOpen && (
         <BlogWindow onClose={() => setIsBlogOpen(false)} />
       )}
+
+      <InfoCard isVisible={showInfoCard} mousePos={mousePos} />
 
       {activeSection && (
         <div className="fixed inset-0 z-40 flex items-center justify-end bg-black/60 backdrop-blur-sm">
