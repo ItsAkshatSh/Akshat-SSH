@@ -23,7 +23,10 @@ import ExperienceContent from './content/ExperienceContent';
 // --- MAIN APP COMPONENT ---
 
 const App = () => {
-  const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
+  const cursorRef = useRef(null);
+  const mousePosRef = useRef({ x: 0, y: 0 });
+  const statsRef = useRef(null);
+  
   const [cursorState, setCursorState] = useState({
     active: false,
     width: 40,
@@ -43,18 +46,23 @@ const App = () => {
   }, []);
 
   useEffect(() => {
-    let rafId;
     const handleMouseMove = (e) => {
-      rafId = requestAnimationFrame(() => {
-        setMousePos({ x: e.clientX, y: e.clientY });
-      });
+      mousePosRef.current = { x: e.clientX, y: e.clientY };
+      
+      // Update cursor position using transform (GPU accelerated)
+      if (cursorRef.current && !cursorState.active) {
+        cursorRef.current.style.transform = `translate(${e.clientX}px, ${e.clientY}px) translate(-50%, -50%)`;
+      }
+      
+      // Update stats display less frequently (throttled)
+      if (statsRef.current && Math.random() < 0.1) {
+        statsRef.current.textContent = `SYS.coords: ${e.clientX}, ${e.clientY}`;
+      }
     };
+
     window.addEventListener('mousemove', handleMouseMove, { passive: true });
-    return () => {
-      window.removeEventListener('mousemove', handleMouseMove);
-      cancelAnimationFrame(rafId);
-    };
-  }, []);
+    return () => window.removeEventListener('mousemove', handleMouseMove);
+  }, [cursorState.active]);
 
   useEffect(() => {
     const handleMouseOver = (e) => {
@@ -76,6 +84,17 @@ const App = () => {
     document.addEventListener('mouseover', handleMouseOver, { passive: true });
     return () => document.removeEventListener('mouseover', handleMouseOver);
   }, []);
+
+  // Update cursor position when transitioning between active states
+  useEffect(() => {
+    if (cursorRef.current) {
+      if (cursorState.active) {
+        cursorRef.current.style.transform = `translate(${cursorState.x}px, ${cursorState.y}px) translate(-50%, -50%)`;
+      } else {
+        cursorRef.current.style.transform = `translate(${mousePosRef.current.x}px, ${mousePosRef.current.y}px) translate(-50%, -50%)`;
+      }
+    }
+  }, [cursorState.active, cursorState.x, cursorState.y]);
 
   return (
     <div className="min-h-screen bg-[#0a0a0a] text-neutral-200 overflow-hidden font-mono selection:bg-[#ffffff] selection:text-black relative cursor-none">
@@ -106,10 +125,11 @@ const App = () => {
       </div>
 
        <div
-         className="fixed pointer-events-none z-[200] transition-all duration-100 ease-out mix-blend-exclusion"
+         ref={cursorRef}
+         className="fixed pointer-events-none z-[200] mix-blend-exclusion will-change-transform"
          style={{
-           left: cursorState.active ? cursorState.x : mousePos.x,
-           top: cursorState.active ? cursorState.y : mousePos.y,
+           left: 0,
+           top: 0,
            transform: 'translate(-50%, -50%)',
          }}
        >
@@ -181,12 +201,12 @@ const App = () => {
              className="interactive flex items-center gap-2 hover:text-green-500 transition-colors text-left"
            >
              <Terminal size={10} />
-             <span>SYS.coords: {mousePos.x}, {mousePos.y}</span>
+             <span ref={statsRef}>SYS.coords: 0, 0</span>
              <span className="ml-2 opacity-50 animate-pulse">[CLICK TO OPEN SHELL]</span>
            </button>
            <div className="flex items-center gap-2">
              <Cpu size={10} />
-             <span>MEM: {Math.floor(mousePos.x / 20)} MB</span>
+             <span>MEM: {Math.floor(mousePosRef.current.x / 20)} MB</span>
            </div>
         </div>
         
@@ -208,7 +228,7 @@ const App = () => {
         <BlogWindow onClose={() => setIsBlogOpen(false)} />
       )}
 
-      <InfoCard isVisible={showInfoCard} mousePos={mousePos} />
+      <InfoCard isVisible={showInfoCard} mousePos={mousePosRef.current} />
 
       {activeSection && (
         <div className="fixed inset-0 z-40 flex items-center justify-end bg-black/60 backdrop-blur-sm">
