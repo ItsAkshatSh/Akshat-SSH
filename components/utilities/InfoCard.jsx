@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import ScrambleText from './ScrambleText';
 
-const InfoCard = ({ isVisible, mousePos }) => {
+const InfoCard = ({ isVisible }) => {
   const [scrambleActive, setScrambleActive] = useState(false);
 
   useEffect(() => {
@@ -20,43 +20,36 @@ const InfoCard = ({ isVisible, mousePos }) => {
     location: 'Dubai, United Arab Emirates',
   };
 
-  if (!isVisible) return null;
-
   return (
     <div
-      className="fixed z-[150] pointer-events-none"
-      style={{
-        left: `${mousePos.x + 30}px`,
-        top: `${mousePos.y - 50}px`,
-        animation: 'slideUpFade 0.3s ease-out forwards',
-      }}
+      className={`absolute left-full top-1/2 -translate-y-1/2 ml-8 z-[150] pointer-events-none transform-gpu transition-all duration-400 ease-premium ${isVisible ? 'opacity-100 translate-x-0 scale-100' : 'opacity-0 translate-x-4 scale-[0.98]'}`}
     >
-      <div className="bg-neutral-900 border border-neutral-700 rounded-lg p-4 shadow-2xl backdrop-blur-sm w-max min-w-[240px]">
-        <div className="space-y-3">
+      <div className="bg-white/[0.03] border border-white/[0.08] rounded-xl p-5 shadow-card backdrop-blur-xl w-max min-w-[260px]">
+        <div className="space-y-4">
           <div>
-            <p className="text-xs text-neutral-500 uppercase tracking-widest mb-1">Name</p>
-            <p className="text-sm text-neutral-100 font-light">
+            <p className="text-[10px] text-neutral-500 uppercase tracking-[0.2em] mb-1.5">Name</p>
+            <p className="text-sm text-neutral-100 font-light tracking-tight">
               <ScrambleText text={info.name} active={scrambleActive} speed={50} />
             </p>
           </div>
           
           <div>
-            <p className="text-xs text-neutral-500 uppercase tracking-widest mb-1">Email</p>
-            <p className="text-xs text-cyan-400 font-mono break-all">
+            <p className="text-[10px] text-neutral-500 uppercase tracking-[0.2em] mb-1.5">Email</p>
+            <p className="text-xs text-cyan-400/90 font-mono break-all">
               <ScrambleText text={info.email} active={scrambleActive} speed={50} />
             </p>
           </div>
           
           <div>
-            <p className="text-xs text-neutral-500 uppercase tracking-widest mb-1">Location</p>
-            <p className="text-sm text-neutral-100 font-light">
+            <p className="text-[10px] text-neutral-500 uppercase tracking-[0.2em] mb-1.5">Location</p>
+            <p className="text-sm text-neutral-100 font-light tracking-tight">
               <ScrambleText text={info.location} active={scrambleActive} speed={50} />
             </p>
           </div>
         </div>
         
-        <div className="mt-3 pt-3 border-t border-neutral-800">
-          <p className="text-xs text-neutral-600 text-center">dev // creative</p>
+        <div className="mt-4 pt-4 border-t border-white/[0.06]">
+          <p className="text-[10px] text-neutral-600 text-center tracking-widest">dev // creative</p>
         </div>
       </div>
     </div>

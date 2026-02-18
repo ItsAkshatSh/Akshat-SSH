@@ -13,7 +13,6 @@ export default function BlogIndex({ posts }) {
 
       <div className="min-h-screen bg-[#0a0a0a] text-neutral-200">
         <div className="max-w-3xl mx-auto px-6 md:px-8 py-16 md:py-24">
-          {/* Header */}
           <div className="mb-16">
             <Link
               href="/"
@@ -27,7 +26,6 @@ export default function BlogIndex({ posts }) {
             <div className="h-px w-24 bg-neutral-800"></div>
           </div>
 
-          {/* Posts list */}
           <div className="space-y-12">
             {posts.length === 0 ? (
               <div className="text-neutral-500 text-lg">

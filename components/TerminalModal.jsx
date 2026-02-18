@@ -17,6 +17,16 @@ const TerminalModal = ({ onClose, onNavigate }) => {
     if (bottomRef.current) bottomRef.current.scrollIntoView({ behavior: 'smooth' });
   }, [history, isSnakeActive]);
 
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key !== 'Escape') return;
+      if (isSnakeActive) setIsSnakeActive(false);
+      else onClose();
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isSnakeActive, onClose]);
+
   const handleCommand = (e) => {
     if (e.key === 'Enter') {
       const rawCmd = input.trim();
@@ -93,18 +103,18 @@ const TerminalModal = ({ onClose, onNavigate }) => {
   };
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4" onClick={onClose}>
+    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/85 backdrop-blur-md p-4" onClick={onClose}>
       <div 
-        className="w-full max-w-2xl bg-[#0c0c0c] border border-neutral-800 rounded-md shadow-2xl overflow-hidden flex flex-col font-mono text-sm h-[500px]"
+        className="w-full max-w-2xl bg-surface-overlay border border-white/[0.08] rounded-xl shadow-2xl overflow-hidden flex flex-col font-mono text-sm h-[500px]"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="bg-neutral-900 p-2 flex items-center justify-between border-b border-neutral-800 select-none flex-shrink-0">
+        <div className="bg-white/[0.04] px-4 py-3 flex items-center justify-between border-b border-white/[0.06] select-none flex-shrink-0">
            <div className="flex gap-2">
-             <div className="w-3 h-3 rounded-full bg-red-500/50 cursor-none hover:bg-red-500" onClick={onClose} />
-             <div className="w-3 h-3 rounded-full bg-yellow-500/50" />
-             <div className="w-3 h-3 rounded-full bg-green-500/50" />
+             <div className="w-3 h-3 rounded-full bg-red-500/60 cursor-none hover:bg-red-500 transition-colors duration-200" onClick={onClose} />
+             <div className="w-3 h-3 rounded-full bg-yellow-500/60" />
+             <div className="w-3 h-3 rounded-full bg-green-500/60" />
            </div>
-           <div className="text-neutral-500 text-xs">user@akshat.ssh:~</div>
+           <div className="text-neutral-500 text-xs font-medium">user@akshat.ssh:~</div>
            <div className="w-10" />
         </div>
 

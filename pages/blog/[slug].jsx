@@ -27,7 +27,6 @@ export default function BlogPost({ post }) {
 
       <div className="min-h-screen bg-[#0a0a0a] text-neutral-200">
         <article className="max-w-3xl mx-auto px-6 md:px-8 py-16 md:py-24">
-          {/* Navigation */}
           <Link
             href="/blog"
             className="inline-flex items-center text-neutral-500 hover:text-neutral-300 transition-colors mb-12 text-sm"
@@ -35,7 +34,6 @@ export default function BlogPost({ post }) {
             ← Back to blog
           </Link>
 
-          {/* Header */}
           <header className="mb-12 space-y-4">
             {post.date && (
               <time
@@ -63,12 +61,10 @@ export default function BlogPost({ post }) {
             <div className="h-px w-24 bg-neutral-800 mt-8"></div>
           </header>
 
-          {/* Content */}
           <div className="prose-wrapper">
             <MarkdownContent content={post.content} />
           </div>
 
-          {/* Footer */}
           <footer className="mt-16 pt-8 border-t border-neutral-800">
             <Link
               href="/blog"

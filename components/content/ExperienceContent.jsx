@@ -70,7 +70,7 @@ const ExperienceContent = () => {
   return (
     <div className="relative space-y-12">
       <section>
-        <h3 className="text-2xl font-light uppercase tracking-widest text-white mb-6 border-b border-neutral-700 pb-3">Education</h3>
+        <h3 className="text-xl font-light uppercase tracking-[0.2em] text-neutral-100 mb-6 pb-3 border-b border-white/[0.08]">Education</h3>
         {education.map((edu, i) => (
           <StaggerItem key={i} index={i} className="mb-6">
             <div className="interactive group">
@@ -83,7 +83,7 @@ const ExperienceContent = () => {
       </section>
 
       <section>
-        <h3 className="text-2xl font-light uppercase tracking-widest text-white mb-6 border-b border-neutral-700 pb-3">Work Experience</h3>
+        <h3 className="text-xl font-light uppercase tracking-[0.2em] text-neutral-100 mb-6 pb-3 border-b border-white/[0.08]">Work Experience</h3>
         {jobs.map((job, i) => (
           <StaggerItem key={i} index={i} className="mb-8">
             <div className="interactive group">
@@ -94,11 +94,11 @@ const ExperienceContent = () => {
                 </div>
                 <span className="text-neutral-600 text-xs whitespace-nowrap ml-4">{job.time}</span>
               </div>
-              <ul className="text-neutral-400 text-sm space-y-2 mt-3 ml-4">
+              <ul className="text-neutral-400 text-sm space-y-2.5 mt-3 ml-4">
                 {job.bullets.map((bullet, bi) => (
                   <li key={bi} className="flex gap-3">
-                    <span className="text-green-400 flex-shrink-0">→</span>
-                    <span>{bullet}</span>
+                    <span className="text-cyan-400/80 flex-shrink-0 mt-0.5">→</span>
+                    <span className="leading-relaxed">{bullet}</span>
                   </li>
                 ))}
               </ul>
@@ -108,10 +108,10 @@ const ExperienceContent = () => {
       </section>
 
       <section>
-        <h3 className="text-2xl font-light uppercase tracking-widest text-white mb-6 border-b border-neutral-700 pb-3">Skills</h3>
+        <h3 className="text-xl font-light uppercase tracking-[0.2em] text-neutral-100 mb-6 pb-3 border-b border-white/[0.08]">Skills</h3>
         <div className="flex flex-wrap gap-2">
           {skills.map((skill, i) => (
-            <span key={i} className="text-[11px] border border-neutral-600 bg-neutral-900/50 px-3 py-1 text-neutral-300 font-mono hover:border-neutral-400 transition-colors">
+            <span key={i} className="text-[11px] border border-white/[0.08] bg-white/[0.02] px-3 py-1.5 rounded text-neutral-400 font-mono hover:border-white/[0.15] hover:text-neutral-300 transition-colors duration-300">
               {skill}
             </span>
           ))}
@@ -119,12 +119,12 @@ const ExperienceContent = () => {
       </section>
 
       <section>
-        <h3 className="text-2xl font-light uppercase tracking-widest text-white mb-6 border-b border-neutral-700 pb-3">Accomplishments</h3>
+        <h3 className="text-xl font-light uppercase tracking-[0.2em] text-neutral-100 mb-6 pb-3 border-b border-white/[0.08]">Accomplishments</h3>
         <ul className="space-y-4">
           {accomplishments.map((acc, i) => (
             <StaggerItem key={i} index={i}>
               <li className="flex gap-3 text-neutral-400 text-sm leading-relaxed group interactive">
-                <span className="text-green-400 flex-shrink-0 mt-1">✦</span>
+                <span className="text-cyan-400/70 flex-shrink-0 mt-1">✦</span>
                 <span className="group-hover:text-neutral-300 transition-colors">{acc}</span>
               </li>
             </StaggerItem>
@@ -132,18 +132,18 @@ const ExperienceContent = () => {
         </ul>
       </section>
 
-      <section className="border-t border-neutral-800 pt-8">
-        <h3 className="text-2xl font-light uppercase tracking-widest text-white mb-6">Links</h3>
-        <div className="space-y-2">
+      <section className="border-t border-white/[0.06] pt-8">
+        <h3 className="text-xl font-light uppercase tracking-[0.2em] text-neutral-100 mb-6">Links</h3>
+        <div className="space-y-3">
           {socials.map((social, i) => (
             <a 
               key={i}
               href={social.url} 
               target="_blank" 
               rel="noopener noreferrer"
-              className="block text-green-400 hover:text-green-300 text-sm transition-colors"
+              className="inline-flex items-center gap-2 text-cyan-400/90 hover:text-cyan-300 text-sm transition-colors duration-300 group"
             >
-              {social.label} ↗
+              {social.label} <span className="group-hover:translate-x-0.5 transition-transform">↗</span>
             </a>
           ))}
         </div>
