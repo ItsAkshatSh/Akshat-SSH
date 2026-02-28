@@ -23,13 +23,19 @@ const BlogWindow = ({ onClose }) => {
 
   useEffect(() => {
     fetch('/api/blog/posts')
-      .then((res) => res.json())
+      .then((res) => {
+        if (!res.ok) {
+          throw new Error(`HTTP ${res.status}`);
+        }
+        return res.json();
+      })
       .then((data) => {
-        setPosts(data);
+        setPosts(Array.isArray(data) ? data : []);
         setLoading(false);
       })
       .catch((err) => {
         console.error('Error fetching posts:', err);
+        setPosts([]);
         setLoading(false);
       });
   }, []);

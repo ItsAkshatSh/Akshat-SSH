@@ -89,8 +89,6 @@ export default function BlogIndex({ posts }) {
 export async function getStaticProps() {
   const posts = getAllPosts();
   return {
-    props: {
-      posts,
-    },
+    props: { posts },
   };
 }

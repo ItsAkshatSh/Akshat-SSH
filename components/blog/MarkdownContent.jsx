@@ -10,11 +10,11 @@ const MarkdownContent = ({ content }) => {
             const src = props.src;
             if (src?.startsWith('/') || src?.startsWith('http')) {
               return (
-                <span className="block my-8 -mx-4 md:-mx-8 lg:-mx-16">
+                <span className="block my-6 -mx-4 md:-mx-8 lg:-mx-16 flex justify-center">
                   <img
                     {...props}
                     alt={props.alt || ''}
-                    className="w-full h-auto rounded-lg"
+                    className="max-w-md w-full h-auto rounded-lg"
                   />
                 </span>
               );
