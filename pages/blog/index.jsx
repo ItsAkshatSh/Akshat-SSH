@@ -39,6 +39,13 @@ export default function BlogIndex({ posts }) {
                 >
                   <Link href={`/blog/${post.slug}`}>
                     <div className="space-y-3">
+                      {post.image && (
+                        <img
+                          src={post.image}
+                          alt={post.title}
+                          className="w-full h-48 object-cover rounded-md mb-3"
+                        />
+                      )}
                       {post.date && (
                         <time
                           dateTime={post.date}
@@ -87,6 +94,3 @@ export async function getStaticProps() {
     },
   };
 }
-
-
-
