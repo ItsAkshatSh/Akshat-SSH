@@ -24,7 +24,7 @@ const MarkdownContent = ({ content }) => {
           a: ({ node, ...props }) => (
             <a
               {...props}
-              className="text-cyan-400 hover:text-cyan-300 underline underline-offset-4 decoration-cyan-400/50 hover:decoration-cyan-300 transition-colors"
+              className="text-neutral-200 hover:text-white underline underline-offset-4 decoration-white/30 hover:decoration-white/60 transition-colors"
               target={props.href?.startsWith('http') ? '_blank' : undefined}
               rel={props.href?.startsWith('http') ? 'noopener noreferrer' : undefined}
             />
@@ -38,7 +38,7 @@ const MarkdownContent = ({ content }) => {
                 </code>
               </pre>
             ) : (
-              <code className="bg-neutral-900/50 text-cyan-400 px-1.5 py-0.5 rounded text-sm" {...props}>
+              <code className="bg-neutral-900/50 text-neutral-200 px-1.5 py-0.5 rounded text-sm" {...props}>
                 {children}
               </code>
             );

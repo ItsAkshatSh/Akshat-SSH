@@ -1,25 +1,58 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Github, Instagram, Linkedin, Terminal, Cpu } from 'lucide-react';
-import { X } from 'lucide-react';
+import { Github, Instagram, Linkedin, Terminal, ArrowUpRight, FolderGit2, Camera, Briefcase, PenLine, X } from 'lucide-react';
 
 import ScrambleText from './utilities/ScrambleText';
-import MagneticButton from './utilities/MagneticButton';
-import StaggerItem from './utilities/StaggerItem';
 import InfoCard from './utilities/InfoCard';
 
 import StarField from './StarField';
-import SnakeGame from './SnakeGame';
-import TerminalModal from './TerminalModal';
+import TerminalWindow from './TerminalWindow';
 import BlogWindow from './blog/BlogWindow';
 
 import ProjectsContent from './content/ProjectsContent';
 import PhotographyContent from './content/PhotographyContent';
+import PhotographyLightbox from './content/PhotographyLightbox';
 import ExperienceContent from './content/ExperienceContent';
+
+const NavCard = ({ item, index, onClick, hoveredKey, onHover, onLeave, compact = false }) => (
+  <button
+    onClick={onClick}
+    onMouseEnter={() => onHover?.(item.key)}
+    onMouseLeave={() => onLeave?.()}
+    aria-label={`${item.label} — ${item.desc}`}
+    className={`interactive group w-full text-left rounded-2xl border border-white/[0.08] bg-white/[0.02] hover:border-white/20 hover:bg-white/[0.05] transition-all duration-300 ease-premium ${
+      compact ? 'px-5 py-4 min-h-[64px]' : 'px-6 py-5 min-h-[88px]'
+    }`}
+    style={{
+      opacity: 0,
+      animation: `slideUpFade 0.55s cubic-bezier(0.16, 1, 0.3, 1) forwards ${index * 0.07 + 0.15}s`,
+    }}
+  >
+    <div className="flex items-center gap-4">
+      <span className={`flex shrink-0 items-center justify-center rounded-xl border border-white/[0.08] bg-white/[0.03] text-neutral-300 group-hover:border-white/20 group-hover:text-white transition-colors duration-300 ${
+        compact ? 'w-11 h-11' : 'w-12 h-12'
+      }`}>
+        <item.Icon size={compact ? 20 : 22} strokeWidth={1.5} />
+      </span>
+      <span className="flex-1 min-w-0">
+        <span className={`block text-white font-medium tracking-tight ${compact ? 'text-lg' : 'text-xl'}`}>
+          <span className="text-neutral-500 font-mono text-[11px] mr-2 align-middle">{`0${index + 1}`}</span>
+          <ScrambleText text={item.label} active={hoveredKey === item.key} />
+        </span>
+        <span className={`block text-neutral-400 mt-0.5 truncate ${compact ? 'text-[13px]' : 'text-sm'}`}>
+          {item.desc}
+        </span>
+      </span>
+      <ArrowUpRight
+        size={compact ? 18 : 20}
+        className="shrink-0 text-neutral-600 group-hover:text-white group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all duration-300"
+      />
+    </div>
+  </button>
+);
 
 const App = () => {
   const cursorRef = useRef(null);
   const mousePosRef = useRef({ x: 0, y: 0 });
-  const statsRef = useRef(null);
   const cursorPosRef = useRef({ x: 0, y: 0 });
   const lockCenterRef = useRef(null);
   const lockedElementRef = useRef(null);
@@ -35,25 +68,39 @@ const App = () => {
       };
     }
   };
-  
+
   const [cursorState, setCursorState] = useState({
     active: false,
-    width: 40,
-    height: 40,
+    width: 32,
+    height: 32,
     borderRadius: '50%',
   });
-  const [displayCursor, setDisplayCursor] = useState({ width: 40, height: 40, borderRadius: '50%', rotate: 45 });
-  const [time, setTime] = useState(new Date());
+  const [displayCursor, setDisplayCursor] = useState({ width: 32, height: 32, borderRadius: '50%' });
   const [activeSection, setActiveSection] = useState(null);
   const [hoveredNav, setHoveredNav] = useState(null);
   const [isTerminalOpen, setIsTerminalOpen] = useState(false);
   const [isBlogOpen, setIsBlogOpen] = useState(false);
   const [showInfoCard, setShowInfoCard] = useState(false);
   const [selectedImg, setSelectedImg] = useState(null);
+  const [isFinePointer, setIsFinePointer] = useState(false);
+  const [contentIn, setContentIn] = useState(false);
 
   useEffect(() => {
-    const timer = setInterval(() => setTime(new Date()), 1000);
-    return () => clearInterval(timer);
+    const t = setTimeout(() => setContentIn(true), 60);
+    return () => clearTimeout(t);
+  }, []);
+
+  useEffect(() => {
+    if (activeSection !== 'photography') setSelectedImg(null);
+  }, [activeSection]);
+
+  useEffect(() => {
+    if (typeof window === 'undefined' || !window.matchMedia) return;
+    const mq = window.matchMedia('(hover: hover) and (pointer: fine)');
+    const update = () => setIsFinePointer(mq.matches);
+    update();
+    mq.addEventListener?.('change', update);
+    return () => mq.removeEventListener?.('change', update);
   }, []);
 
   useEffect(() => {
@@ -69,17 +116,16 @@ const App = () => {
   }, [selectedImg, isBlogOpen, isTerminalOpen, activeSection]);
 
   useEffect(() => {
+    if (!isFinePointer) return;
     const handleMouseMove = (e) => {
       mousePosRef.current = { x: e.clientX, y: e.clientY };
-      if (statsRef.current && Math.random() < 0.1) {
-        statsRef.current.textContent = `SYS.coords: ${e.clientX}, ${e.clientY}`;
-      }
     };
     window.addEventListener('mousemove', handleMouseMove, { passive: true });
     return () => window.removeEventListener('mousemove', handleMouseMove);
-  }, []);
+  }, [isFinePointer]);
 
   useEffect(() => {
+    if (!isFinePointer) return;
     const handleMouseOver = (e) => {
       const target = e.target.closest('button, a, input, .interactive');
       if (target) {
@@ -88,11 +134,11 @@ const App = () => {
         const centerY = rect.top + rect.height / 2;
         setCursorState({
           active: true,
-          width: rect.width + 20,
-          height: rect.height + 20,
+          width: rect.width + 16,
+          height: rect.height + 16,
           x: centerX,
           y: centerY,
-          borderRadius: getComputedStyle(target).borderRadius || '8px',
+          borderRadius: getComputedStyle(target).borderRadius || '12px',
         });
         lockCenterRef.current = { x: centerX, y: centerY };
         lockedElementRef.current = target;
@@ -104,29 +150,29 @@ const App = () => {
     };
     document.addEventListener('mouseover', handleMouseOver, { passive: true });
     return () => document.removeEventListener('mouseover', handleMouseOver);
-  }, []);
+  }, [isFinePointer]);
 
   useEffect(() => {
     setDisplayCursor({
-      width: cursorState.active ? cursorState.width : 40,
-      height: cursorState.active ? cursorState.height : 40,
+      width: cursorState.active ? cursorState.width : 32,
+      height: cursorState.active ? cursorState.height : 32,
       borderRadius: cursorState.active ? cursorState.borderRadius : '50%',
-      rotate: cursorState.active ? 0 : 45,
     });
   }, [cursorState.active, cursorState.width, cursorState.height, cursorState.borderRadius]);
 
   useEffect(() => {
+    if (!isFinePointer) return;
     const LERP = 0.18;
     const LOCK_BLEND = 0.12;
     const ease = 1 - Math.pow(1 - LERP, 1.5);
-    
+
     const animate = () => {
       const mouse = mousePosRef.current;
       const lock = lockCenterRef.current;
       const target = lock
         ? { x: lock.x + (mouse.x - lock.x) * LOCK_BLEND, y: lock.y + (mouse.y - lock.y) * LOCK_BLEND }
         : { x: mouse.x, y: mouse.y };
-      
+
       const current = cursorPosRef.current;
       cursorPosRef.current = {
         x: current.x + (target.x - current.x) * ease,
@@ -137,206 +183,308 @@ const App = () => {
       }
       rafRef.current = requestAnimationFrame(animate);
     };
-    
+
     cursorPosRef.current = { ...mousePosRef.current };
     rafRef.current = requestAnimationFrame(animate);
-    
+
     return () => {
       if (rafRef.current) cancelAnimationFrame(rafRef.current);
     };
-  }, []);
+  }, [isFinePointer]);
 
+  const navItems = [
+    {
+      label: 'Projects',
+      key: 'projects',
+      desc: 'Software, hardware & games',
+      Icon: FolderGit2,
+      onClick: () => setActiveSection('projects'),
+    },
+    {
+      label: 'Photography',
+      key: 'photography',
+      desc: 'Moments through my lens',
+      Icon: Camera,
+      onClick: () => setActiveSection('photography'),
+    },
+    {
+      label: 'Experience',
+      key: 'experience',
+      desc: 'Work, education & wins',
+      Icon: Briefcase,
+      onClick: () => setActiveSection('experience'),
+    },
+    {
+      label: 'Blog',
+      key: 'blog',
+      desc: 'Notes, stories & writing',
+      Icon: PenLine,
+      onClick: () => setIsBlogOpen(true),
+    },
+  ];
 
+  const socials = [
+    { label: 'GitHub', href: 'https://github.com/ItsAkshatSh', Icon: Github },
+    { label: 'Instagram', href: 'https://www.instagram.com/akshat.ssh/', Icon: Instagram },
+    { label: 'LinkedIn', href: 'https://www.linkedin.com/in/akshat404/', Icon: Linkedin },
+  ];
+
+  const sectionTitle = activeSection
+    ? navItems.find((n) => n.key === activeSection)?.label ?? activeSection
+    : '';
 
   return (
-    <div className="min-h-screen bg-[#0a0a0a] text-neutral-200 overflow-hidden font-mono selection:bg-[#ffffff] selection:text-black relative cursor-none">
-      
+    <div className={`min-h-screen bg-[#070707] text-neutral-200 overflow-x-hidden relative ${isFinePointer ? 'cursor-fine-none' : ''}`}>
       <StarField />
-      <div className="fixed inset-0 opacity-[0.03] pointer-events-none z-0 mix-blend-overlay" 
-           style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")` }}>
-      </div>
 
-      <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Silkscreen&display=swap');
-        @keyframes slideUpFade {
-          0% { opacity: 0; transform: translateY(24px); }
-          100% { opacity: 1; transform: translateY(0); }
-        }
-        @keyframes slideInRight {
-          0% { opacity: 0; transform: translateX(24px); }
-          100% { opacity: 1; transform: translateX(0); }
-        }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        @keyframes fadeIn { 0% { opacity: 0; } 100% { opacity: 1; } }
-        ::-webkit-scrollbar { width: 0px; }
-        .scanline { background: linear-gradient(to bottom, transparent 50%, rgba(0, 0, 0, 0.4) 51%); background-size: 100% 4px; }
-      `}</style>
+      {/* Ambient background */}
+      <div
+        className="fixed inset-0 z-0 pointer-events-none"
+        style={{
+          background: 'radial-gradient(ellipse 80% 60% at 50% 0%, rgba(255,255,255,0.03) 0%, transparent 60%), radial-gradient(ellipse 60% 50% at 80% 100%, rgba(255,255,255,0.02) 0%, transparent 50%)',
+        }}
+      />
+      <div
+        className="fixed inset-0 z-0 pointer-events-none"
+        style={{ background: 'radial-gradient(circle at 50% 50%, transparent 40%, rgba(0,0,0,0.4) 100%)' }}
+      />
 
-      <div className="fixed top-8 left-8 z-30 mix-blend-difference select-none pointer-events-none">
-         <h1 
-           className="text-3xl md:text-4xl text-white tracking-tighter opacity-90"
-           style={{ fontFamily: '"Silkscreen", cursive' }}
-         >
-           akshat.ssh<span className="text-white-500 animate-pulse">_</span>
-         </h1>
-      </div>
+      {/* Header */}
+      <header className="fixed top-0 inset-x-0 z-30 px-6 md:px-10 py-6 md:py-8 flex items-center justify-between pointer-events-none">
+        <div className="select-none">
+          <h1 className="font-display text-xl md:text-2xl text-white tracking-tight">
+            akshat.ssh<span className="text-neutral-500 animate-pulse">_</span>
+          </h1>
+          <p className="hidden sm:block mt-1 text-[11px] tracking-[0.28em] uppercase text-neutral-500 font-mono">
+            Developer · Dubai
+          </p>
+        </div>
 
-       <div
-         ref={cursorRef}
-         className="fixed pointer-events-none z-[200] mix-blend-exclusion will-change-transform"
-         style={{
-           left: 0,
-           top: 0,
-           transform: 'translate(-50%, -50%)',
-         }}
-       >
-        <div className={`absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-1 h-1 bg-white rounded-full transition-opacity duration-300 ease-out ${cursorState.active ? 'opacity-0' : 'opacity-100'}`} />
+        <div className="pointer-events-auto hidden md:flex items-center gap-2">
+          {socials.map(({ label, href, Icon }) => (
+            <a
+              key={label}
+              href={href}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label={label}
+              className="interactive flex items-center justify-center w-10 h-10 rounded-xl border border-white/[0.06] text-neutral-400 hover:text-white hover:border-white/15 hover:bg-white/[0.04] transition-all duration-300"
+            >
+              <Icon size={18} strokeWidth={1.5} />
+            </a>
+          ))}
+        </div>
+      </header>
+
+      {/* Custom cursor */}
+      {isFinePointer && (
         <div
-          className="border-[1px] border-white"
-          style={{
-            width: `${displayCursor.width}px`,
-            height: `${displayCursor.height}px`,
-            borderRadius: displayCursor.borderRadius,
-            transform: `rotate(${displayCursor.rotate}deg)`,
-            borderStyle: cursorState.active ? 'solid' : 'dotted',
-            animation: !cursorState.active ? 'spin 8s linear infinite' : 'none',
-            transition: 'width 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), height 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), border-radius 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), border-style 0.3s ease-out',
-          }}
-        />
-      </div>
+          ref={cursorRef}
+          className="fixed pointer-events-none z-[200] will-change-transform hidden lg:block"
+          style={{ left: 0, top: 0, transform: 'translate(-50%, -50%)' }}
+        >
+          <div className={`absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-1 h-1 bg-white rounded-full transition-opacity duration-300 ${cursorState.active ? 'opacity-0' : 'opacity-100'}`} />
+          <div
+            className="border border-white/40"
+            style={{
+              width: `${displayCursor.width}px`,
+              height: `${displayCursor.height}px`,
+              borderRadius: displayCursor.borderRadius,
+              transition: 'width 0.35s cubic-bezier(0.16, 1, 0.3, 1), height 0.35s cubic-bezier(0.16, 1, 0.3, 1), border-radius 0.35s cubic-bezier(0.16, 1, 0.3, 1)',
+              opacity: cursorState.active ? 0.9 : 0.5,
+            }}
+          />
+        </div>
+      )}
 
-      <main className={`relative z-10 w-full h-screen flex items-center justify-center transition-all duration-700 ease-premium ${activeSection ? 'opacity-[0.03] blur-md scale-[0.98] pointer-events-none' : 'opacity-100 blur-0 scale-100'}`}>
-        
-        <div className="relative w-[800px] h-[600px] max-w-full flex items-center">
-          <div className="interactive relative z-10 group w-[300px] h-[400px] flex-shrink-0 grayscale hover:grayscale-0 transition-all duration-600 ease-premium overflow-visible" onMouseEnter={() => setShowInfoCard(true)} onMouseLeave={() => setShowInfoCard(false)}>
-            <div className="w-full h-full bg-[#050505] border border-white/[0.08] overflow-hidden flex items-center justify-center relative rounded-lg group-hover:border-white/20 group-hover:shadow-glow-soft transition-all duration-500">
-               <img 
-                  src="/images/ascii/ascii.png"
-                  alt="ASCII Art" 
-                  className="w-full h-full object-cover opacity-60 mix-blend-hard-light transition-opacity duration-500"
-               />
-               <div className="absolute inset-0 scanline opacity-20 pointer-events-none"></div>
+      <main
+        className={`relative z-10 w-full min-h-screen flex items-center justify-center px-6 md:px-10 py-28 md:py-24 transition-all duration-500 ease-premium ${
+          activeSection ? 'opacity-[0.15] blur-sm scale-[0.99] pointer-events-none' : 'opacity-100 blur-0 scale-100'
+        }`}
+      >
+        <div
+          className={`w-full max-w-6xl grid lg:grid-cols-[minmax(260px,320px)_1fr] gap-10 lg:gap-16 xl:gap-20 items-center transition-all duration-700 ease-premium ${
+            contentIn ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-3'
+          }`}
+        >
+          {/* Portrait column */}
+          <div
+            className="interactive relative mx-auto lg:mx-0 w-full max-w-[280px] lg:max-w-none group"
+            onMouseEnter={() => setShowInfoCard(true)}
+            onMouseLeave={() => setShowInfoCard(false)}
+            style={{
+              opacity: 0,
+              animation: 'slideUpFade 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards 0.05s',
+            }}
+          >
+            <div className="absolute -inset-8 bg-white/[0.03] blur-[50px] rounded-full pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
+            <div className="relative aspect-[3/4] rounded-2xl overflow-hidden border border-white/[0.08] bg-[#0c0c0c] shadow-card group-hover:border-white/15 group-hover:shadow-card-hover transition-all duration-500">
+              <img
+                src="/images/ascii/ascii.png"
+                alt="Portrait of Akshat Sharma"
+                className="w-full h-full object-cover opacity-80 group-hover:opacity-95 transition-opacity duration-500"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent pointer-events-none" />
+              <div className="absolute bottom-4 left-4 right-4">
+                <p className="text-[11px] font-mono uppercase tracking-[0.2em] text-white/60 group-hover:text-white/90 transition-colors">
+                  Dubai, UAE
+                </p>
+              </div>
             </div>
-
             <InfoCard isVisible={showInfoCard} />
           </div>
 
-          <div className="absolute left-[280px] top-1/2 -translate-y-1/2 w-[400px] h-[400px] pointer-events-none">
-            <svg className="absolute inset-0 w-full h-full opacity-10 animate-pulse" style={{ animationDuration: '4s' }} viewBox="0 0 400 400">
-               <circle cx="200" cy="200" r="150" stroke="currentColor" fill="none" strokeWidth="0.5" />
-               <circle cx="200" cy="200" r="100" stroke="currentColor" fill="none" strokeDasharray="2 4" strokeWidth="0.5" />
-            </svg>
+          {/* Content column */}
+          <div className="flex flex-col gap-8 lg:gap-10">
+            <header
+              style={{
+                opacity: 0,
+                animation: 'slideUpFade 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards 0.1s',
+              }}
+            >
+              <p className="text-neutral-500 text-xs font-mono uppercase tracking-[0.3em] mb-4">
+                Developer & Creative
+              </p>
+              <h2 className="text-3xl sm:text-4xl lg:text-[2.75rem] leading-[1.12] font-medium text-white tracking-tight text-balance mb-4">
+                Hi, I'm Akshat Sharma.
+              </h2>
+              <p className="text-neutral-400 text-base sm:text-lg leading-relaxed max-w-xl text-balance">
+                I build software, hardware and games — voice assistants, custom macropads,
+                deep-learning projects and more.
+              </p>
+            </header>
 
-            {['Projects', 'Photography', 'Experience', 'Blog'].map((item, index) => {
-               const positions = [
-                  'top-[50px] left-[120px]',
-                  'top-[130px] -translate-y-1/2 right-[-35px]',
-                  'bottom-[50px] left-[120px]',
-                  'top-[235px] -translate-y-1/2 right-[50px]'
-               ];
-               const isBlog = item === 'Blog';
-               return (
-                <MagneticButton 
-                  key={item}
-                  onClick={() => isBlog ? setIsBlogOpen(true) : setActiveSection(item.toLowerCase())}
-                  className={`interactive pointer-events-auto absolute ${positions[index]} group flex items-center gap-4 transition-all duration-300`}
-                >
-                   <div className="w-2 h-2 rounded-full bg-neutral-600 group-hover:bg-cyan-400 group-hover:shadow-[0_0_8px_rgba(6,182,212,0.5)] transition-all duration-300" />
-                   <div 
-                     className="text-2xl font-light tracking-tighter uppercase"
-                     onMouseEnter={() => setHoveredNav(item.toLowerCase())}
-                     onMouseLeave={() => setHoveredNav(null)}
-                   >
-                     <ScrambleText text={item} active={hoveredNav === item.toLowerCase()} />
-                   </div>
-                </MagneticButton>
-               )
-            })}
+            <nav aria-label="Primary" className="grid sm:grid-cols-2 gap-3">
+              {navItems.map((item, index) => (
+                <NavCard
+                  key={item.key}
+                  item={item}
+                  index={index}
+                  onClick={item.onClick}
+                  hoveredKey={hoveredNav}
+                  onHover={setHoveredNav}
+                  onLeave={() => setHoveredNav(null)}
+                />
+              ))}
+            </nav>
+
+            <div
+              className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3"
+              style={{
+                opacity: 0,
+                animation: 'slideUpFade 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards 0.45s',
+              }}
+            >
+              <button
+                onClick={() => setIsTerminalOpen(true)}
+                className="interactive group flex items-center gap-3 rounded-2xl border border-white/[0.08] bg-white/[0.02] px-5 py-3.5 hover:border-accent-green/30 hover:bg-white/[0.04] transition-all duration-300"
+              >
+                <Terminal size={18} className="text-accent-green shrink-0" />
+                <span className="text-sm text-neutral-300 group-hover:text-white transition-colors">Open shell</span>
+                <span className="ml-auto text-[11px] text-neutral-600 font-mono hidden sm:inline">help</span>
+              </button>
+
+              <div className="flex md:hidden items-center gap-2">
+                {socials.map(({ label, href, Icon }) => (
+                  <a
+                    key={label}
+                    href={href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label={label}
+                    className="interactive flex flex-1 items-center justify-center h-12 rounded-xl border border-white/[0.08] text-neutral-400 hover:text-white hover:border-white/15 transition-all duration-300"
+                  >
+                    <Icon size={20} strokeWidth={1.5} />
+                  </a>
+                ))}
+              </div>
+            </div>
           </div>
-        </div>
-
-        <div className="fixed bottom-8 left-8 z-10 flex flex-col gap-2 text-[10px] text-neutral-500 tracking-widest font-medium">
-           <button 
-             onClick={() => setIsTerminalOpen(true)}
-             className="interactive flex items-center gap-2.5 hover:text-accent-green transition-colors duration-300 text-left group/terminal"
-           >
-             <Terminal size={12} className="opacity-60 group-hover/terminal:opacity-100 transition-opacity" />
-             <span ref={statsRef} className="font-mono text-neutral-600 group-hover/terminal:text-neutral-400">SYS.coords: 0, 0</span>
-             <span className="ml-1 text-[9px] opacity-40 group-hover/terminal:opacity-60 transition-opacity">open shell</span>
-           </button>
-           <div className="flex items-center gap-2.5 text-neutral-600">
-             <Cpu size={12} className="opacity-60" />
-             <span className="font-mono">MEM: {Math.floor(mousePosRef.current.x / 20)} MB</span>
-           </div>
-        </div>
-        
-        <div className="fixed bottom-8 right-8 flex flex-col gap-5 z-10">
-          <a href="https://github.com/ItsAkshatSh" target="_blank" rel="noopener noreferrer" className="interactive text-neutral-500 hover:text-white transition-all duration-300 opacity-80 hover:opacity-100 hover:-translate-y-0.5" aria-label="GitHub"><Github size={22} strokeWidth={1.5} /></a>
-          <a href="https://www.instagram.com/akshat.ssh/" target="_blank" rel="noopener noreferrer" className="interactive text-neutral-500 hover:text-white transition-all duration-300 opacity-80 hover:opacity-100 hover:-translate-y-0.5" aria-label="Instagram"><Instagram size={22} strokeWidth={1.5} /></a>
-          <a href="https://www.linkedin.com/in/akshat404/" target="_blank" rel="noopener noreferrer" className="interactive text-neutral-500 hover:text-white transition-all duration-300 opacity-80 hover:opacity-100 hover:-translate-y-0.5" aria-label="LinkedIn"><Linkedin size={22} strokeWidth={1.5} /></a>
         </div>
       </main>
 
+      {/* Footer */}
+      <footer className="fixed bottom-0 inset-x-0 z-20 px-6 md:px-10 py-5 flex items-center justify-between pointer-events-none">
+        <p className="text-[11px] text-neutral-600 font-mono hidden sm:block">
+          © {new Date().getFullYear()} Akshat Sharma
+        </p>
+        <p className="text-[11px] text-neutral-600 font-mono sm:hidden">
+          Dubai, UAE
+        </p>
+        <p className="text-[11px] text-neutral-600 font-mono hidden md:block">
+          Press <kbd className="px-1.5 py-0.5 rounded bg-white/[0.06] text-neutral-400">esc</kbd> to close panels
+        </p>
+      </footer>
+
       {isTerminalOpen && (
-        <TerminalModal 
-          onClose={() => setIsTerminalOpen(false)} 
-          onNavigate={setActiveSection} 
+        <>
+          <div className="fixed inset-0 z-[99] bg-black/60 backdrop-blur-sm" onClick={() => setIsTerminalOpen(false)} aria-hidden="true" />
+          <TerminalWindow onClose={() => setIsTerminalOpen(false)} onNavigate={setActiveSection} />
+        </>
+      )}
+
+      {selectedImg && (
+        <PhotographyLightbox
+          selectedImg={selectedImg}
+          onClose={() => setSelectedImg(null)}
+          onSelect={setSelectedImg}
         />
       )}
 
       {isBlogOpen && (
         <>
-          <div 
-            className="fixed inset-0 z-[99] cursor-none" 
-            onClick={() => setIsBlogOpen(false)}
-            aria-hidden="true"
-          />
+          <div className="fixed inset-0 z-[99] bg-black/60 backdrop-blur-sm" onClick={() => setIsBlogOpen(false)} aria-hidden="true" />
           <BlogWindow onClose={() => setIsBlogOpen(false)} />
         </>
       )}
 
       {activeSection && (
         <>
-          <div 
-            className="fixed inset-0 z-40 bg-black/70 backdrop-blur-md animate-fade-in cursor-none"
+          <div
+            className="fixed inset-0 z-40 bg-black/70 backdrop-blur-md animate-fade-in"
             onClick={() => setActiveSection(null)}
-            aria-label="Close sidebar"
+            aria-label="Close panel"
           />
-          <div 
-            className="fixed inset-0 z-40 flex items-center justify-end pointer-events-none"
-          >
-            <div 
-              className="w-full md:w-3/4 lg:w-2/3 h-full bg-surface border-l border-white/[0.06] p-8 md:p-16 flex flex-col shadow-2xl pointer-events-auto"
-              style={{ animation: 'slideInRight 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards' }}
-              onClick={(e) => e.stopPropagation()}
-            >
-            <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
-
-            <div className="flex justify-between items-center mb-12 shrink-0">
-              <div>
-                <h2 className="text-4xl md:text-6xl font-light uppercase tracking-tighter text-neutral-100 mb-3">
-                  <ScrambleText text={activeSection} active={true} />
-                </h2>
-                <div className="h-px w-20 bg-gradient-to-r from-cyan-500/40 to-transparent" />
-              </div>
-              <button 
-                onClick={() => setActiveSection(null)}
-                className="interactive p-3 rounded-full hover:bg-white/5 transition-all duration-300 text-neutral-400 hover:text-white hover:rotate-90"
-                aria-label="Close"
-              >
-                <X size={28} strokeWidth={1.5} />
-              </button>
-            </div>
-
+          <div className="fixed inset-0 z-40 flex items-center justify-end pointer-events-none">
             <div
-              onScroll={syncLockPosition}
-              className="flex-1 overflow-y-auto pr-4 custom-scrollbar pb-24"
+              className="w-full md:w-[85%] lg:w-[72%] xl:w-[65%] h-full bg-[#0a0a0a] border-l border-white/[0.06] flex flex-col shadow-2xl pointer-events-auto"
+              style={{ animation: 'slideInRight 0.45s cubic-bezier(0.16, 1, 0.3, 1) forwards' }}
+              onClick={(e) => e.stopPropagation()}
+              role="dialog"
+              aria-modal="true"
+              aria-label={sectionTitle}
             >
-              {activeSection === 'projects' && <ProjectsContent />}
-              {activeSection === 'photography' && <PhotographyContent selectedImg={selectedImg} onCloseImg={() => setSelectedImg(null)} onSelectImg={setSelectedImg} />}
-              {activeSection === 'experience' && <ExperienceContent />}
+              <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-white/10 via-white/5 to-transparent" />
+
+              <div className="flex justify-between items-start gap-4 px-6 sm:px-10 md:px-14 pt-8 md:pt-12 pb-6 shrink-0">
+                <div>
+                  <p className="text-[11px] font-mono uppercase tracking-[0.3em] text-neutral-500 mb-3">
+                    {sectionTitle}
+                  </p>
+                  <h2 className="text-3xl sm:text-4xl md:text-5xl font-medium text-white tracking-tight capitalize">
+                    <ScrambleText text={sectionTitle} active />
+                  </h2>
+                </div>
+                <button
+                  onClick={() => setActiveSection(null)}
+                  className="interactive p-2.5 rounded-xl border border-white/[0.08] text-neutral-400 hover:text-white hover:border-white/15 hover:bg-white/[0.04] transition-all duration-300 shrink-0 mt-1"
+                  aria-label="Close"
+                >
+                  <X size={22} strokeWidth={1.5} />
+                </button>
+              </div>
+
+              <div
+                onScroll={syncLockPosition}
+                className="flex-1 overflow-y-auto px-6 sm:px-10 md:px-14 pb-16 custom-scrollbar"
+              >
+                {activeSection === 'projects' && <ProjectsContent />}
+                {activeSection === 'photography' && (
+                  <PhotographyContent onSelectImg={setSelectedImg} />
+                )}
+                {activeSection === 'experience' && <ExperienceContent />}
+              </div>
             </div>
-          </div>
           </div>
         </>
       )}

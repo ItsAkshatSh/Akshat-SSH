@@ -1,4 +1,5 @@
 import Head from 'next/head';
+import Link from 'next/link';
 import { getAllPosts, getPostContent } from '../../lib/blog';
 import { format } from 'date-fns';
 
@@ -10,16 +11,33 @@ export default function BlogPost({ post }) {
         <meta name="description" content={post.data.excerpt || ''} />
       </Head>
 
-      <article className="prose prose-invert max-w-3xl mx-auto px-6 md:px-8 py-16">
-        <h1>{post.data.title}</h1>
-        {post.data.date && (
-          <time dateTime={post.data.date}>
-            {format(new Date(post.data.date), 'MMMM d, yyyy')}
-          </time>
-        )}
+      <div className="min-h-screen bg-[#0a0a0a] text-neutral-200">
+        <article className="max-w-3xl mx-auto px-6 md:px-8 py-16 md:py-24">
+          <Link
+            href="/blog"
+            className="inline-flex items-center text-neutral-400 hover:text-white transition-colors mb-10 text-sm"
+          >
+            ← All posts
+          </Link>
 
-        <div dangerouslySetInnerHTML={{ __html: post.contentHtml }} />
-      </article>
+          <h1 className="text-3xl md:text-5xl font-light tracking-tight text-neutral-50 mb-3">
+            {post.data.title}
+          </h1>
+          {post.data.date && (
+            <time
+              dateTime={post.data.date}
+              className="block text-sm text-neutral-400 font-mono mb-10"
+            >
+              {format(new Date(post.data.date), 'MMMM d, yyyy')}
+            </time>
+          )}
+
+          <div
+            className="prose-wrapper"
+            dangerouslySetInnerHTML={{ __html: post.contentHtml }}
+          />
+        </article>
+      </div>
     </>
   );
 }

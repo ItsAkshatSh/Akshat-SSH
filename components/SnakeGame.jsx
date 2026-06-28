@@ -130,7 +130,7 @@ const SnakeGame = ({ onExit }) => {
           <p className="text-white mb-4">Final Score: {score}</p>
           <button 
             onClick={onExit}
-            className="px-4 py-2 border border-white hover:bg-white hover:text-black transition-colors font-mono text-xs cursor-none"
+            className="px-4 py-2 border border-white hover:bg-white hover:text-black transition-colors font-mono text-xs"
           >
             EXIT TO SHELL
           </button>

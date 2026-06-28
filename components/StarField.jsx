@@ -17,25 +17,24 @@ const StarField = () => {
 
     const initParticles = () => {
       particles = [];
-      const particleCount = Math.floor((window.innerWidth * window.innerHeight) / 15000); 
-      
+      const particleCount = Math.floor((window.innerWidth * window.innerHeight) / 22000);
+
       for (let i = 0; i < particleCount; i++) {
         particles.push({
           x: Math.random() * canvas.width,
           y: Math.random() * canvas.height,
-          vx: (Math.random() - 0.5) * 0.2,
-          vy: (Math.random() - 0.5) * 0.2,
-          size: Math.random() * 1.2,
-          alpha: Math.random() * 0.5 + 0.1,
-          pulseSpeed: 0.02 
+          vx: (Math.random() - 0.5) * 0.12,
+          vy: (Math.random() - 0.5) * 0.12,
+          size: Math.random() * 0.9 + 0.3,
+          alpha: Math.random() * 0.35 + 0.08,
         });
       }
     };
 
     const render = () => {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
-      
-      particles.forEach(p => {
+
+      particles.forEach((p) => {
         p.x += p.vx;
         p.y += p.vy;
 
@@ -63,7 +62,7 @@ const StarField = () => {
     };
   }, []);
 
-  return <canvas ref={canvasRef} className="fixed inset-0 z-0 pointer-events-none opacity-60 mix-blend-screen" />;
+  return <canvas ref={canvasRef} className="fixed inset-0 z-0 pointer-events-none opacity-40" />;
 };
 
 export default StarField;

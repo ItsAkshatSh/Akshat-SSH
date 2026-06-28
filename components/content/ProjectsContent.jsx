@@ -38,36 +38,36 @@ const ProjectsContent = () => {
   ];
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 pb-8">
       {projects.map((project, i) => (
         <StaggerItem key={project.id} index={i}>
           <a
             href={project.link}
             target="_blank"
             rel="noopener noreferrer"
-            className="interactive group block relative border-l-2 border-neutral-700/80 hover:border-cyan-500/60 pl-6 pr-6 py-6 rounded-r-lg bg-white/[0.02] hover:bg-white/[0.04] transition-all duration-400 ease-premium hover:shadow-glow-soft"
+            className="interactive group block rounded-xl border border-white/[0.06] bg-white/[0.02] p-5 sm:p-6 hover:border-white/12 hover:bg-white/[0.04] transition-all duration-300"
           >
             <div className="flex justify-between items-start gap-4 mb-3">
               <div className="flex-1 min-w-0">
-                <h3 className="text-xl md:text-2xl text-neutral-200 font-light group-hover:text-white transition-colors duration-300">
+                <h3 className="text-lg sm:text-xl text-white font-medium group-hover:text-neutral-100 transition-colors duration-300">
                   {project.title}
                 </h3>
-                <p className="text-neutral-600 text-xs mt-1">{project.date}</p>
+                <p className="text-neutral-500 text-xs mt-1.5 font-mono">{project.date}</p>
               </div>
-              <span className="text-cyan-400/90 text-xs whitespace-nowrap font-mono flex items-center gap-1 transition-colors duration-300 opacity-80 group-hover:opacity-100 group-hover:text-cyan-300">
+              <span className="text-neutral-400 text-xs whitespace-nowrap font-mono flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                 github <span className="group-hover:translate-x-0.5 transition-transform">↗</span>
               </span>
             </div>
 
-            <p className="text-neutral-400 leading-relaxed mb-4 font-light text-sm">
+            <p className="text-neutral-400 leading-relaxed mb-4 text-sm">
               {project.desc}
             </p>
 
             <div className="flex flex-wrap gap-2">
-              {project.stack.map(tech => (
-                <span 
-                  key={tech} 
-                  className="text-[10px] border border-white/[0.08] bg-white/[0.03] px-2.5 py-1 rounded text-neutral-400 font-mono uppercase tracking-wider hover:border-white/[0.15] hover:text-neutral-300 transition-colors duration-300"
+              {project.stack.map((tech) => (
+                <span
+                  key={tech}
+                  className="text-[11px] border border-white/[0.08] bg-white/[0.03] px-2.5 py-1 rounded-md text-neutral-400 font-mono"
                 >
                   {tech}
                 </span>

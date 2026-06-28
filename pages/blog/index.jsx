@@ -16,7 +16,7 @@ export default function BlogIndex({ posts }) {
           <div className="mb-16">
             <Link
               href="/"
-              className="inline-flex items-center text-neutral-500 hover:text-neutral-300 transition-colors mb-8 text-sm"
+              className="inline-flex items-center text-neutral-400 hover:text-white transition-colors mb-8 text-sm"
             >
               ← Back home
             </Link>
@@ -49,7 +49,7 @@ export default function BlogIndex({ posts }) {
                       {post.date && (
                         <time
                           dateTime={post.date}
-                          className="text-sm text-neutral-500 font-mono"
+                          className="text-sm text-neutral-400 font-mono"
                         >
                           {format(new Date(post.date), 'MMMM d, yyyy')}
                         </time>
@@ -58,7 +58,7 @@ export default function BlogIndex({ posts }) {
                         {post.title}
                       </h2>
                       {post.excerpt && (
-                        <p className="text-neutral-400 leading-relaxed">
+                        <p className="text-neutral-300 leading-relaxed">
                           {post.excerpt}
                         </p>
                       )}
@@ -67,7 +67,7 @@ export default function BlogIndex({ posts }) {
                           {post.tags.map((tag) => (
                             <span
                               key={tag}
-                              className="text-xs text-neutral-600 border border-neutral-800 px-2 py-1 rounded"
+                              className="text-xs text-neutral-300 border border-neutral-700 px-2 py-1 rounded"
                             >
                               {tag}
                             </span>
