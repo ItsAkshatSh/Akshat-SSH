@@ -11,7 +11,7 @@ const ExperienceContent = () => {
       role: 'Chair of Innovation and Technology',
       company: 'Indian International School',
       location: 'Dubai, UAE',
-      time: 'Dec 2024 → Present',
+      time: 'May 2026 → Present',
       type: 'School leadership',
       bullets: [
         'Pioneered school-wide STEM initiatives, designing advanced technical programs to mentor gifted students.',
@@ -22,7 +22,7 @@ const ExperienceContent = () => {
       role: 'Campfire Host',
       company: 'HackClub',
       location: 'Dubai, UAE',
-      time: 'Dec 2024 → Present',
+      time: 'Feb 2026 → Jul 2026',
       type: 'Community · Volunteer',
       bullets: [
         'Led technical operations for community game-development projects.',
