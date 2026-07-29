@@ -7,7 +7,7 @@ export default function BlogPost({ post }) {
   return (
     <>
       <Head>
-        <title>{post.data.title} — akshat.ssh</title>
+        <title>{post.data.title} · akshat.ssh</title>
         <meta name="description" content={post.data.excerpt || ''} />
       </Head>
 

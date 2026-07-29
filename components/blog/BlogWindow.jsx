@@ -1,43 +1,23 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { X, Minus, ArrowLeft } from 'lucide-react';
+/**
+ * BlogWindow
+ * Full-screen overlay matching the sub-page pattern. Two internal states:
+ * an index of posts and a single-post reader. The header title swaps in
+ * place when a post is opened.
+ */
+import { useState, useEffect } from 'react';
 import { format } from 'date-fns';
 import MarkdownContent from './MarkdownContent';
+import ScrambleText from '../utilities/ScrambleText';
 
 const BlogWindow = ({ onClose }) => {
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedPost, setSelectedPost] = useState(null);
-  const [isDragging, setIsDragging] = useState(false);
-  const [position, setPosition] = useState({ x: 0, y: 0 });
-  const [isMinimized, setIsMinimized] = useState(false);
-  const [isMobile, setIsMobile] = useState(false);
-  const dragStartPos = useRef({ x: 0, y: 0 });
-  const windowRef = useRef(null);
-
-  // Track viewport so we can switch to a full-screen, touch-friendly layout.
-  useEffect(() => {
-    if (typeof window === 'undefined' || !window.matchMedia) return;
-    const mq = window.matchMedia('(max-width: 768px)');
-    const update = () => setIsMobile(mq.matches);
-    update();
-    mq.addEventListener?.('change', update);
-    return () => mq.removeEventListener?.('change', update);
-  }, []);
-
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const centerX = (window.innerWidth - 900) / 2;
-      const centerY = (window.innerHeight - 700) / 2;
-      setPosition({ x: Math.max(20, centerX), y: Math.max(20, centerY) });
-    }
-  }, []);
 
   useEffect(() => {
     fetch('/api/blog/posts')
       .then((res) => {
-        if (!res.ok) {
-          throw new Error(`HTTP ${res.status}`);
-        }
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
         return res.json();
       })
       .then((data) => {
@@ -51,240 +31,166 @@ const BlogWindow = ({ onClose }) => {
       });
   }, []);
 
-  const handleMouseDown = (e) => {
-    if (isMobile) return;
-    if (e.target.closest('.window-drag-handle')) {
-      setIsDragging(true);
-      dragStartPos.current = {
-        x: e.clientX - position.x,
-        y: e.clientY - position.y,
-      };
-    }
-  };
-
   useEffect(() => {
-    if (isDragging) {
-      const handleMouseMove = (e) => {
-        setPosition({
-          x: e.clientX - dragStartPos.current.x,
-          y: e.clientY - dragStartPos.current.y,
-        });
-      };
+    const onKey = (e) => {
+      if (e.key !== 'Escape') return;
+      if (selectedPost) setSelectedPost(null);
+      else onClose?.();
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [selectedPost, onClose]);
 
-      const handleMouseUp = () => {
-        setIsDragging(false);
-      };
-
-      window.addEventListener('mousemove', handleMouseMove);
-      window.addEventListener('mouseup', handleMouseUp);
-
-      return () => {
-        window.removeEventListener('mousemove', handleMouseMove);
-        window.removeEventListener('mouseup', handleMouseUp);
-      };
-    }
-  }, [isDragging]);
-
-  if (isMinimized && !isMobile) {
-    return (
-      <div
-        className="fixed bg-surface-elevated border border-white/[0.08] rounded-t-lg shadow-2xl z-[100] cursor-pointer hover:bg-white/[0.04] transition-colors"
-        style={{
-          left: `${position.x}px`,
-          bottom: '0px',
-          width: '200px',
-          height: '32px',
-        }}
-        onClick={() => setIsMinimized(false)}
-      >
-        <div className="window-drag-handle h-full flex items-center px-4 text-xs text-neutral-300">
-          Blog
-        </div>
-      </div>
-    );
-  }
-
-  // ----- Layout: full-screen on mobile, draggable window on desktop -----
-  const frameStyle = isMobile
-    ? { left: 0, top: 0, width: '100vw', height: '100dvh' }
-    : {
-        left: `${position.x}px`,
-        top: `${position.y}px`,
-        width: '900px',
-        height: '700px',
-        maxWidth: 'calc(100vw - 40px)',
-        maxHeight: 'calc(100vh - 40px)',
-      };
-
-  // On mobile we show either the list or the reader (master–detail).
-  const showList = !isMobile || !selectedPost;
-  const showReader = !isMobile || !!selectedPost;
+  const title = selectedPost ? selectedPost.title : 'Blog';
+  const label = selectedPost ? 'Post' : 'Section';
 
   return (
     <div
-      ref={windowRef}
-      className={`fixed bg-surface-elevated border border-white/[0.08] shadow-2xl z-[100] flex flex-col overflow-hidden ${isMobile ? '' : 'rounded-xl'}`}
-      style={frameStyle}
+      className="fixed inset-0 z-[100] flex flex-col overflow-hidden"
       role="dialog"
       aria-modal="true"
       aria-label="Blog"
+      style={{ animation: 'fadeIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards' }}
     >
+      <button
+        type="button"
+        aria-label="Close blog"
+        onClick={onClose}
+        className="absolute inset-0 w-full h-full bg-[#050810]/70 backdrop-blur-md cursor-default"
+        tabIndex={-1}
+      />
+
       <div
-        className={`window-drag-handle bg-white/[0.04] h-11 md:h-9 flex items-center justify-between px-4 select-none border-b border-white/[0.06] ${isMobile ? '' : 'cursor-move'}`}
-        onMouseDown={handleMouseDown}
+        className="relative flex flex-col h-full w-full max-w-5xl mx-auto pointer-events-none"
+        onClick={(e) => e.stopPropagation()}
       >
-        <div className="flex items-center gap-2">
-          {isMobile && selectedPost ? (
-            <button
-              onClick={() => setSelectedPost(null)}
-              className="flex items-center gap-1.5 text-sm text-neutral-200 hover:text-white"
-              aria-label="Back to posts"
-            >
-              <ArrowLeft size={16} /> Posts
-            </button>
-          ) : (
-            <>
-              <div className="flex gap-1.5">
-                <button
-                  onClick={onClose}
-                  className="w-3.5 h-3.5 md:w-3 md:h-3 rounded-full bg-[#ff5f57] hover:bg-[#ff4747] transition-colors flex items-center justify-center"
-                  aria-label="Close blog"
-                >
-                  <X size={8} className="opacity-0 hover:opacity-100" />
-                </button>
-                {!isMobile && (
-                  <button
-                    onClick={() => setIsMinimized(true)}
-                    className="w-3 h-3 rounded-full bg-[#ffbd2e] hover:bg-[#ffa700] transition-colors"
-                    aria-label="Minimize blog"
-                  >
-                    <Minus size={8} className="opacity-0 hover:opacity-100" />
-                  </button>
-                )}
-                <div className="w-3.5 h-3.5 md:w-3 md:h-3 rounded-full bg-[#28c840]"></div>
-              </div>
-              <span className="text-xs text-neutral-300 ml-4 font-medium">Blog</span>
-            </>
-          )}
-        </div>
-        {isMobile && (
-          <button onClick={onClose} className="p-1 text-neutral-300 hover:text-white" aria-label="Close blog">
-            <X size={18} />
-          </button>
-        )}
-      </div>
-
-      <div className="flex-1 flex overflow-hidden bg-[#0a0a0a]">
-        {showList && (
-          <div className={`${isMobile ? 'w-full' : 'w-80 border-r border-white/[0.06]'} bg-[#0c0c0c] flex flex-col`}>
-            <div className="p-4 border-b border-white/[0.06]">
-              <h2 className="text-lg font-medium text-white mb-1">Posts</h2>
-              <p className="text-xs text-neutral-400">{posts.length} {posts.length === 1 ? 'post' : 'posts'}</p>
-            </div>
-
-            <div className="flex-1 overflow-y-auto custom-scrollbar">
-              {loading ? (
-                <div className="p-6 flex flex-col items-center justify-center gap-3 text-neutral-400">
-                  <div className="w-8 h-8 border-2 border-white/10 border-t-white/40 rounded-full animate-spin" />
-                  <p className="text-sm">Loading posts...</p>
-                </div>
-              ) : posts.length === 0 ? (
-                <div className="p-8 text-center text-neutral-400">
-                  <p className="text-sm mb-1">No posts yet.</p>
-                  <p className="text-xs text-neutral-500">Check back soon.</p>
-                </div>
-              ) : (
-                <div className="divide-y divide-white/[0.06]">
-                  {posts.map((post) => (
-                    <button
-                      key={post.slug}
-                      onClick={() => setSelectedPost(post)}
-                      className={`w-full text-left p-4 transition-all duration-300 ${
-                        selectedPost?.slug === post.slug
-                          ? 'bg-white/[0.06] border-l-2 border-white/40'
-                          : 'hover:bg-white/[0.04]'
-                      }`}
-                    >
-                      <div className="flex items-start justify-between mb-1 gap-2">
-                        <h3 className="text-sm font-medium text-neutral-100 flex-1">
-                          {post.title}
-                        </h3>
-                        {post.date && (
-                          <span className="text-xs text-neutral-400 whitespace-nowrap">
-                            {format(new Date(post.date), 'MMM d')}
-                          </span>
-                        )}
-                      </div>
-                      {post.excerpt && (
-                        <p className="text-xs text-neutral-400 line-clamp-2 mt-1">
-                          {post.excerpt}
-                        </p>
-                      )}
-                      {post.tags && post.tags.length > 0 && (
-                        <div className="flex flex-wrap gap-1 mt-2">
-                          {post.tags.slice(0, 2).map((tag) => (
-                            <span
-                              key={tag}
-                              className="text-[10px] px-1.5 py-0.5 bg-neutral-700/60 text-neutral-300 rounded"
-                            >
-                              {tag}
-                            </span>
-                          ))}
-                        </div>
-                      )}
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
+        {/* Header */}
+        <div className="flex justify-between items-start gap-4 px-6 sm:px-10 md:px-14 pt-16 md:pt-20 pb-6 md:pb-8 shrink-0 pointer-events-auto">
+          <div className="min-w-0 flex-1">
+            <p className="text-[10px] uppercase tracking-[0.4em] text-neutral-300 mb-5 flex items-center gap-3">
+              <span className="text-white">04</span>
+              <span className="h-px w-8 bg-neutral-600" />
+              <span>{label}</span>
+            </p>
+            <h2 className="text-3xl sm:text-4xl md:text-5xl font-medium text-white tracking-[-0.02em] leading-[1.05] break-words">
+              <ScrambleText text={title} active />
+            </h2>
           </div>
-        )}
+          <div className="flex items-center gap-2 shrink-0 mt-2">
+            {selectedPost && (
+              <button
+                onClick={() => setSelectedPost(null)}
+                className="interactive h-10 px-4 rounded-full border border-white/[0.14] text-neutral-200 hover:text-white hover:border-white/30 hover:bg-white/[0.05] transition-all duration-300 text-[11px] tracking-[0.25em] uppercase"
+                aria-label="Back to index"
+              >
+                Index
+              </button>
+            )}
+            <button
+              onClick={onClose}
+              className="interactive h-10 px-4 rounded-full border border-white/[0.14] text-neutral-200 hover:text-white hover:border-white/30 hover:bg-white/[0.05] transition-all duration-300 text-[11px] tracking-[0.25em] uppercase"
+              aria-label="Close"
+            >
+              Close
+            </button>
+          </div>
+        </div>
 
-        {showReader && (
-          <div className="flex-1 flex flex-col bg-surface-elevated">
+        {/* Content */}
+        <div className="flex-1 overflow-y-auto px-6 sm:px-10 md:px-14 pb-24 md:pb-28 custom-scrollbar pointer-events-auto">
+          <div
+            key={selectedPost?.slug || 'index'}
+            style={{
+              opacity: 0,
+              animation: 'slideUpFade 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards 0.1s',
+            }}
+          >
             {selectedPost ? (
-              <>
-                <div className="p-5 sm:p-6 border-b border-white/[0.06]">
-                  <h1 className="text-xl sm:text-2xl font-light text-neutral-50 mb-2">
-                    {selectedPost.title}
-                  </h1>
-                  <div className="flex items-center gap-4 text-xs text-neutral-400 flex-wrap">
-                    {selectedPost.date && (
-                      <time dateTime={selectedPost.date}>
-                        {format(new Date(selectedPost.date), 'MMMM d, yyyy')}
-                      </time>
-                    )}
-                    {selectedPost.tags && selectedPost.tags.length > 0 && (
-                      <div className="flex gap-2 flex-wrap">
+              <article>
+                <div className="mb-8 pb-6 border-b border-white/[0.06] flex flex-wrap items-center gap-3 text-xs text-neutral-300">
+                  {selectedPost.date && (
+                    <time dateTime={selectedPost.date} className="font-mono tracking-[0.22em] uppercase">
+                      {format(new Date(selectedPost.date), 'MMM d, yyyy')}
+                    </time>
+                  )}
+                  {selectedPost.tags?.length > 0 && (
+                    <>
+                      <span className="text-neutral-600">/</span>
+                      <div className="flex flex-wrap gap-2">
                         {selectedPost.tags.map((tag) => (
                           <span
                             key={tag}
-                            className="px-2 py-0.5 bg-neutral-800 text-neutral-300 rounded"
+                            className="text-[10px] px-2 py-0.5 border border-white/[0.12] bg-white/[0.03] rounded text-neutral-200 font-mono"
                           >
                             {tag}
                           </span>
                         ))}
                       </div>
-                    )}
-                  </div>
+                    </>
+                  )}
                 </div>
-
-                <div className="flex-1 overflow-y-auto p-5 sm:p-6 custom-scrollbar">
-                  <div className="prose-wrapper">
-                    <MarkdownContent content={selectedPost.content} />
-                  </div>
+                <div className="prose-wrapper max-w-none">
+                  <MarkdownContent content={selectedPost.content} />
                 </div>
-              </>
-            ) : (
-              <div className="flex-1 flex items-center justify-center text-neutral-400">
-                <div className="text-center max-w-[240px]">
-                  <p className="text-base mb-1 font-light">Select a post to read</p>
-                  <p className="text-sm text-neutral-500">Choose from the list</p>
-                </div>
+              </article>
+            ) : loading ? (
+              <div className="py-24 flex flex-col items-center gap-3 text-neutral-300">
+                <div className="w-8 h-8 border border-white/10 border-t-white/60 rounded-full animate-spin" />
+                <p className="text-[11px] tracking-[0.25em] uppercase">Loading</p>
               </div>
+            ) : posts.length === 0 ? (
+              <div className="py-24 text-center">
+                <p className="text-[15px] text-neutral-200 mb-1">No posts yet.</p>
+                <p className="text-sm text-neutral-400">Check back soon.</p>
+              </div>
+            ) : (
+              <>
+                <div className="mb-6 pb-6 border-b border-white/[0.06]">
+                  <p className="text-[15px] text-neutral-200 leading-[1.7] max-w-lg">
+                    Personal writing and long-form thoughts. Click any entry to read.
+                  </p>
+                  <p className="text-[11px] text-neutral-400 font-mono mt-3 uppercase tracking-[0.22em]">
+                    {String(posts.length).padStart(2, '0')} · {posts.length === 1 ? 'entry' : 'entries'}
+                  </p>
+                </div>
+                <ul className="divide-y divide-white/[0.06]">
+                  {posts.map((post, i) => (
+                    <li key={post.slug}>
+                      <button
+                        onClick={() => setSelectedPost(post)}
+                        className="interactive group w-full text-left py-5 sm:py-6 flex flex-col sm:flex-row sm:items-baseline gap-2 sm:gap-6 transition-colors duration-300 hover:bg-white/[0.03] -mx-4 sm:-mx-6 px-4 sm:px-6 rounded-lg"
+                      >
+                        <span className="text-neutral-400 text-[11px] font-mono tracking-[0.25em] w-12 shrink-0 uppercase">
+                          {String(i + 1).padStart(2, '0')}
+                        </span>
+                        <div className="flex-1 min-w-0">
+                          <h3 className="text-lg sm:text-xl text-white font-medium tracking-[-0.01em] group-hover:text-neutral-100 transition-colors">
+                            {post.title}
+                          </h3>
+                          {post.excerpt && (
+                            <p className="text-neutral-300 text-[15px] mt-1.5 leading-[1.6] line-clamp-2">
+                              {post.excerpt}
+                            </p>
+                          )}
+                        </div>
+                        <div className="flex items-center gap-4 shrink-0">
+                          {post.date && (
+                            <span className="text-neutral-400 text-[11px] font-mono whitespace-nowrap uppercase tracking-[0.22em]">
+                              {format(new Date(post.date), 'MMM yyyy')}
+                            </span>
+                          )}
+                          <span className="text-neutral-400 group-hover:text-white transition-colors duration-300">
+                            <span className="inline-block group-hover:translate-x-0.5 transition-transform">↗</span>
+                          </span>
+                        </div>
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              </>
             )}
           </div>
-        )}
+        </div>
       </div>
     </div>
   );

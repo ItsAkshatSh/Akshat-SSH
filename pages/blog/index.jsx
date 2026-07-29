@@ -7,7 +7,7 @@ export default function BlogIndex({ posts }) {
   return (
     <>
       <Head>
-        <title>Blog — akshat.ssh</title>
+        <title>Blog · akshat.ssh</title>
         <meta name="description" content="Personal blog and thoughts" />
       </Head>
 

@@ -1,127 +1,189 @@
-import React from 'react';
+/**
+ * ExperienceContent
+ * Mirrors the resume: three roles, one school entry, achievements and
+ * certifications.
+ */
 import StaggerItem from '../utilities/StaggerItem';
 
 const ExperienceContent = () => {
-  const education = [
-    { level: "Senior Secondary (XII), Science", school: "Indian International School, Dubai", board: "CBSE", year: "2027" }
-  ];
-
   const jobs = [
     {
-      role: "Event Organizer – Hackathon/Game Jam",
-      company: "Hackclub, Dubai",
-      time: "Oct 2024 - Nov 2024 (2 months)",
-      type: "Internship",
+      role: 'Chair of Innovation and Technology',
+      company: 'Indian International School',
+      location: 'Dubai, UAE',
+      time: 'Dec 2024 → Present',
+      type: 'School leadership',
       bullets: [
-        "Hosted a Game Jam/Hackathon in downtown Dubai with 30+ participants.",
-        "Coordinated event logistics, participant engagement, and technical support.",
-        "Collaborated with HackClub to deliver an impactful community-driven coding event.",
-        "Gained hands-on experience in event management, leadership, and community building."
-      ]
-    }
+        'Pioneered school-wide STEM initiatives, designing advanced technical programs to mentor gifted students.',
+        'Created hands-on opportunities in software, hardware and engineering for peers across year groups.',
+      ],
+    },
+    {
+      role: 'Campfire Host',
+      company: 'HackClub',
+      location: 'Dubai, UAE',
+      time: 'Dec 2024 → Present',
+      type: 'Community · Volunteer',
+      bullets: [
+        'Led technical operations for community game-development projects.',
+        'Facilitated hands-on workshops on Git, GitHub, GameMaker and Itch.io for local makers.',
+      ],
+    },
+    {
+      role: 'Counterspell Host',
+      company: 'HackClub',
+      location: 'Dubai, UAE',
+      time: 'Oct 2024 → Nov 2024',
+      type: 'Community · Volunteer',
+      bullets: [
+        'Coordinated and hosted a hackathon in the heart of downtown Dubai for the Counterspell global event.',
+      ],
+    },
   ];
 
-  const skills = ["Python", "JavaScript", "React", "Node.js", "Flask", "HTML5", "CSS3", "OpenCV", "TensorFlow", "Game Development", "PCB Design", "Git", "GitHub", "Problem Solving", "Leadership"];
-
-  const accomplishments = [
-    "Won an international hackathon by developing an innovative project under time-bound constraints, competing with students from multiple countries",
-    "Secured 1st place in a national-level coding competition with my team, outperforming participants from across the country",
-    "Won a state-level coding competition, demonstrating advanced problem-solving and programming skills",
-    "Attended workshops at the American University of Sharjah, gaining advanced exposure to computer science concepts and practical applications",
-    "Completed Harvard's CS50 course, acquiring strong foundational skills in computer science and programming",
-    "Represented Sky Sports as an IPC delegate at the F1CC Committee, earning an Honorable Mention for outstanding participation and contributions"
+  const education = [
+    {
+      level: 'School',
+      school: 'Indian International School, DSO',
+      location: 'Dubai, UAE',
+      time: 'Jan 2014 → Jan 2027',
+    },
   ];
 
-  const socials = [
-    { label: "GitHub", url: "https://github.com/ItsAkshatSh" },
-    { label: "Instagram", url: "https://www.instagram.com/akshat.ssh/" },
-    { label: "LinkedIn", url: "https://www.linkedin.com/in/akshat404/" }
+  const achievements = [
+    { title: 'Winner · International Level Hackathon', issuer: 'BrightChamps', date: 'May 2024' },
+    { title: 'Winner · National Level Hackathon', issuer: 'ICodeJr', date: 'Jan 2024' },
+    { title: 'Winner · State Level Hackathon', issuer: 'ICodeJr', date: 'Feb 2023' },
   ];
 
-  const SectionHeading = ({ children }) => (
-    <h3 className="text-sm font-mono uppercase tracking-[0.25em] text-neutral-400 mb-5">{children}</h3>
+  const certifications = [
+    { title: 'Python Advanced Certification', issuer: 'BrightChamps', date: 'Jul 2025' },
+    { title: 'Web Developer Certification', issuer: 'BrightChamps', date: 'Jul 2025' },
+    { title: 'App Developer Certification', issuer: 'BrightChamps', date: 'Sep 2022' },
+  ];
+
+  const SectionHeading = ({ children, count }) => (
+    <div className="flex items-baseline gap-3 mb-6">
+      <h3 className="text-[11px] font-mono uppercase tracking-[0.3em] text-neutral-200">
+        {children}
+      </h3>
+      {count != null && (
+        <span className="text-[10px] font-mono text-neutral-500">
+          {String(count).padStart(2, '0')}
+        </span>
+      )}
+      <span className="flex-1 h-px bg-white/[0.08]" />
+    </div>
   );
 
   return (
     <div className="relative space-y-12 pb-8">
-      <section>
-        <SectionHeading>Education</SectionHeading>
-        {education.map((edu, i) => (
-          <StaggerItem key={i} index={i} className="mb-6">
-            <div className="interactive group rounded-xl border border-white/[0.06] bg-white/[0.02] p-5">
-              <h4 className="text-lg text-white font-medium">{edu.level}</h4>
-              <p className="text-neutral-400 text-sm mt-1">{edu.school} · {edu.board}</p>
-              <p className="text-neutral-500 text-xs mt-1 font-mono">Expected {edu.year}</p>
-            </div>
-          </StaggerItem>
-        ))}
-      </section>
+      <div className="mb-2 pb-6 border-b border-white/[0.06]">
+        <p className="text-[15px] text-neutral-200 leading-[1.7] max-w-xl">
+          Aspiring Computer Engineer from Dubai. Hardware and software projects ranging from a home-brewed StreamDeck to Flutter apps. Experience in web dev, app dev, embedded systems, PCB design and game dev.
+        </p>
+        <p className="text-[11px] text-neutral-400 font-mono mt-3 uppercase tracking-[0.22em]">
+          Live CV
+        </p>
+      </div>
 
       <section>
-        <SectionHeading>Work Experience</SectionHeading>
-        {jobs.map((job, i) => (
-          <StaggerItem key={i} index={i} className="mb-8">
-            <div className="interactive group rounded-xl border border-white/[0.06] bg-white/[0.02] p-5 sm:p-6">
-              <div className="flex justify-between items-start mb-2 gap-3 flex-wrap">
-                <div>
-                  <h4 className="text-lg text-white font-medium">{job.role}</h4>
-                  <p className="text-neutral-400 text-sm mt-0.5">{job.company} · {job.type}</p>
+        <SectionHeading count={jobs.length}>Experience</SectionHeading>
+        <div className="space-y-3">
+          {jobs.map((job, i) => (
+            <StaggerItem key={i} index={i}>
+              <div className="rounded-xl border border-white/[0.08] bg-white/[0.03] p-5 sm:p-6">
+                <div className="flex justify-between items-start mb-1 gap-3 flex-wrap">
+                  <div className="min-w-0">
+                    <h4 className="text-lg sm:text-xl text-white font-medium tracking-[-0.01em]">{job.role}</h4>
+                    <p className="text-neutral-300 text-[15px] mt-1">
+                      {job.company} · {job.location}
+                    </p>
+                  </div>
+                  <span className="text-neutral-300 text-[11px] font-mono uppercase tracking-[0.22em] whitespace-nowrap">
+                    {job.time}
+                  </span>
                 </div>
-                <span className="text-neutral-500 text-xs font-mono whitespace-nowrap">{job.time}</span>
+                <p className="text-neutral-400 text-[11px] font-mono uppercase tracking-[0.22em] mb-4">
+                  {job.type}
+                </p>
+                <ul className="text-neutral-200 text-[15px] leading-[1.7] space-y-2.5">
+                  {job.bullets.map((bullet, bi) => (
+                    <li key={bi} className="flex gap-3">
+                      <span className="text-neutral-500 flex-shrink-0 mt-2 text-[10px]">▸</span>
+                      <span>{bullet}</span>
+                    </li>
+                  ))}
+                </ul>
               </div>
-              <ul className="text-neutral-400 text-sm space-y-2.5 mt-4">
-                {job.bullets.map((bullet, bi) => (
-                  <li key={bi} className="flex gap-3">
-                    <span className="text-neutral-500 flex-shrink-0 mt-0.5">·</span>
-                    <span className="leading-relaxed">{bullet}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </StaggerItem>
-        ))}
-      </section>
-
-      <section>
-        <SectionHeading>Skills</SectionHeading>
-        <div className="flex flex-wrap gap-2">
-          {skills.map((skill, i) => (
-            <span key={i} className="text-xs border border-white/[0.08] bg-white/[0.03] px-3 py-1.5 rounded-md text-neutral-400 font-mono">
-              {skill}
-            </span>
+            </StaggerItem>
           ))}
         </div>
       </section>
 
       <section>
-        <SectionHeading>Accomplishments</SectionHeading>
-        <ul className="space-y-3">
-          {accomplishments.map((acc, i) => (
+        <SectionHeading count={education.length}>Education</SectionHeading>
+        {education.map((edu, i) => (
+          <StaggerItem key={i} index={i}>
+            <div className="rounded-xl border border-white/[0.08] bg-white/[0.03] p-5">
+              <div className="flex justify-between items-start gap-3 flex-wrap">
+                <div className="min-w-0">
+                  <h4 className="text-lg sm:text-xl text-white font-medium tracking-[-0.01em]">{edu.level}</h4>
+                  <p className="text-neutral-300 text-[15px] mt-1">
+                    {edu.school} · {edu.location}
+                  </p>
+                </div>
+                <span className="text-neutral-300 text-[11px] font-mono uppercase tracking-[0.22em] whitespace-nowrap">
+                  {edu.time}
+                </span>
+              </div>
+            </div>
+          </StaggerItem>
+        ))}
+      </section>
+
+      <section>
+        <SectionHeading count={achievements.length}>Achievements</SectionHeading>
+        <ul className="divide-y divide-white/[0.06] border-t border-b border-white/[0.06]">
+          {achievements.map((a, i) => (
             <StaggerItem key={i} index={i}>
-              <li className="flex gap-3 text-neutral-400 text-sm leading-relaxed">
-                <span className="text-neutral-500 flex-shrink-0 mt-1">✦</span>
-                <span>{acc}</span>
+              <li className="flex flex-col sm:flex-row sm:items-baseline gap-1 sm:gap-4 py-4">
+                <span className="text-neutral-400 text-[11px] font-mono w-12 shrink-0 tracking-[0.22em]">
+                  {String(i + 1).padStart(2, '0')}
+                </span>
+                <div className="flex-1 min-w-0">
+                  <p className="text-white text-[15px] font-medium tracking-[-0.01em]">{a.title}</p>
+                  <p className="text-neutral-300 text-sm mt-1">{a.issuer}</p>
+                </div>
+                <span className="text-neutral-400 text-[11px] font-mono uppercase tracking-[0.22em] whitespace-nowrap">
+                  {a.date}
+                </span>
               </li>
             </StaggerItem>
           ))}
         </ul>
       </section>
 
-      <section className="border-t border-white/[0.06] pt-8">
-        <SectionHeading>Links</SectionHeading>
-        <div className="flex flex-wrap gap-4">
-          {socials.map((social, i) => (
-            <a
-              key={i}
-              href={social.url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 text-neutral-300 hover:text-white text-sm transition-colors duration-300 group"
-            >
-              {social.label} <span className="group-hover:translate-x-0.5 transition-transform">↗</span>
-            </a>
+      <section>
+        <SectionHeading count={certifications.length}>Certifications</SectionHeading>
+        <ul className="divide-y divide-white/[0.06] border-t border-b border-white/[0.06]">
+          {certifications.map((c, i) => (
+            <StaggerItem key={i} index={i}>
+              <li className="flex flex-col sm:flex-row sm:items-baseline gap-1 sm:gap-4 py-4">
+                <span className="text-neutral-400 text-[11px] font-mono w-12 shrink-0 tracking-[0.22em]">
+                  {String(i + 1).padStart(2, '0')}
+                </span>
+                <div className="flex-1 min-w-0">
+                  <p className="text-white text-[15px] font-medium tracking-[-0.01em]">{c.title}</p>
+                  <p className="text-neutral-300 text-sm mt-1">{c.issuer}</p>
+                </div>
+                <span className="text-neutral-400 text-[11px] font-mono uppercase tracking-[0.22em] whitespace-nowrap">
+                  {c.date}
+                </span>
+              </li>
+            </StaggerItem>
           ))}
-        </div>
+        </ul>
       </section>
     </div>
   );

@@ -1,65 +1,96 @@
-import React from 'react';
+/**
+ * ProjectsContent
+ * Selected projects from the resume, ordered newest-first.
+ */
 import StaggerItem from '../utilities/StaggerItem';
 
 const ProjectsContent = () => {
   const projects = [
     {
-      id: 1,
-      title: "Custom Macropad (9-key + Rotary Encoder)",
-      date: "Jun 2025",
-      link: "https://github.com/ItsAkshatSh/Macropad",
-      stack: ["Hardware", "PCB Design", "KMK Firmware"],
-      desc: "Designed and built a custom 9-switch macro pad with rotary encoder and 3D printed case. Created PCB schematic and layout, wired components, and developed firmware using KMK."
+      id: 'glyph',
+      title: 'Glyph',
+      subtitle: 'NFC business card · e-ink display · mechanical switches',
+      date: 'Jul 2026',
+      link: 'https://github.com/ItsAkshatSh/Glyph',
+      stack: ['Hardware', 'PCB Design', 'MicroPython', 'E-Ink', 'NFC'],
+      desc: 'A programmable business card that pairs an NFC chip with an e-ink display and three Cherry MX switches. Custom PCB and low-power firmware turn a piece of plastic into a tactile mini-device: swap what it shows, tap it to share, click a switch to trigger an action.',
     },
     {
-      id: 2,
-      title: "Sylvoria – Adventure Game",
-      date: "Jan 2025 - Apr 2025",
-      link: "https://github.com/ItsAkshatSh/Sylvoria",
-      stack: ["Game Development", "Python", "Networking"],
-      desc: "Developed Sylvoria as part of the Juice HackClub event, committing ~100 hours of development time. Earned travel to China (all expenses paid) by meeting the event's development milestone. Built core game mechanics, user interface, networking, and game systems."
+      id: 'neko',
+      title: 'Neko',
+      subtitle: 'Cat-care companion app · #HackTheKitty 2026',
+      date: 'Jun 2026 → Jul 2026',
+      link: 'https://github.com/ItsAkshatSh/Neko',
+      stack: ['Flutter', 'Dart', 'Kotlin', 'Firebase', 'Lottie'],
+      desc: 'A comprehensive cat-care app for streamlining pet management: automated feeding schedules, secure veterinary records, and an interactive AI companion. Features a custom Apple-inspired Dynamic Island overlay for seamless real-time notifications. Built for the #HackTheKitty 2026 jam.',
     },
     {
-      id: 3,
-      title: "J.A.R.V.I.S – Desktop Voice Assistant",
-      date: "Oct 2024 - Nov 2024",
-      link: "https://github.com/ItsAkshatSh/J.A.R.V.I.S",
-      stack: ["Python", "Speech Recognition", "NLP"],
-      desc: "Built a Python-based desktop voice assistant inspired by Siri. Integrated speech recognition, text-to-speech, and natural language processing to perform tasks like opening apps, fetching information, and playing music."
+      id: 'the-deck',
+      title: 'The Deck!',
+      subtitle: 'StreamDeck reimagined · RP2040 + resistive touchscreen',
+      date: 'Mar 2026 → Apr 2026',
+      link: 'https://github.com/ItsAkshatSh/TheDeck',
+      stack: ['CircuitPython', 'PCB Design', 'Embedded Systems'],
+      desc: 'A macropad on steroids: a Seeed Studio XIAO RP2040 driving a 2.8" resistive touchscreen, a rotary encoder and two Cherry MX switches, with an MCP23017 for extra I/O. Instead of a fixed grid, the touchscreen surfaces different app "screens" with contextual functions.',
     },
     {
-      id: 4,
-      title: "Emotion Recognition",
-      date: "Jun 2024",
-      link: "https://github.com/ItsAkshatSh/Emotion-recognition",
-      stack: ["Python", "OpenCV", "TensorFlow", "Deep Learning"],
-      desc: "Built a facial emotion recognition system using deep learning (computer vision). Used face detection with OpenCV to isolate faces and applied CNN models to classify emotions with real-time prediction capabilities."
-    }
+      id: 'bat-hunt',
+      title: 'Bat Hunt',
+      subtitle: 'Reflex shooter · Ember Game Jam',
+      date: 'Mar 2026',
+      link: 'https://github.com/ItsAkshatSh/BatHunt',
+      stack: ['Godot', 'GDScript', 'Game Design'],
+      desc: 'A fast-paced arcade reflex shooter inspired by the NES classic Duck Hunt. Reimagined for a high-intensity, low-visibility cave environment: responsive aiming mechanics, randomised flight behaviours for aerial targets, and tight polish on player-reaction feel. Submitted to the Ember Game Jam.',
+    },
+    {
+      id: 'hisabipocket',
+      title: 'HisabiPocket',
+      subtitle: 'Next-gen finance tracker · voice-first expense logging',
+      date: 'Nov 2025 → Present',
+      link: 'https://github.com/ItsAkshatSh/HisabiPocket',
+      stack: ['Flutter', 'Dart', 'Kotlin', 'Firebase'],
+      desc: 'A hands-free finance tracker: log expenses by voice or receipt scan, with visual analytics, smart spending alerts and weekly summaries. Roadmap includes real-time card-transaction tracking and a personalised AI budgeting companion for a seamless money picture.',
+    },
   ];
 
   return (
     <div className="space-y-4 pb-8">
+      <div className="mb-8 pb-6 border-b border-white/[0.06]">
+        <p className="text-[15px] text-neutral-200 leading-[1.7] max-w-lg">
+          Selected work across hardware, mobile, games and web. Click any card for the source or the live version.
+        </p>
+        <p className="text-[11px] text-neutral-400 font-mono mt-3 uppercase tracking-[0.22em]">
+          {String(projects.length).padStart(2, '0')} · Projects
+        </p>
+      </div>
+
       {projects.map((project, i) => (
         <StaggerItem key={project.id} index={i}>
           <a
             href={project.link}
             target="_blank"
             rel="noopener noreferrer"
-            className="interactive group block rounded-xl border border-white/[0.06] bg-white/[0.02] p-5 sm:p-6 hover:border-white/12 hover:bg-white/[0.04] transition-all duration-300"
+            className="interactive group block rounded-xl border border-white/[0.08] bg-white/[0.03] p-5 sm:p-6 hover:border-white/20 hover:bg-white/[0.05] transition-all duration-300"
           >
-            <div className="flex justify-between items-start gap-4 mb-3">
+            <div className="flex justify-between items-start gap-4 mb-4">
               <div className="flex-1 min-w-0">
-                <h3 className="text-lg sm:text-xl text-white font-medium group-hover:text-neutral-100 transition-colors duration-300">
+                <h3 className="text-xl sm:text-2xl text-white font-medium tracking-[-0.01em] leading-tight">
                   {project.title}
                 </h3>
-                <p className="text-neutral-500 text-xs mt-1.5 font-mono">{project.date}</p>
+                {project.subtitle && (
+                  <p className="text-neutral-300 text-[15px] mt-1.5 leading-snug">{project.subtitle}</p>
+                )}
+                <p className="text-neutral-400 text-[11px] mt-2 font-mono uppercase tracking-[0.22em]">
+                  {project.date}
+                </p>
               </div>
-              <span className="text-neutral-400 text-xs whitespace-nowrap font-mono flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                github <span className="group-hover:translate-x-0.5 transition-transform">↗</span>
+              <span className="text-neutral-300 group-hover:text-white text-[11px] whitespace-nowrap font-mono uppercase tracking-[0.22em] flex items-center gap-1.5 transition-colors duration-300">
+                Open
+                <span className="inline-block group-hover:translate-x-0.5 transition-transform">↗</span>
               </span>
             </div>
 
-            <p className="text-neutral-400 leading-relaxed mb-4 text-sm">
+            <p className="text-neutral-200 leading-[1.7] mb-5 text-[15px]">
               {project.desc}
             </p>
 
@@ -67,7 +98,7 @@ const ProjectsContent = () => {
               {project.stack.map((tech) => (
                 <span
                   key={tech}
-                  className="text-[11px] border border-white/[0.08] bg-white/[0.03] px-2.5 py-1 rounded-md text-neutral-400 font-mono"
+                  className="text-[11px] border border-white/[0.12] bg-white/[0.04] px-2.5 py-1 rounded-md text-neutral-200 font-mono"
                 >
                   {tech}
                 </span>
