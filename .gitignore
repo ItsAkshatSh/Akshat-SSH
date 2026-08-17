@@ -27,3 +27,9 @@ Thumbs.db
 
 .vercel
 README.md
+
+# Original photography source files (backed up before web optimization).
+.originals/
+
+# Kiro workspace settings (contains MCP server API keys).
+.kiro/settings/mcp.json

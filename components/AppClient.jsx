@@ -5,7 +5,7 @@
  * screens (Projects / Photography / Experience) plus the Blog and the
  * photo lightbox.
  */
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 
 import ScrambleText from './utilities/ScrambleText';
 
@@ -13,10 +13,10 @@ import ASCIIField from './ascii/ASCIIField';
 import ASCIICanvas from './ascii/ASCIICanvas';
 import BlogWindow from './blog/BlogWindow';
 import FloatingMenu from './ui/FloatingMenu';
+import { SmoothCursor } from './ui/smooth-cursor';
 
 import ProjectsContent from './content/ProjectsContent';
 import PhotographyContent from './content/PhotographyContent';
-import PhotographyLightbox from './content/PhotographyLightbox';
 import ExperienceContent from './content/ExperienceContent';
 
 const SOCIALS = [
@@ -53,15 +53,34 @@ const SOCIALS = [
 
 const SECTION_ORDER = ['projects', 'photography', 'experience'];
 
-const App = () => {
-  const cursorRef = useRef(null);
-  const mousePosRef = useRef({ x: 0, y: 0 });
-  const cursorPosRef = useRef({ x: 0, y: 0 });
-  const rafRef = useRef(null);
+/**
+ * Small L-shaped bracket for the four corners of the sub-page content
+ * column. Decorative only; adds a technical-drawing feel without noise.
+ */
+const SectionCorner = ({ position }) => {
+  const anchor = {
+    tl: 'top-3 left-3 sm:top-6 sm:left-6',
+    tr: 'top-3 right-3 sm:top-6 sm:right-6 rotate-90',
+    bl: 'bottom-3 left-3 sm:bottom-6 sm:left-6 -rotate-90',
+    br: 'bottom-3 right-3 sm:bottom-6 sm:right-6 rotate-180',
+  }[position];
+  return (
+    <div
+      aria-hidden="true"
+      className={`absolute w-4 h-4 pointer-events-none ${anchor}`}
+      style={{
+        borderTop: '1px solid rgba(255,255,255,0.25)',
+        borderLeft: '1px solid rgba(255,255,255,0.25)',
+        opacity: 0,
+        animation: 'sectionBackdrop 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards 0.4s',
+      }}
+    />
+  );
+};
 
+const App = () => {
   const [activeSection, setActiveSection] = useState(null);
   const [isBlogOpen, setIsBlogOpen] = useState(false);
-  const [selectedImg, setSelectedImg] = useState(null);
   const [isFinePointer, setIsFinePointer] = useState(false);
   const [contentIn, setContentIn] = useState(false);
 
@@ -70,11 +89,6 @@ const App = () => {
     const t = setTimeout(() => setContentIn(true), 60);
     return () => clearTimeout(t);
   }, []);
-
-  // Reset lightbox when navigating away from Photography.
-  useEffect(() => {
-    if (activeSection !== 'photography') setSelectedImg(null);
-  }, [activeSection]);
 
   // Only show the custom cursor on fine-pointer devices.
   useEffect(() => {
@@ -86,54 +100,17 @@ const App = () => {
     return () => mq.removeEventListener?.('change', update);
   }, []);
 
-  // Escape closes overlays in reverse depth order.
+  // Escape closes overlays in reverse depth order. The photo lightbox is
+  // owned by the shared-element gallery and handles its own escape.
   useEffect(() => {
     const handleKeyDown = (e) => {
       if (e.key !== 'Escape') return;
-      if (selectedImg) setSelectedImg(null);
-      else if (isBlogOpen) setIsBlogOpen(false);
+      if (isBlogOpen) setIsBlogOpen(false);
       else if (activeSection) setActiveSection(null);
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [selectedImg, isBlogOpen, activeSection]);
-
-  // Track raw mouse position (updated in rAF for smoothness).
-  useEffect(() => {
-    if (!isFinePointer) return;
-    const handleMouseMove = (e) => {
-      mousePosRef.current = { x: e.clientX, y: e.clientY };
-    };
-    window.addEventListener('mousemove', handleMouseMove, { passive: true });
-    return () => window.removeEventListener('mousemove', handleMouseMove);
-  }, [isFinePointer]);
-
-  // Cursor follow loop.
-  useEffect(() => {
-    if (!isFinePointer) return;
-    const LERP = 0.22;
-    const ease = 1 - Math.pow(1 - LERP, 1.5);
-
-    const animate = () => {
-      const mouse = mousePosRef.current;
-      const current = cursorPosRef.current;
-      cursorPosRef.current = {
-        x: current.x + (mouse.x - current.x) * ease,
-        y: current.y + (mouse.y - current.y) * ease,
-      };
-      if (cursorRef.current) {
-        cursorRef.current.style.transform = `translate(${cursorPosRef.current.x}px, ${cursorPosRef.current.y}px) translate(-50%, -50%)`;
-      }
-      rafRef.current = requestAnimationFrame(animate);
-    };
-
-    cursorPosRef.current = { ...mousePosRef.current };
-    rafRef.current = requestAnimationFrame(animate);
-
-    return () => {
-      if (rafRef.current) cancelAnimationFrame(rafRef.current);
-    };
-  }, [isFinePointer]);
+  }, [isBlogOpen, activeSection]);
 
   const navItems = [
     { label: 'Projects', onClick: () => setActiveSection('projects') },
@@ -147,20 +124,13 @@ const App = () => {
     : '';
 
   return (
-    <div className={`min-h-screen bg-[#060a10] text-slate-200 overflow-x-hidden relative ${isFinePointer ? 'cursor-fine-none' : ''}`}>
-      {/* Background: ASCII ocean */}
-      <ASCIIField paused={!!selectedImg} />
+    <div className="min-h-screen bg-[#060a10] text-slate-200 overflow-x-hidden relative">
+      {/* Background: ASCII ocean. */}
+      <ASCIIField paused={false} />
 
-      {/* Custom cursor */}
-      {isFinePointer && (
-        <div
-          ref={cursorRef}
-          className="fixed pointer-events-none z-[200] will-change-transform hidden lg:block"
-          style={{ left: 0, top: 0 }}
-        >
-          <div className="w-1.5 h-1.5 rounded-full bg-white/85" />
-        </div>
-      )}
+      {/* Custom cursor: an ASCII jellyfish that spring-follows the pointer
+          and rotates to face its direction of travel. */}
+      {isFinePointer && <SmoothCursor />}
 
       {/* Hero */}
       <main className="relative z-10 w-full min-h-screen flex items-center justify-center px-6 md:px-10 py-20 md:py-24">
@@ -239,49 +209,96 @@ const App = () => {
       {/* Floating navigation */}
       <FloatingMenu items={navItems.map((n) => ({ label: n.label, onClick: n.onClick }))} />
 
-      {/* Photo lightbox */}
-      {selectedImg && (
-        <PhotographyLightbox
-          selectedImg={selectedImg}
-          onClose={() => setSelectedImg(null)}
-          onSelect={setSelectedImg}
-        />
-      )}
-
       {/* Blog overlay */}
       {isBlogOpen && <BlogWindow onClose={() => setIsBlogOpen(false)} />}
 
-      {/* Section overlay: Projects / Photography / Experience */}
+      {/* Section overlay: Projects / Photography / Experience.
+          Backdrop and content are animated separately so the panel feels
+          like it is being built up: dark curtain first, then label, title,
+          content sliding up in sequence. */}
       {activeSection && (
         <div
           className="fixed inset-0 z-40 flex flex-col overflow-hidden"
           role="dialog"
           aria-modal="true"
           aria-label={sectionTitle}
-          style={{ animation: 'fadeIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards' }}
         >
+          {/* Translucent tint over the ocean so the ASCII field shows
+              through as an atmospheric backdrop. Heavy blur smooths the
+              underlying motion into a soft gradient behind the text. */}
           <button
             type="button"
             aria-label="Close section"
             onClick={() => setActiveSection(null)}
-            className="absolute inset-0 w-full h-full bg-[#050810]/70 backdrop-blur-md cursor-default"
+            className="absolute inset-0 w-full h-full bg-[#060a10]/55 backdrop-blur-2xl cursor-default"
             tabIndex={-1}
+            style={{
+              opacity: 0,
+              animation: 'sectionBackdrop 0.35s cubic-bezier(0.4, 0, 0.2, 1) forwards',
+            }}
+          />
+          {/* Vignettes soften the top/bottom bleed so the ocean fades
+              into the edges. */}
+          <div
+            aria-hidden="true"
+            className="absolute inset-x-0 top-0 h-40 bg-gradient-to-b from-[#060a10]/80 to-transparent pointer-events-none"
+          />
+          <div
+            aria-hidden="true"
+            className="absolute inset-x-0 bottom-0 h-56 bg-gradient-to-t from-[#060a10]/90 via-[#060a10]/45 to-transparent pointer-events-none"
           />
 
           <div
-            className="relative flex flex-col h-full w-full max-w-5xl mx-auto pointer-events-none"
+            className="readable-on-blur relative flex flex-col h-full w-full max-w-5xl mx-auto pointer-events-none"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="flex justify-between items-start gap-4 px-6 sm:px-10 md:px-14 pt-16 md:pt-20 pb-6 md:pb-8 shrink-0 pointer-events-auto">
+            {/* Ghost section number, sitting behind the header as a
+                design element. Very low opacity so it never competes with
+                the copy. */}
+            <div
+              aria-hidden="true"
+              className="absolute top-6 md:top-10 right-4 sm:right-10 md:right-14 pointer-events-none select-none leading-none"
+              style={{
+                fontSize: 'clamp(10rem, 26vw, 22rem)',
+                fontWeight: 500,
+                letterSpacing: '-0.05em',
+                color: 'rgba(255,255,255,0.035)',
+                opacity: 0,
+                animation:
+                  'sectionBackdrop 0.9s cubic-bezier(0.16, 1, 0.3, 1) forwards 0.2s',
+              }}
+            >
+              {String(SECTION_ORDER.indexOf(activeSection) + 1).padStart(2, '0')}
+            </div>
+
+            {/* Technical corner brackets. */}
+            <SectionCorner position="tl" />
+            <SectionCorner position="tr" />
+            <SectionCorner position="bl" />
+            <SectionCorner position="br" />
+
+            <div className="relative flex justify-between items-start gap-4 px-6 sm:px-10 md:px-14 pt-16 md:pt-20 pb-6 md:pb-8 shrink-0 pointer-events-auto">
               <div className="min-w-0">
-                <p className="text-[10px] uppercase tracking-[0.4em] text-neutral-300 mb-5 flex items-center gap-3">
+                <p
+                  className="text-[10px] uppercase tracking-[0.4em] text-neutral-300 mb-5 flex items-center gap-3"
+                  style={{
+                    opacity: 0,
+                    animation: 'slideUpFade 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards 0.15s',
+                  }}
+                >
                   <span className="text-white">
                     {String(SECTION_ORDER.indexOf(activeSection) + 1).padStart(2, '0')}
                   </span>
                   <span className="h-px w-8 bg-neutral-600" />
                   <span>Section</span>
                 </p>
-                <h2 className="text-4xl sm:text-5xl md:text-6xl font-medium text-white tracking-[-0.02em] capitalize leading-none">
+                <h2
+                  className="text-4xl sm:text-5xl md:text-6xl font-medium text-white tracking-[-0.02em] capitalize leading-none"
+                  style={{
+                    opacity: 0,
+                    animation: 'sectionTitleEnter 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards 0.25s',
+                  }}
+                >
                   <ScrambleText text={sectionTitle} active />
                 </h2>
               </div>
@@ -289,22 +306,48 @@ const App = () => {
                 onClick={() => setActiveSection(null)}
                 className="interactive shrink-0 mt-2 h-10 px-4 rounded-full border border-white/[0.14] text-neutral-200 hover:text-white hover:border-white/30 hover:bg-white/[0.05] transition-all duration-300 text-[11px] tracking-[0.25em] uppercase"
                 aria-label="Close"
+                style={{
+                  opacity: 0,
+                  animation: 'slideUpFade 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards 0.35s',
+                }}
               >
                 Close
               </button>
             </div>
 
-            <div className="flex-1 overflow-y-auto px-6 sm:px-10 md:px-14 pb-24 md:pb-28 custom-scrollbar pointer-events-auto">
+            {/* Meta bar with section pagination, static aesthetic marker. */}
+            <div
+              className="relative mx-6 sm:mx-10 md:mx-14 flex items-center gap-4 shrink-0 pointer-events-none"
+              style={{
+                opacity: 0,
+                animation: 'slideUpFade 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards 0.32s',
+              }}
+            >
+              <span className="h-px flex-1 bg-gradient-to-r from-transparent via-white/25 to-white/25" />
+              <span className="text-[10px] font-mono uppercase tracking-[0.3em] text-neutral-400">
+                {String(SECTION_ORDER.indexOf(activeSection) + 1).padStart(2, '0')} / {String(SECTION_ORDER.length).padStart(2, '0')}
+              </span>
+              <span className="h-px w-16 bg-white/25" />
+            </div>
+
+            {/* Scrollable content, with soft edge fades top and bottom. */}
+            <div
+              className="relative flex-1 overflow-y-auto px-6 sm:px-10 md:px-14 pt-8 md:pt-10 pb-24 md:pb-28 custom-scrollbar pointer-events-auto"
+              style={{
+                WebkitMaskImage:
+                  'linear-gradient(to bottom, transparent 0, #000 24px, #000 calc(100% - 40px), transparent 100%)',
+                maskImage:
+                  'linear-gradient(to bottom, transparent 0, #000 24px, #000 calc(100% - 40px), transparent 100%)',
+              }}
+            >
               <div
                 style={{
                   opacity: 0,
-                  animation: 'slideUpFade 0.55s cubic-bezier(0.16, 1, 0.3, 1) forwards 0.15s',
+                  animation: 'sectionBodyEnter 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards 0.4s',
                 }}
               >
                 {activeSection === 'projects' && <ProjectsContent />}
-                {activeSection === 'photography' && (
-                  <PhotographyContent onSelectImg={setSelectedImg} />
-                )}
+                {activeSection === 'photography' && <PhotographyContent />}
                 {activeSection === 'experience' && <ExperienceContent />}
               </div>
             </div>

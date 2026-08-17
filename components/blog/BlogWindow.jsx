@@ -9,6 +9,27 @@ import { format } from 'date-fns';
 import MarkdownContent from './MarkdownContent';
 import ScrambleText from '../utilities/ScrambleText';
 
+const SectionCorner = ({ position }) => {
+  const anchor = {
+    tl: 'top-3 left-3 sm:top-6 sm:left-6',
+    tr: 'top-3 right-3 sm:top-6 sm:right-6 rotate-90',
+    bl: 'bottom-3 left-3 sm:bottom-6 sm:left-6 -rotate-90',
+    br: 'bottom-3 right-3 sm:bottom-6 sm:right-6 rotate-180',
+  }[position];
+  return (
+    <div
+      aria-hidden="true"
+      className={`absolute w-4 h-4 pointer-events-none ${anchor}`}
+      style={{
+        borderTop: '1px solid rgba(255,255,255,0.25)',
+        borderLeft: '1px solid rgba(255,255,255,0.25)',
+        opacity: 0,
+        animation: 'sectionBackdrop 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards 0.4s',
+      }}
+    />
+  );
+};
+
 const BlogWindow = ({ onClose }) => {
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -50,33 +71,76 @@ const BlogWindow = ({ onClose }) => {
       role="dialog"
       aria-modal="true"
       aria-label="Blog"
-      style={{ animation: 'fadeIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards' }}
     >
       <button
         type="button"
         aria-label="Close blog"
         onClick={onClose}
-        className="absolute inset-0 w-full h-full bg-[#050810]/70 backdrop-blur-md cursor-default"
+        className="absolute inset-0 w-full h-full bg-[#060a10]/55 backdrop-blur-2xl cursor-default"
         tabIndex={-1}
+        style={{
+          opacity: 0,
+          animation: 'sectionBackdrop 0.35s cubic-bezier(0.4, 0, 0.2, 1) forwards',
+        }}
       />
+      <div aria-hidden="true" className="absolute inset-x-0 top-0 h-40 bg-gradient-to-b from-[#060a10]/80 to-transparent pointer-events-none" />
+      <div aria-hidden="true" className="absolute inset-x-0 bottom-0 h-56 bg-gradient-to-t from-[#060a10]/90 via-[#060a10]/45 to-transparent pointer-events-none" />
 
       <div
-        className="relative flex flex-col h-full w-full max-w-5xl mx-auto pointer-events-none"
+        className="readable-on-blur relative flex flex-col h-full w-full max-w-5xl mx-auto pointer-events-none"
         onClick={(e) => e.stopPropagation()}
       >
+        <div
+          aria-hidden="true"
+          className="absolute top-6 md:top-10 right-4 sm:right-10 md:right-14 pointer-events-none select-none leading-none"
+          style={{
+            fontSize: 'clamp(10rem, 26vw, 22rem)',
+            fontWeight: 500,
+            letterSpacing: '-0.05em',
+            color: 'rgba(255,255,255,0.035)',
+            opacity: 0,
+            animation: 'sectionBackdrop 0.9s cubic-bezier(0.16, 1, 0.3, 1) forwards 0.2s',
+          }}
+        >
+          04
+        </div>
+
+        <SectionCorner position="tl" />
+        <SectionCorner position="tr" />
+        <SectionCorner position="bl" />
+        <SectionCorner position="br" />
+
         {/* Header */}
-        <div className="flex justify-between items-start gap-4 px-6 sm:px-10 md:px-14 pt-16 md:pt-20 pb-6 md:pb-8 shrink-0 pointer-events-auto">
+        <div className="relative flex justify-between items-start gap-4 px-6 sm:px-10 md:px-14 pt-16 md:pt-20 pb-6 md:pb-8 shrink-0 pointer-events-auto">
           <div className="min-w-0 flex-1">
-            <p className="text-[10px] uppercase tracking-[0.4em] text-neutral-300 mb-5 flex items-center gap-3">
+            <p
+              className="text-[10px] uppercase tracking-[0.4em] text-neutral-300 mb-5 flex items-center gap-3"
+              style={{
+                opacity: 0,
+                animation: 'slideUpFade 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards 0.15s',
+              }}
+            >
               <span className="text-white">04</span>
               <span className="h-px w-8 bg-neutral-600" />
               <span>{label}</span>
             </p>
-            <h2 className="text-3xl sm:text-4xl md:text-5xl font-medium text-white tracking-[-0.02em] leading-[1.05] break-words">
+            <h2
+              className="text-3xl sm:text-4xl md:text-5xl font-medium text-white tracking-[-0.02em] leading-[1.05] break-words"
+              style={{
+                opacity: 0,
+                animation: 'sectionTitleEnter 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards 0.25s',
+              }}
+            >
               <ScrambleText text={title} active />
             </h2>
           </div>
-          <div className="flex items-center gap-2 shrink-0 mt-2">
+          <div
+            className="flex items-center gap-2 shrink-0 mt-2"
+            style={{
+              opacity: 0,
+              animation: 'slideUpFade 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards 0.35s',
+            }}
+          >
             {selectedPost && (
               <button
                 onClick={() => setSelectedPost(null)}
@@ -96,13 +160,36 @@ const BlogWindow = ({ onClose }) => {
           </div>
         </div>
 
+        {/* Meta bar. */}
+        <div
+          className="relative mx-6 sm:mx-10 md:mx-14 flex items-center gap-4 shrink-0 pointer-events-none"
+          style={{
+            opacity: 0,
+            animation: 'slideUpFade 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards 0.32s',
+          }}
+        >
+          <span className="h-px flex-1 bg-gradient-to-r from-transparent via-white/25 to-white/25" />
+          <span className="text-[10px] font-mono uppercase tracking-[0.3em] text-neutral-400">
+            04 / 04
+          </span>
+          <span className="h-px w-16 bg-white/25" />
+        </div>
+
         {/* Content */}
-        <div className="flex-1 overflow-y-auto px-6 sm:px-10 md:px-14 pb-24 md:pb-28 custom-scrollbar pointer-events-auto">
+        <div
+          className="relative flex-1 overflow-y-auto px-6 sm:px-10 md:px-14 pt-8 md:pt-10 pb-24 md:pb-28 custom-scrollbar pointer-events-auto"
+          style={{
+            WebkitMaskImage:
+              'linear-gradient(to bottom, transparent 0, #000 24px, #000 calc(100% - 40px), transparent 100%)',
+            maskImage:
+              'linear-gradient(to bottom, transparent 0, #000 24px, #000 calc(100% - 40px), transparent 100%)',
+          }}
+        >
           <div
             key={selectedPost?.slug || 'index'}
             style={{
               opacity: 0,
-              animation: 'slideUpFade 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards 0.1s',
+              animation: 'sectionBodyEnter 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards 0.4s',
             }}
           >
             {selectedPost ? (
