@@ -1,0 +1,40 @@
+# Akshat Sharma
+
+> Aspiring Computer Engineer based in Dubai. Personal portfolio built as a
+> reactive ASCII ocean, featuring hardware, mobile, games and community
+> work, plus photography and long-form writing.
+
+Akshat is a student and maker from Dubai, UAE. His work spans four areas:
+
+- **Hardware**: Custom macropads, a programmable NFC + e-ink business card
+  (Glyph), and a XIAO RP2040 touch-screen StreamDeck alternative (The Deck).
+- **Mobile apps**: Flutter apps including Neko (cat-care companion with a
+  Dynamic Island overlay, built for #HackTheKitty 2026) and HisabiPocket
+  (voice-first finance tracker with receipt scanning).
+- **Games**: Godot arcade shooter (Bat Hunt, Ember Game Jam) and a
+  Python-based multiplayer adventure game (Sylvoria).
+- **Community**: Host of HackClub events in Dubai (Counterspell 2024,
+  ongoing Campfire), and Chair of Innovation & Technology at Indian
+  International School.
+
+## Overview
+
+- [Home](https://akshatshh.vercel.app/): Single-page portfolio with a
+  procedural three.js jellyfish + fish rendered as ASCII, sub-pages for
+  projects / photography / experience, and an ASCII cursor.
+- [Blog Index](https://akshatshh.vercel.app/blog): List of writing.
+
+## Blog Posts
+
+- [Welcome](https://akshatshh.vercel.app/blog/welcome)
+- [Genius Hour](https://akshatshh.vercel.app/blog/geniusHour)
+- [Campfire Dubai](https://akshatshh.vercel.app/blog/campFireDubai)
+- [HisabiPocket](https://akshatshh.vercel.app/blog/hisabi)
+
+## Contact
+
+- Email: ItsAkshatSh@gmail.com
+- GitHub: https://github.com/ItsAkshatSh
+- LinkedIn: https://www.linkedin.com/in/akshat404/
+- Instagram: https://www.instagram.com/akshat.ssh/
+- Location: Dubai, UAE

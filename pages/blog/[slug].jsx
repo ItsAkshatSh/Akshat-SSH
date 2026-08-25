@@ -3,12 +3,80 @@ import Link from 'next/link';
 import { getAllPosts, getPostContent } from '../../lib/blog';
 import { format } from 'date-fns';
 
-export default function BlogPost({ post }) {
+const SITE_URL =
+  process.env.NEXT_PUBLIC_SITE_URL || 'https://akshatshh.vercel.app';
+
+export default function BlogPost({ post, slug }) {
+  const { data, contentHtml } = post;
+  const url = `${SITE_URL}/blog/${slug}`;
+  const title = `${data.title} · Akshat Sharma`;
+  const description =
+    data.excerpt ||
+    `${data.title} — a blog post by Akshat Sharma.`;
+  const image = data.image
+    ? data.image.startsWith('http')
+      ? data.image
+      : `${SITE_URL}${data.image}`
+    : `${SITE_URL}/images/ascii/real_pfp.jpg`;
+
+  // BlogPosting schema for rich results.
+  const postSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'BlogPosting',
+    headline: data.title,
+    description,
+    url,
+    image,
+    datePublished: data.date || undefined,
+    dateModified: data.date || undefined,
+    author: {
+      '@type': 'Person',
+      name: 'Akshat Sharma',
+      url: SITE_URL,
+    },
+    publisher: {
+      '@type': 'Person',
+      name: 'Akshat Sharma',
+      url: SITE_URL,
+    },
+    mainEntityOfPage: {
+      '@type': 'WebPage',
+      '@id': url,
+    },
+    keywords: (data.tags || []).join(', ') || undefined,
+  };
+
   return (
     <>
       <Head>
-        <title>{post.data.title} · akshat.ssh</title>
-        <meta name="description" content={post.data.excerpt || ''} />
+        <title>{title}</title>
+        <meta name="description" content={description} />
+        <link rel="canonical" href={url} />
+
+        {/* Open Graph — article type gets richer previews on socials. */}
+        <meta property="og:type" content="article" />
+        <meta property="og:title" content={data.title} />
+        <meta property="og:description" content={description} />
+        <meta property="og:url" content={url} />
+        <meta property="og:image" content={image} />
+        {data.date && (
+          <meta property="article:published_time" content={data.date} />
+        )}
+        <meta property="article:author" content="Akshat Sharma" />
+        {(data.tags || []).map((tag) => (
+          <meta key={tag} property="article:tag" content={tag} />
+        ))}
+
+        {/* Twitter */}
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content={data.title} />
+        <meta name="twitter:description" content={description} />
+        <meta name="twitter:image" content={image} />
+
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(postSchema) }}
+        />
       </Head>
 
       <div className="min-h-screen bg-[#0a0a0a] text-neutral-200">
@@ -21,20 +89,20 @@ export default function BlogPost({ post }) {
           </Link>
 
           <h1 className="text-3xl md:text-5xl font-light tracking-tight text-neutral-50 mb-3">
-            {post.data.title}
+            {data.title}
           </h1>
-          {post.data.date && (
+          {data.date && (
             <time
-              dateTime={post.data.date}
+              dateTime={data.date}
               className="block text-sm text-neutral-400 font-mono mb-10"
             >
-              {format(new Date(post.data.date), 'MMMM d, yyyy')}
+              {format(new Date(data.date), 'MMMM d, yyyy')}
             </time>
           )}
 
           <div
             className="prose-wrapper"
-            dangerouslySetInnerHTML={{ __html: post.contentHtml }}
+            dangerouslySetInnerHTML={{ __html: contentHtml }}
           />
         </article>
       </div>
@@ -53,5 +121,5 @@ export async function getStaticPaths() {
 
 export async function getStaticProps({ params }) {
   const post = await getPostContent(params.slug);
-  return { props: { post } };
+  return { props: { post, slug: params.slug } };
 }

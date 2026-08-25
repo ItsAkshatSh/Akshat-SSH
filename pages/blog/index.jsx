@@ -3,12 +3,58 @@ import Link from 'next/link';
 import { getAllPosts } from '../../lib/blog';
 import { format } from 'date-fns';
 
+const SITE_URL =
+  process.env.NEXT_PUBLIC_SITE_URL || 'https://akshatshh.vercel.app';
+
+const BLOG_TITLE = 'Blog · Akshat Sharma';
+const BLOG_DESCRIPTION =
+  'Personal writing and long-form notes from Akshat Sharma — projects, community events, and the craft behind them.';
+const BLOG_URL = `${SITE_URL}/blog`;
+const BLOG_IMAGE = `${SITE_URL}/images/ascii/real_pfp.jpg`;
+
 export default function BlogIndex({ posts }) {
+  const blogSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'Blog',
+    name: BLOG_TITLE,
+    description: BLOG_DESCRIPTION,
+    url: BLOG_URL,
+    author: {
+      '@type': 'Person',
+      name: 'Akshat Sharma',
+      url: SITE_URL,
+    },
+    blogPost: posts.map((post) => ({
+      '@type': 'BlogPosting',
+      headline: post.title,
+      url: `${SITE_URL}/blog/${post.slug}`,
+      datePublished: post.date || undefined,
+      description: post.excerpt || undefined,
+    })),
+  };
+
   return (
     <>
       <Head>
-        <title>Blog · akshat.ssh</title>
-        <meta name="description" content="Personal blog and thoughts" />
+        <title>{BLOG_TITLE}</title>
+        <meta name="description" content={BLOG_DESCRIPTION} />
+        <link rel="canonical" href={BLOG_URL} />
+
+        <meta property="og:type" content="website" />
+        <meta property="og:title" content={BLOG_TITLE} />
+        <meta property="og:description" content={BLOG_DESCRIPTION} />
+        <meta property="og:url" content={BLOG_URL} />
+        <meta property="og:image" content={BLOG_IMAGE} />
+
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content={BLOG_TITLE} />
+        <meta name="twitter:description" content={BLOG_DESCRIPTION} />
+        <meta name="twitter:image" content={BLOG_IMAGE} />
+
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(blogSchema) }}
+        />
       </Head>
 
       <div className="min-h-screen bg-[#0a0a0a] text-neutral-200">

@@ -1,0 +1,33 @@
+# robots.txt — Akshat Sharma personal portfolio
+# All crawlers welcome. Sitemap is generated dynamically at /sitemap.xml.
+
+User-agent: *
+Allow: /
+Disallow: /api/
+
+# Explicitly welcome the major LLM training and search-augmentation bots.
+User-agent: GPTBot
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: OAI-SearchBot
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: Claude-Web
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+User-agent: Applebot-Extended
+Allow: /
+
+Sitemap: https://akshatshh.vercel.app/sitemap.xml
