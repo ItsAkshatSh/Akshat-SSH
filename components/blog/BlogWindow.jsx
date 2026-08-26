@@ -63,7 +63,6 @@ const BlogWindow = ({ onClose }) => {
   }, [selectedPost, onClose]);
 
   const title = selectedPost ? selectedPost.title : 'Blog';
-  const label = selectedPost ? 'Post' : 'Section';
 
   return (
     <div
@@ -90,21 +89,6 @@ const BlogWindow = ({ onClose }) => {
         className="readable-on-blur relative flex flex-col h-full w-full max-w-5xl mx-auto pointer-events-none"
         onClick={(e) => e.stopPropagation()}
       >
-        <div
-          aria-hidden="true"
-          className="absolute top-6 md:top-10 right-4 sm:right-10 md:right-14 pointer-events-none select-none leading-none"
-          style={{
-            fontSize: 'clamp(10rem, 26vw, 22rem)',
-            fontWeight: 500,
-            letterSpacing: '-0.05em',
-            color: 'rgba(255,255,255,0.035)',
-            opacity: 0,
-            animation: 'sectionBackdrop 0.9s cubic-bezier(0.16, 1, 0.3, 1) forwards 0.2s',
-          }}
-        >
-          04
-        </div>
-
         <SectionCorner position="tl" />
         <SectionCorner position="tr" />
         <SectionCorner position="bl" />
@@ -113,22 +97,11 @@ const BlogWindow = ({ onClose }) => {
         {/* Header */}
         <div className="relative flex justify-between items-start gap-4 px-6 sm:px-10 md:px-14 pt-16 md:pt-20 pb-6 md:pb-8 shrink-0 pointer-events-auto">
           <div className="min-w-0 flex-1">
-            <p
-              className="text-[10px] uppercase tracking-[0.4em] text-neutral-300 mb-5 flex items-center gap-3"
-              style={{
-                opacity: 0,
-                animation: 'slideUpFade 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards 0.15s',
-              }}
-            >
-              <span className="text-white">04</span>
-              <span className="h-px w-8 bg-neutral-600" />
-              <span>{label}</span>
-            </p>
             <h2
               className="text-3xl sm:text-4xl md:text-5xl font-medium text-white tracking-[-0.02em] leading-[1.05] break-words"
               style={{
                 opacity: 0,
-                animation: 'sectionTitleEnter 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards 0.25s',
+                animation: 'sectionTitleEnter 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards 0.2s',
               }}
             >
               <ScrambleText text={title} active />
@@ -138,7 +111,7 @@ const BlogWindow = ({ onClose }) => {
             className="flex items-center gap-2 shrink-0 mt-2"
             style={{
               opacity: 0,
-              animation: 'slideUpFade 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards 0.35s',
+              animation: 'slideUpFade 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards 0.3s',
             }}
           >
             {selectedPost && (
@@ -158,21 +131,6 @@ const BlogWindow = ({ onClose }) => {
               Close
             </button>
           </div>
-        </div>
-
-        {/* Meta bar. */}
-        <div
-          className="relative mx-6 sm:mx-10 md:mx-14 flex items-center gap-4 shrink-0 pointer-events-none"
-          style={{
-            opacity: 0,
-            animation: 'slideUpFade 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards 0.32s',
-          }}
-        >
-          <span className="h-px flex-1 bg-gradient-to-r from-transparent via-white/25 to-white/25" />
-          <span className="text-[10px] font-mono uppercase tracking-[0.3em] text-neutral-400">
-            04 / 04
-          </span>
-          <span className="h-px w-16 bg-white/25" />
         </div>
 
         {/* Content */}

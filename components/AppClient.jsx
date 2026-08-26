@@ -14,6 +14,7 @@ import ASCIICanvas from './ascii/ASCIICanvas';
 import BlogWindow from './blog/BlogWindow';
 import FloatingMenu from './ui/FloatingMenu';
 import { SmoothCursor } from './ui/smooth-cursor';
+import usePerformanceTier from './utilities/usePerformanceTier';
 
 import ProjectsContent from './content/ProjectsContent';
 import PhotographyContent from './content/PhotographyContent';
@@ -83,6 +84,7 @@ const App = () => {
   const [isBlogOpen, setIsBlogOpen] = useState(false);
   const [isFinePointer, setIsFinePointer] = useState(false);
   const [contentIn, setContentIn] = useState(false);
+  const tier = usePerformanceTier();
 
   // Mount fade-in.
   useEffect(() => {
@@ -125,12 +127,13 @@ const App = () => {
 
   return (
     <div className="min-h-screen bg-[#060a10] text-slate-200 overflow-x-hidden relative">
-      {/* Background: ASCII ocean. */}
-      <ASCIIField paused={false} />
+      {/* Background: ASCII ocean. Quality scales with device capability. */}
+      <ASCIIField paused={false} tier={tier} />
 
-      {/* Custom cursor: an ASCII jellyfish that spring-follows the pointer
-          and rotates to face its direction of travel. */}
-      {isFinePointer && <SmoothCursor />}
+      {/* Custom cursor: an ASCII arrow that spring-follows the pointer
+          and rotates to face its direction of travel. Disabled on low-end
+          hosts so we don't pay for a rAF spring every frame. */}
+      {isFinePointer && tier !== 'low' && <SmoothCursor />}
 
       {/* Hero */}
       <main className="relative z-10 w-full min-h-screen flex items-center justify-center px-6 md:px-10 py-20 md:py-24">
@@ -150,14 +153,14 @@ const App = () => {
             <div className="relative aspect-[3/4] rounded-2xl overflow-hidden border border-white/[0.08] bg-[#0a0f16] shadow-card">
               <ASCIICanvas
                 src="/images/ascii/real_pfp.jpg"
-                cellSize={4}
+                cellSize={tier === 'low' ? 8 : tier === 'medium' ? 6 : 4}
                 preserveColor
                 glitchUseSampled
                 gamma={0.6}
-                radius={100}
-                displace={12}
+                radius={tier === 'low' ? 70 : 100}
+                displace={tier === 'low' ? 6 : 12}
                 className="absolute inset-0"
-                fps={30}
+                fps={tier === 'low' ? 18 : tier === 'medium' ? 24 : 30}
               />
             </div>
           </div>
@@ -252,25 +255,6 @@ const App = () => {
             className="readable-on-blur relative flex flex-col h-full w-full max-w-5xl mx-auto pointer-events-none"
             onClick={(e) => e.stopPropagation()}
           >
-            {/* Ghost section number, sitting behind the header as a
-                design element. Very low opacity so it never competes with
-                the copy. */}
-            <div
-              aria-hidden="true"
-              className="absolute top-6 md:top-10 right-4 sm:right-10 md:right-14 pointer-events-none select-none leading-none"
-              style={{
-                fontSize: 'clamp(10rem, 26vw, 22rem)',
-                fontWeight: 500,
-                letterSpacing: '-0.05em',
-                color: 'rgba(255,255,255,0.035)',
-                opacity: 0,
-                animation:
-                  'sectionBackdrop 0.9s cubic-bezier(0.16, 1, 0.3, 1) forwards 0.2s',
-              }}
-            >
-              {String(SECTION_ORDER.indexOf(activeSection) + 1).padStart(2, '0')}
-            </div>
-
             {/* Technical corner brackets. */}
             <SectionCorner position="tl" />
             <SectionCorner position="tr" />
@@ -279,24 +263,11 @@ const App = () => {
 
             <div className="relative flex justify-between items-start gap-4 px-6 sm:px-10 md:px-14 pt-16 md:pt-20 pb-6 md:pb-8 shrink-0 pointer-events-auto">
               <div className="min-w-0">
-                <p
-                  className="text-[10px] uppercase tracking-[0.4em] text-neutral-300 mb-5 flex items-center gap-3"
-                  style={{
-                    opacity: 0,
-                    animation: 'slideUpFade 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards 0.15s',
-                  }}
-                >
-                  <span className="text-white">
-                    {String(SECTION_ORDER.indexOf(activeSection) + 1).padStart(2, '0')}
-                  </span>
-                  <span className="h-px w-8 bg-neutral-600" />
-                  <span>Section</span>
-                </p>
                 <h2
                   className="text-4xl sm:text-5xl md:text-6xl font-medium text-white tracking-[-0.02em] capitalize leading-none"
                   style={{
                     opacity: 0,
-                    animation: 'sectionTitleEnter 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards 0.25s',
+                    animation: 'sectionTitleEnter 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards 0.2s',
                   }}
                 >
                   <ScrambleText text={sectionTitle} active />
@@ -308,26 +279,11 @@ const App = () => {
                 aria-label="Close"
                 style={{
                   opacity: 0,
-                  animation: 'slideUpFade 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards 0.35s',
+                  animation: 'slideUpFade 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards 0.3s',
                 }}
               >
                 Close
               </button>
-            </div>
-
-            {/* Meta bar with section pagination, static aesthetic marker. */}
-            <div
-              className="relative mx-6 sm:mx-10 md:mx-14 flex items-center gap-4 shrink-0 pointer-events-none"
-              style={{
-                opacity: 0,
-                animation: 'slideUpFade 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards 0.32s',
-              }}
-            >
-              <span className="h-px flex-1 bg-gradient-to-r from-transparent via-white/25 to-white/25" />
-              <span className="text-[10px] font-mono uppercase tracking-[0.3em] text-neutral-400">
-                {String(SECTION_ORDER.indexOf(activeSection) + 1).padStart(2, '0')} / {String(SECTION_ORDER.length).padStart(2, '0')}
-              </span>
-              <span className="h-px w-16 bg-white/25" />
             </div>
 
             {/* Scrollable content, with soft edge fades top and bottom. */}
