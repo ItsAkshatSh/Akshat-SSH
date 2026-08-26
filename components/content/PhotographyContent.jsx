@@ -27,22 +27,20 @@ const PhotographyContent = () => {
   const segments = tier === 'low' ? 20 : tier === 'medium' ? 28 : 35;
 
   return (
-    <div className="-mx-6 sm:-mx-10 md:-mx-14 -mt-8 md:-mt-10 pb-4">
-      <div className="relative h-[78vh] min-h-[520px]">
-        <DomeGallery
-          images={images}
-          fit={0.85}
-          minRadius={620}
-          dragDampening={1.2}
-          grayscale={false}
-          overlayBlurColor="#060a10"
-          imageBorderRadius="14px"
-          openedImageBorderRadius="14px"
-          openedImageWidth="min(520px, 78vw)"
-          openedImageHeight="min(620px, 74vh)"
-          segments={segments}
-        />
-      </div>
+    <div className="relative h-full w-full">
+      <DomeGallery
+        images={images}
+        fit={0.9}
+        minRadius={680}
+        dragDampening={1.2}
+        grayscale={false}
+        overlayBlurColor="#060a10"
+        imageBorderRadius="14px"
+        openedImageBorderRadius="14px"
+        openedImageWidth="min(560px, 82vw)"
+        openedImageHeight="min(680px, 80vh)"
+        segments={segments}
+      />
     </div>
   );
 };

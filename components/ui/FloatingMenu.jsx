@@ -105,7 +105,7 @@ function MenuButton({ label, onClick, isOpen, index }) {
   );
 }
 
-export default function FloatingMenu({ items }) {
+export default function FloatingMenu({ items, hidden = false }) {
   const [isOpen, setIsOpen] = useState(false);
   const containerRef = useRef(null);
 
@@ -144,10 +144,11 @@ export default function FloatingMenu({ items }) {
     <motion.div
       ref={containerRef}
       className="fixed bottom-6 left-1/2 z-[80]"
-      style={{ x: '-50%', pointerEvents: 'auto' }}
+      style={{ x: '-50%', pointerEvents: hidden ? 'none' : 'auto' }}
       initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5, ease, delay: 0.4 }}
+      animate={{ opacity: hidden ? 0 : 1, y: hidden ? 20 : 0 }}
+      transition={{ duration: 0.35, ease }}
+      aria-hidden={hidden}
     >
       <motion.div
         className="interactive relative overflow-hidden flex flex-col"

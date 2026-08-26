@@ -19,7 +19,6 @@ export default function BlogPost({ post, slug }) {
       : `${SITE_URL}${data.image}`
     : `${SITE_URL}/images/ascii/real_pfp.jpg`;
 
-  // BlogPosting schema for rich results.
   const postSchema = {
     '@context': 'https://schema.org',
     '@type': 'BlogPosting',
@@ -53,7 +52,6 @@ export default function BlogPost({ post, slug }) {
         <meta name="description" content={description} />
         <link rel="canonical" href={url} />
 
-        {/* Open Graph — article type gets richer previews on socials. */}
         <meta property="og:type" content="article" />
         <meta property="og:title" content={data.title} />
         <meta property="og:description" content={description} />
@@ -67,7 +65,6 @@ export default function BlogPost({ post, slug }) {
           <meta key={tag} property="article:tag" content={tag} />
         ))}
 
-        {/* Twitter */}
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content={data.title} />
         <meta name="twitter:description" content={description} />

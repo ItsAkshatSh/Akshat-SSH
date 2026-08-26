@@ -1,13 +1,13 @@
 /**
  * AppClient
  * Root of the single-page portfolio. Owns the animated ASCII ocean
- * background, the hero, the floating menu, and the three overlay
- * screens (Projects / Photography / Experience) plus the Blog and the
- * photo lightbox.
+ * background, the hero, the floating menu, and overlay sections.
  */
 import { useState, useEffect } from 'react';
 
 import ScrambleText from './utilities/ScrambleText';
+import SectionOverlay from './ui/SectionOverlay';
+import { HERO, SOCIALS } from '../lib/siteContent';
 
 import ASCIIField from './ascii/ASCIIField';
 import ASCIICanvas from './ascii/ASCIICanvas';
@@ -20,63 +20,24 @@ import ProjectsContent from './content/ProjectsContent';
 import PhotographyContent from './content/PhotographyContent';
 import ExperienceContent from './content/ExperienceContent';
 
-const SOCIALS = [
-  {
-    label: 'GitHub',
-    href: 'https://github.com/ItsAkshatSh',
-    icon: (
-      <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-        <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.44 9.81 8.21 11.4.6.11.82-.26.82-.58 0-.29-.01-1.04-.02-2.05-3.34.72-4.04-1.61-4.04-1.61-.55-1.39-1.34-1.76-1.34-1.76-1.09-.75.08-.73.08-.73 1.21.09 1.85 1.24 1.85 1.24 1.07 1.84 2.81 1.31 3.5 1 .11-.78.42-1.31.76-1.61-2.67-.31-5.47-1.34-5.47-5.93 0-1.31.47-2.38 1.24-3.22-.12-.31-.54-1.52.12-3.17 0 0 1.01-.32 3.3 1.23a11.5 11.5 0 0 1 6 0c2.29-1.55 3.3-1.23 3.3-1.23.66 1.65.24 2.86.12 3.17.77.84 1.24 1.91 1.24 3.22 0 4.61-2.81 5.62-5.49 5.92.43.37.82 1.1.82 2.22 0 1.6-.01 2.9-.01 3.29 0 .32.22.7.83.58C20.57 21.8 24 17.3 24 12c0-6.63-5.37-12-12-12z" />
-      </svg>
-    ),
-  },
-  {
-    label: 'Instagram',
-    href: 'https://www.instagram.com/akshat.ssh/',
-    icon: (
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-        <rect x="3" y="3" width="18" height="18" rx="5" />
-        <circle cx="12" cy="12" r="4" />
-        <circle cx="17.3" cy="6.7" r="0.6" fill="currentColor" />
-      </svg>
-    ),
-  },
-  {
-    label: 'LinkedIn',
-    href: 'https://www.linkedin.com/in/akshat404/',
-    icon: (
-      <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-        <path d="M20.45 20.45h-3.55v-5.57c0-1.33-.02-3.04-1.85-3.04-1.85 0-2.13 1.45-2.13 2.94v5.67H9.35V9h3.41v1.56h.05c.48-.9 1.63-1.85 3.36-1.85 3.59 0 4.25 2.36 4.25 5.44v6.3zM5.34 7.43a2.06 2.06 0 1 1 0-4.12 2.06 2.06 0 0 1 0 4.12zM7.12 20.45H3.55V9h3.57v11.45zM22.22 0H1.77C.79 0 0 .77 0 1.72v20.56C0 23.23.79 24 1.77 24h20.45C23.2 24 24 23.23 24 22.28V1.72C24 .77 23.2 0 22.22 0z" />
-      </svg>
-    ),
-  },
-];
-
-const SECTION_ORDER = ['projects', 'photography', 'experience'];
-
-/**
- * Small L-shaped bracket for the four corners of the sub-page content
- * column. Decorative only; adds a technical-drawing feel without noise.
- */
-const SectionCorner = ({ position }) => {
-  const anchor = {
-    tl: 'top-3 left-3 sm:top-6 sm:left-6',
-    tr: 'top-3 right-3 sm:top-6 sm:right-6 rotate-90',
-    bl: 'bottom-3 left-3 sm:bottom-6 sm:left-6 -rotate-90',
-    br: 'bottom-3 right-3 sm:bottom-6 sm:right-6 rotate-180',
-  }[position];
-  return (
-    <div
-      aria-hidden="true"
-      className={`absolute w-4 h-4 pointer-events-none ${anchor}`}
-      style={{
-        borderTop: '1px solid rgba(255,255,255,0.25)',
-        borderLeft: '1px solid rgba(255,255,255,0.25)',
-        opacity: 0,
-        animation: 'sectionBackdrop 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards 0.4s',
-      }}
-    />
-  );
+const SOCIAL_ICONS = {
+  GitHub: (
+    <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+      <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.44 9.81 8.21 11.4.6.11.82-.26.82-.58 0-.29-.01-1.04-.02-2.05-3.34.72-4.04-1.61-4.04-1.61-.55-1.39-1.34-1.76-1.34-1.76-1.09-.75.08-.73.08-.73 1.21.09 1.85 1.24 1.85 1.24 1.07 1.84 2.81 1.31 3.5 1 .11-.78.42-1.31.76-1.61-2.67-.31-5.47-1.34-5.47-5.93 0-1.31.47-2.38 1.24-3.22-.12-.31-.54-1.52.12-3.17 0 0 1.01-.32 3.3 1.23a11.5 11.5 0 0 1 6 0c2.29-1.55 3.3-1.23 3.3-1.23.66 1.65.24 2.86.12 3.17.77.84 1.24 1.91 1.24 3.22 0 4.61-2.81 5.62-5.49 5.92.43.37.82 1.1.82 2.22 0 1.6-.01 2.9-.01 3.29 0 .32.22.7.83.58C20.57 21.8 24 17.3 24 12c0-6.63-5.37-12-12-12z" />
+    </svg>
+  ),
+  Instagram: (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <rect x="3" y="3" width="18" height="18" rx="5" />
+      <circle cx="12" cy="12" r="4" />
+      <circle cx="17.3" cy="6.7" r="0.6" fill="currentColor" />
+    </svg>
+  ),
+  LinkedIn: (
+    <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+      <path d="M20.45 20.45h-3.55v-5.57c0-1.33-.02-3.04-1.85-3.04-1.85 0-2.13 1.45-2.13 2.94v5.67H9.35V9h3.41v1.56h.05c.48-.9 1.63-1.85 3.36-1.85 3.59 0 4.25 2.36 4.25 5.44v6.3zM5.34 7.43a2.06 2.06 0 1 1 0-4.12 2.06 2.06 0 0 1 0 4.12zM7.12 20.45H3.55V9h3.57v11.45zM22.22 0H1.77C.79 0 0 .77 0 1.72v20.56C0 23.23.79 24 1.77 24h20.45C23.2 24 24 23.23 24 22.28V1.72C24 .77 23.2 0 22.22 0z" />
+    </svg>
+  ),
 };
 
 const App = () => {
@@ -86,13 +47,19 @@ const App = () => {
   const [contentIn, setContentIn] = useState(false);
   const tier = usePerformanceTier();
 
-  // Mount fade-in.
+  useEffect(() => {
+    const shell = document.getElementById('hero-shell');
+    if (shell) shell.style.display = 'none';
+    return () => {
+      if (shell) shell.style.display = '';
+    };
+  }, []);
+
   useEffect(() => {
     const t = setTimeout(() => setContentIn(true), 60);
     return () => clearTimeout(t);
   }, []);
 
-  // Only show the custom cursor on fine-pointer devices.
   useEffect(() => {
     if (typeof window === 'undefined' || !window.matchMedia) return;
     const mq = window.matchMedia('(hover: hover) and (pointer: fine)');
@@ -102,8 +69,6 @@ const App = () => {
     return () => mq.removeEventListener?.('change', update);
   }, []);
 
-  // Escape closes overlays in reverse depth order. The photo lightbox is
-  // owned by the shared-element gallery and handles its own escape.
   useEffect(() => {
     const handleKeyDown = (e) => {
       if (e.key !== 'Escape') return;
@@ -113,6 +78,19 @@ const App = () => {
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [isBlogOpen, activeSection]);
+
+  // Open sections from hash links in the SSR hero shell (e.g. /#projects).
+  useEffect(() => {
+    const syncFromHash = () => {
+      const hash = window.location.hash.replace('#', '');
+      if (['projects', 'photography', 'experience'].includes(hash)) {
+        setActiveSection(hash);
+      }
+    };
+    syncFromHash();
+    window.addEventListener('hashchange', syncFromHash);
+    return () => window.removeEventListener('hashchange', syncFromHash);
+  }, []);
 
   const navItems = [
     { label: 'Projects', onClick: () => setActiveSection('projects') },
@@ -124,25 +102,20 @@ const App = () => {
   const sectionTitle = activeSection
     ? activeSection.charAt(0).toUpperCase() + activeSection.slice(1)
     : '';
+  const isPhotography = activeSection === 'photography';
 
   return (
-    <div className="min-h-screen bg-[#060a10] text-slate-200 overflow-x-hidden relative">
-      {/* Background: ASCII ocean. Quality scales with device capability. */}
+    <div className="fixed inset-0 z-10 min-h-screen bg-[#060a10] text-slate-200 overflow-x-hidden overflow-y-auto">
       <ASCIIField paused={false} tier={tier} />
 
-      {/* Custom cursor: an ASCII arrow that spring-follows the pointer
-          and rotates to face its direction of travel. Disabled on low-end
-          hosts so we don't pay for a rAF spring every frame. */}
       {isFinePointer && tier !== 'low' && <SmoothCursor />}
 
-      {/* Hero */}
       <main className="relative z-10 w-full min-h-screen flex items-center justify-center px-6 md:px-10 py-20 md:py-24">
         <div
           className={`w-full max-w-6xl grid lg:grid-cols-[minmax(260px,320px)_1fr] gap-10 lg:gap-16 xl:gap-20 items-center transition-all duration-700 ease-premium ${
             contentIn ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-3'
           }`}
         >
-          {/* Portrait */}
           <div
             className="interactive relative mx-auto lg:mx-0 w-full max-w-[280px] lg:max-w-none"
             style={{
@@ -165,7 +138,6 @@ const App = () => {
             </div>
           </div>
 
-          {/* Intro + socials */}
           <div className="flex flex-col gap-9 lg:gap-11">
             <header
               className="max-w-xl"
@@ -175,13 +147,12 @@ const App = () => {
               }}
             >
               <h2 className="text-4xl sm:text-5xl lg:text-[3.4rem] leading-[1.02] font-medium text-white tracking-[-0.02em] mb-6">
-                Akshat<br />Sharma.
+                {HERO.nameLines[0]}
+                <br />
+                {HERO.nameLines[1]}
               </h2>
-
               <p className="text-neutral-200 text-[15px] sm:text-base leading-[1.75] max-w-md">
-                Aspiring Computer Engineer from Dubai. Building across hardware,
-                mobile, embedded systems, PCB design and games. From a home-brewed
-                StreamDeck to Flutter apps that actually ship.
+                {HERO.bio}
               </p>
             </header>
 
@@ -192,7 +163,7 @@ const App = () => {
                 animation: 'slideUpFade 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards 0.2s',
               }}
             >
-              {SOCIALS.map(({ label, href, icon }) => (
+              {SOCIALS.map(({ label, href }) => (
                 <a
                   key={label}
                   href={href}
@@ -201,7 +172,7 @@ const App = () => {
                   aria-label={label}
                   className="interactive group flex items-center justify-center w-11 h-11 rounded-full border border-white/[0.1] text-neutral-200 hover:text-white hover:border-white/30 hover:bg-white/[0.05] transition-all duration-300"
                 >
-                  <span className="w-[18px] h-[18px] block">{icon}</span>
+                  <span className="w-[18px] h-[18px] block">{SOCIAL_ICONS[label]}</span>
                 </a>
               ))}
             </div>
@@ -209,106 +180,26 @@ const App = () => {
         </div>
       </main>
 
-      {/* Floating navigation */}
-      <FloatingMenu items={navItems.map((n) => ({ label: n.label, onClick: n.onClick }))} />
+      <FloatingMenu
+        items={navItems.map((n) => ({ label: n.label, onClick: n.onClick }))}
+        hidden={Boolean(activeSection || isBlogOpen)}
+      />
 
-      {/* Blog overlay */}
       {isBlogOpen && <BlogWindow onClose={() => setIsBlogOpen(false)} />}
 
-      {/* Section overlay: Projects / Photography / Experience.
-          Backdrop and content are animated separately so the panel feels
-          like it is being built up: dark curtain first, then label, title,
-          content sliding up in sequence. */}
       {activeSection && (
-        <div
-          className="fixed inset-0 z-40 flex flex-col overflow-hidden"
-          role="dialog"
-          aria-modal="true"
-          aria-label={sectionTitle}
+        <SectionOverlay
+          ariaLabel={sectionTitle}
+          onClose={() => setActiveSection(null)}
+          variant={isPhotography ? 'fullpage' : 'default'}
+          showVignettes={!isPhotography}
+          contentKey={activeSection}
+          title={<ScrambleText text={sectionTitle} active />}
         >
-          {/* Translucent tint over the ocean so the ASCII field shows
-              through as an atmospheric backdrop. Heavy blur smooths the
-              underlying motion into a soft gradient behind the text. */}
-          <button
-            type="button"
-            aria-label="Close section"
-            onClick={() => setActiveSection(null)}
-            className="absolute inset-0 w-full h-full bg-[#060a10]/55 backdrop-blur-2xl cursor-default"
-            tabIndex={-1}
-            style={{
-              opacity: 0,
-              animation: 'sectionBackdrop 0.35s cubic-bezier(0.4, 0, 0.2, 1) forwards',
-            }}
-          />
-          {/* Vignettes soften the top/bottom bleed so the ocean fades
-              into the edges. */}
-          <div
-            aria-hidden="true"
-            className="absolute inset-x-0 top-0 h-40 bg-gradient-to-b from-[#060a10]/80 to-transparent pointer-events-none"
-          />
-          <div
-            aria-hidden="true"
-            className="absolute inset-x-0 bottom-0 h-56 bg-gradient-to-t from-[#060a10]/90 via-[#060a10]/45 to-transparent pointer-events-none"
-          />
-
-          <div
-            className="readable-on-blur relative flex flex-col h-full w-full max-w-5xl mx-auto pointer-events-none"
-            onClick={(e) => e.stopPropagation()}
-          >
-            {/* Technical corner brackets. */}
-            <SectionCorner position="tl" />
-            <SectionCorner position="tr" />
-            <SectionCorner position="bl" />
-            <SectionCorner position="br" />
-
-            <div className="relative flex justify-between items-start gap-4 px-6 sm:px-10 md:px-14 pt-16 md:pt-20 pb-6 md:pb-8 shrink-0 pointer-events-auto">
-              <div className="min-w-0">
-                <h2
-                  className="text-4xl sm:text-5xl md:text-6xl font-medium text-white tracking-[-0.02em] capitalize leading-none"
-                  style={{
-                    opacity: 0,
-                    animation: 'sectionTitleEnter 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards 0.2s',
-                  }}
-                >
-                  <ScrambleText text={sectionTitle} active />
-                </h2>
-              </div>
-              <button
-                onClick={() => setActiveSection(null)}
-                className="interactive shrink-0 mt-2 h-10 px-4 rounded-full border border-white/[0.14] text-neutral-200 hover:text-white hover:border-white/30 hover:bg-white/[0.05] transition-all duration-300 text-[11px] tracking-[0.25em] uppercase"
-                aria-label="Close"
-                style={{
-                  opacity: 0,
-                  animation: 'slideUpFade 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards 0.3s',
-                }}
-              >
-                Close
-              </button>
-            </div>
-
-            {/* Scrollable content, with soft edge fades top and bottom. */}
-            <div
-              className="relative flex-1 overflow-y-auto px-6 sm:px-10 md:px-14 pt-8 md:pt-10 pb-24 md:pb-28 custom-scrollbar pointer-events-auto"
-              style={{
-                WebkitMaskImage:
-                  'linear-gradient(to bottom, transparent 0, #000 24px, #000 calc(100% - 40px), transparent 100%)',
-                maskImage:
-                  'linear-gradient(to bottom, transparent 0, #000 24px, #000 calc(100% - 40px), transparent 100%)',
-              }}
-            >
-              <div
-                style={{
-                  opacity: 0,
-                  animation: 'sectionBodyEnter 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards 0.4s',
-                }}
-              >
-                {activeSection === 'projects' && <ProjectsContent />}
-                {activeSection === 'photography' && <PhotographyContent />}
-                {activeSection === 'experience' && <ExperienceContent />}
-              </div>
-            </div>
-          </div>
-        </div>
+          {activeSection === 'projects' && <ProjectsContent />}
+          {activeSection === 'photography' && <PhotographyContent />}
+          {activeSection === 'experience' && <ExperienceContent />}
+        </SectionOverlay>
       )}
     </div>
   );
