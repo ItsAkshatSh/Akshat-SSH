@@ -11,15 +11,11 @@ import * as THREE from 'three';
 const RAMP = ' .·:-=+*x#%@';
 const GLITCH = '!@#$%&*+=~/\\|<>[]{}?';
 
-// Adaptive quality profiles. Larger cells = fewer characters to iterate
-// per frame; lower render scale = smaller three.js texture; lower FPS =
-// fewer paint passes per second. The `low` tier trades some fidelity for
-// a big reduction in CPU / GPU load.
-const QUALITY_PROFILES = {
-  high:   { cellW: 7,  cellH: 12, fontSize: 12, renderScale: 2.0, targetFps: 30 },
-  medium: { cellW: 9,  cellH: 15, fontSize: 14, renderScale: 1.5, targetFps: 24 },
-  low:    { cellW: 12, cellH: 19, fontSize: 17, renderScale: 1.0, targetFps: 18 },
-};
+const CELL_W = 7;
+const CELL_H = 12;
+const FONT_SIZE = 12;
+const RENDER_SCALE = 2.0;
+const TARGET_FPS = 30;
 
 // ---------- Jellyfish shaders (from the reference, adapted) ----------
 const BELL_VERT = /* glsl */ `
@@ -163,7 +159,7 @@ function makeStrandGeometry(length, thickness, curl) {
   return g;
 }
 
-export default function ASCIIField({ paused = false, tier = 'high' } = {}) {
+export default function ASCIIField({ paused = false } = {}) {
   const displayCanvasRef = useRef(null);
   const pausedRef = useRef(paused);
   useEffect(() => {
@@ -174,14 +170,6 @@ export default function ASCIIField({ paused = false, tier = 'high' } = {}) {
     const displayCanvas = displayCanvasRef.current;
     if (!displayCanvas) return;
     const dctx = displayCanvas.getContext('2d');
-
-    // Adaptive quality knobs derived from the current tier. Kept inside
-    // the effect so a tier change rebuilds the scene with new metrics.
-    const profile = QUALITY_PROFILES[tier] || QUALITY_PROFILES.high;
-    const CELL_W = profile.cellW;
-    const CELL_H = profile.cellH;
-    const FONT_SIZE = profile.fontSize;
-    const RENDER_SCALE = profile.renderScale;
 
     // Offscreen canvas: source pixels for the ASCII pass.
     const gridCanvas = document.createElement('canvas');
@@ -389,7 +377,7 @@ export default function ASCIIField({ paused = false, tier = 'high' } = {}) {
 
     let raf;
     let lastFrame = 0;
-    const targetInterval = 1000 / profile.targetFps;
+    const targetInterval = 1000 / TARGET_FPS;
 
     const initAmbient = () => {
       const bubCount = Math.floor((cols * rows) / 1400);
@@ -908,7 +896,7 @@ export default function ASCIIField({ paused = false, tier = 'high' } = {}) {
       for (const d of disposables) d.dispose?.();
       renderer.dispose();
     };
-  }, [tier]);
+  }, []);
 
   return (
     <canvas

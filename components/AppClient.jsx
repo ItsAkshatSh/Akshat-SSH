@@ -14,7 +14,6 @@ import ASCIICanvas from './ascii/ASCIICanvas';
 import BlogWindow from './blog/BlogWindow';
 import FloatingMenu from './ui/FloatingMenu';
 import { SmoothCursor } from './ui/smooth-cursor';
-import usePerformanceTier from './utilities/usePerformanceTier';
 
 import ProjectsContent from './content/ProjectsContent';
 import PhotographyContent from './content/PhotographyContent';
@@ -45,7 +44,6 @@ const App = () => {
   const [isBlogOpen, setIsBlogOpen] = useState(false);
   const [isFinePointer, setIsFinePointer] = useState(false);
   const [contentIn, setContentIn] = useState(false);
-  const tier = usePerformanceTier();
 
   useEffect(() => {
     const shell = document.getElementById('hero-shell');
@@ -106,9 +104,9 @@ const App = () => {
 
   return (
     <div className="fixed inset-0 z-10 min-h-screen bg-[#060a10] text-slate-200 overflow-x-hidden overflow-y-auto">
-      <ASCIIField paused={false} tier={tier} />
+      <ASCIIField paused={false} />
 
-      {isFinePointer && tier !== 'low' && <SmoothCursor />}
+      {isFinePointer && <SmoothCursor />}
 
       <main className="relative z-10 w-full min-h-screen flex items-center justify-center px-6 md:px-10 py-20 md:py-24">
         <div
@@ -126,14 +124,14 @@ const App = () => {
             <div className="relative aspect-[3/4] rounded-2xl overflow-hidden border border-white/[0.08] bg-[#0a0f16] shadow-card">
               <ASCIICanvas
                 src="/images/ascii/real_pfp.jpg"
-                cellSize={tier === 'low' ? 8 : tier === 'medium' ? 6 : 4}
+                cellSize={4}
                 preserveColor
                 glitchUseSampled
                 gamma={0.6}
-                radius={tier === 'low' ? 70 : 100}
-                displace={tier === 'low' ? 6 : 12}
+                radius={100}
+                displace={12}
                 className="absolute inset-0"
-                fps={tier === 'low' ? 18 : tier === 'medium' ? 24 : 30}
+                fps={30}
               />
             </div>
           </div>
