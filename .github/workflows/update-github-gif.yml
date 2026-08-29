@@ -1,66 +1,53 @@
 name: Update GitHub profile GIF
-
 on:
+  push:
+    branches:
+      - main
   schedule:
-    # Every hour at :00 UTC
-    - cron: '0 * * * *'
+    - cron: '*/30 * * * *'
   workflow_dispatch:
-
 permissions:
   contents: write
-
 concurrency:
   group: update-github-gif
   cancel-in-progress: true
-
 jobs:
   regenerate-gif:
     runs-on: ubuntu-latest
     timeout-minutes: 30
-
     env:
       GITHUB_TOKEN: ${{ secrets.PROFILE_TOKEN }}
       GITHUB_USERNAME: ItsAkshatSh
       GIF_FPS: '15'
       GIF_DURATION_SEC: '2.5'
-
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
           node-version: '22'
           cache: npm
-
       - name: Install dependencies
         run: npm install
-
       - name: Install Playwright Chromium
         run: npx playwright install --with-deps chromium
-
       - name: Build site
         run: npm run build
-
       - name: Generate github.gif
         run: node scripts/generate-github-gif.mjs --start-server
-
       - name: Commit and push
         run: |
           if [ ! -f public/github.gif ]; then
             echo "public/github.gif was not created"
             exit 1
           fi
-
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add public/github.gif public/github-gif-version.txt public/github-profile-embed.md
-
           if git diff --cached --quiet; then
             echo "No GIF changes to commit."
             exit 0
           fi
-
           git commit -m "chore: update github profile gif"
           git push
