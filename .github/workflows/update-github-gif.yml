@@ -19,7 +19,7 @@ jobs:
     timeout-minutes: 30
 
     env:
-      GITHUB_TOKEN: ${{ secrets.GITHUB_PROFILE_TOKEN }}
+      GITHUB_TOKEN: ${{ secrets.PROFILE_TOKEN }}
       GITHUB_USERNAME: ItsAkshatSh
       GIF_FPS: '15'
       GIF_DURATION_SEC: '2.5'
