@@ -50,5 +50,5 @@ jobs:
           fi
           git commit -m "chore: update github profile gif"
           git fetch origin main
-          git rebase origin/main
+          git merge -X ours origin/main --no-edit
           git push origin HEAD:main
