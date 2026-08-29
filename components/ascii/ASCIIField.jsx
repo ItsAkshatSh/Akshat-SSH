@@ -159,7 +159,7 @@ function makeStrandGeometry(length, thickness, curl) {
   return g;
 }
 
-export default function ASCIIField({ paused = false } = {}) {
+export default function ASCIIField({ paused = false, targetFps = TARGET_FPS, profileMode = false } = {}) {
   const displayCanvasRef = useRef(null);
   const pausedRef = useRef(paused);
   useEffect(() => {
@@ -377,10 +377,12 @@ export default function ASCIIField({ paused = false } = {}) {
 
     let raf;
     let lastFrame = 0;
-    const targetInterval = 1000 / TARGET_FPS;
+    const fps = Math.max(1, Math.min(120, targetFps));
+    const targetInterval = 1000 / fps;
 
     const initAmbient = () => {
-      const bubCount = Math.floor((cols * rows) / 1400);
+      const density = profileMode ? 2800 : 1400;
+      const bubCount = Math.floor((cols * rows) / density);
       bubbles = Array.from({ length: bubCount }, () => ({
         x: Math.random() * cols,
         y: Math.random() * rows,
@@ -742,6 +744,7 @@ export default function ASCIIField({ paused = false } = {}) {
       // Thresholds for a cell to count as under each mask.
       const RAY_THRESHOLD = 24;
       const KELP_THRESHOLD = 30;
+      const minBright = profileMode ? 32 : 22;
 
       let lastStyleKey = -1;
 
@@ -765,7 +768,7 @@ export default function ASCIIField({ paused = false } = {}) {
           const sceneBright = 0.299 * r + 0.587 * g + 0.114 * b;
           const bright =
             sceneBright + rayStrength * 0.55 + kelpStrength * 0.45;
-          if (bright < 22 && !underRay && !underKelp) continue;
+          if (bright < minBright && !underRay && !underKelp) continue;
 
           const rampIdx = Math.min(rampLen - 1, Math.floor((bright / 255) * rampLen));
           let ch = RAMP[rampIdx];
@@ -777,7 +780,7 @@ export default function ASCIIField({ paused = false } = {}) {
           let offY = 0;
           let isGlitch = false;
 
-          if (inf > 0.01) {
+          if (!profileMode && inf > 0.01) {
             const dx = px + CELL_W * 0.5 - cx;
             const dy = py + CELL_H * 0.5 - cy;
             const d2 = dx * dx + dy * dy;
@@ -866,7 +869,7 @@ export default function ASCIIField({ paused = false } = {}) {
       cursor.target = 0;
     };
 
-    // ----- Main loop, throttled to 30fps, paused when a panel is open -----
+    // ----- Main loop, throttled to targetFps, paused when a panel is open -----
     const loop = (t) => {
       raf = requestAnimationFrame(loop);
       if (pausedRef.current) return;
@@ -880,23 +883,27 @@ export default function ASCIIField({ paused = false } = {}) {
     resize();
     const handleResize = () => resize();
     window.addEventListener('resize', handleResize);
-    window.addEventListener('mousemove', onMouseMove);
-    window.addEventListener('mouseleave', onMouseLeave);
-    window.addEventListener('touchmove', onTouchMove, { passive: true });
-    window.addEventListener('touchend', onTouchEnd);
+    if (!profileMode) {
+      window.addEventListener('mousemove', onMouseMove);
+      window.addEventListener('mouseleave', onMouseLeave);
+      window.addEventListener('touchmove', onTouchMove, { passive: true });
+      window.addEventListener('touchend', onTouchEnd);
+    }
     raf = requestAnimationFrame(loop);
 
     return () => {
       window.removeEventListener('resize', handleResize);
-      window.removeEventListener('mousemove', onMouseMove);
-      window.removeEventListener('mouseleave', onMouseLeave);
-      window.removeEventListener('touchmove', onTouchMove);
-      window.removeEventListener('touchend', onTouchEnd);
+      if (!profileMode) {
+        window.removeEventListener('mousemove', onMouseMove);
+        window.removeEventListener('mouseleave', onMouseLeave);
+        window.removeEventListener('touchmove', onTouchMove);
+        window.removeEventListener('touchend', onTouchEnd);
+      }
       if (raf) cancelAnimationFrame(raf);
       for (const d of disposables) d.dispose?.();
       renderer.dispose();
     };
-  }, []);
+  }, [targetFps, profileMode]);
 
   return (
     <canvas
