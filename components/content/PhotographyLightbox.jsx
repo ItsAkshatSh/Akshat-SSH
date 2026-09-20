@@ -66,7 +66,7 @@ const PhotographyLightbox = ({ selectedImg, onClose, onSelect }) => {
 
   return createPortal(
     <div
-      className="fixed inset-0 z-[200] bg-[#050810] flex flex-col overflow-hidden"
+      className="fixed inset-0 z-lightbox bg-[#050810] flex flex-col overflow-hidden"
       role="dialog"
       aria-modal="true"
       aria-label={`Photo ${selectedIndex + 1} of ${total}`}
@@ -78,9 +78,9 @@ const PhotographyLightbox = ({ selectedImg, onClose, onSelect }) => {
       <CornerMark position="br" />
 
       {/* Top bar: index + close */}
-      <header className="relative flex items-center justify-between px-6 sm:px-10 py-5 shrink-0">
+      <header className="safe-t safe-l safe-r relative flex items-center justify-between px-6 sm:px-10 py-5 shrink-0">
         <div
-          className="flex items-baseline gap-3 text-[11px] font-mono uppercase tracking-[0.3em]"
+          className="flex items-baseline gap-3 text-[11px] font-mono uppercase tracking-[0.3em] tabular-nums"
           style={{
             opacity: 0,
             animation: 'slideUpFade 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards 0.1s',
@@ -97,7 +97,7 @@ const PhotographyLightbox = ({ selectedImg, onClose, onSelect }) => {
         </div>
         <button
           onClick={onClose}
-          className="interactive h-10 px-4 rounded-full border border-white/[0.14] text-neutral-200 hover:text-white hover:border-white/30 hover:bg-white/[0.05] transition-all duration-300 text-[11px] tracking-[0.25em] uppercase"
+          className="interactive press h-10 px-4 rounded-full border border-white/[0.14] text-neutral-200 hover:text-white hover:border-white/30 hover:bg-white/[0.05] text-[11px] tracking-[0.25em] uppercase"
           aria-label="Close"
           style={{
             opacity: 0,
@@ -114,7 +114,7 @@ const PhotographyLightbox = ({ selectedImg, onClose, onSelect }) => {
           <button
             onClick={() => goTo(selectedIndex - 1)}
             aria-label="Previous photo"
-            className="interactive absolute left-3 sm:left-8 top-1/2 -translate-y-1/2 z-10 w-11 h-11 sm:w-12 sm:h-12 rounded-full border border-white/[0.14] flex items-center justify-center text-white/80 hover:text-white hover:border-white/40 hover:bg-white/[0.05] transition-all duration-300 backdrop-blur-sm bg-black/30"
+            className="interactive absolute left-3 sm:left-8 top-1/2 -translate-y-1/2 z-content size-11 sm:size-12 rounded-full border border-white/[0.14] flex items-center justify-center text-white/80 hover:text-white hover:border-white/40 hover:bg-white/[0.05] transition-all duration-300 active:duration-100 active:scale-90 backdrop-blur-sm bg-black/30"
           >
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
               <path d="M15 6l-6 6 6 6" />
@@ -139,7 +139,7 @@ const PhotographyLightbox = ({ selectedImg, onClose, onSelect }) => {
           <button
             onClick={() => goTo(selectedIndex + 1)}
             aria-label="Next photo"
-            className="interactive absolute right-3 sm:right-8 top-1/2 -translate-y-1/2 z-10 w-11 h-11 sm:w-12 sm:h-12 rounded-full border border-white/[0.14] flex items-center justify-center text-white/80 hover:text-white hover:border-white/40 hover:bg-white/[0.05] transition-all duration-300 backdrop-blur-sm bg-black/30"
+            className="interactive absolute right-3 sm:right-8 top-1/2 -translate-y-1/2 z-content size-11 sm:size-12 rounded-full border border-white/[0.14] flex items-center justify-center text-white/80 hover:text-white hover:border-white/40 hover:bg-white/[0.05] transition-all duration-300 active:duration-100 active:scale-90 backdrop-blur-sm bg-black/30"
           >
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
               <path d="M9 6l6 6-6 6" />

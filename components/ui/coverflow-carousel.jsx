@@ -12,12 +12,31 @@
 'use client';
 
 import * as React from 'react';
-
-// Minimal classnames helper.
-const cn = (...args) => args.filter(Boolean).join(' ');
+import { cn } from '../../lib/utils';
 
 const useIsoLayoutEffect =
   typeof window !== 'undefined' ? React.useLayoutEffect : React.useEffect;
+
+// --- Motion model -----------------------------------------------------------
+// Critically damped (damping ratio 1.0): nothing here is thrown hard enough to
+// justify overshoot, and a card that bounces past its snap point reads as a
+// mistake rather than as momentum. `response` is Apple's parameter — the time
+// in seconds the value takes to reach its target.
+const RESPONSE = 0.4;
+const OMEGA = (2 * Math.PI) / RESPONSE;
+
+// Momentum projection, in Apple's exponential-decay form rather than the
+// textbook v²/2a: how far the flick *would* have travelled. The snap target is
+// then chosen from that projected landing point, so a flick ends up where the
+// gesture was heading instead of where the finger happened to stop.
+const DECELERATION = 0.998;
+const project = (velocity) =>
+  ((velocity / 1000) * DECELERATION) / (1 - DECELERATION);
+
+// The ring loops, so an unbounded projection could spin the whole set.
+const MAX_THROW = 3;
+// Velocity is read from a short trailing window, not the final sample.
+const VELOCITY_WINDOW_MS = 100;
 
 const ChevronLeft = ({ className }) => (
   <svg
@@ -122,22 +141,41 @@ export function CoverflowCarousel({
     });
   }, [count, depth, fade, falloff, gap, loop, rotate]);
 
+  // Critically damped spring, solved analytically so the motion is identical
+  // at 60Hz and 120Hz — a per-frame `pos += remaining * k` step (the previous
+  // approach) settles twice as fast on a ProMotion display.
+  //
+  // `initialVelocity` is in cards/second and is the whole point: it lets the
+  // cards continue at the finger's release speed, so there is no seam between
+  // dragging and animating. Once the spring is running, a new pointer-down
+  // cancels it and the drag picks up from `posRef`, which is always the live
+  // value on screen rather than the logical target.
   const settle = React.useCallback(
-    (target) => {
+    (target, initialVelocity = 0) => {
       if (rafRef.current !== null) cancelAnimationFrame(rafRef.current);
       targetRef.current = target;
       setSelected(indexAt(target));
-      const step = () => {
-        const remaining = target - posRef.current;
-        if (Math.abs(remaining) < 0.0004) {
+
+      const from = posRef.current;
+      const a = from - target;
+      const b = initialVelocity + OMEGA * a;
+      const t0 = performance.now();
+
+      const step = (now) => {
+        const t = Math.max(0, (now - t0) / 1000);
+        const decay = Math.exp(-OMEGA * t);
+        const x = target + (a + b * t) * decay;
+        const v = (b - OMEGA * (a + b * t)) * decay;
+
+        posRef.current = x;
+        paint();
+
+        if (Math.abs(x - target) < 0.0005 && Math.abs(v) < 0.004) {
           posRef.current = target;
           paint();
           rafRef.current = null;
           return;
         }
-        // Exponential ease-out, not a spring.
-        posRef.current += remaining * 0.16;
-        paint();
         rafRef.current = requestAnimationFrame(step);
       };
       rafRef.current = requestAnimationFrame(step);
@@ -177,8 +215,7 @@ export function CoverflowCarousel({
       id: event.pointerId,
       x: event.clientX,
       pos: posRef.current,
-      v: 0,
-      t: performance.now(),
+      samples: [{ t: performance.now(), pos: posRef.current }],
       moved: false,
     };
   };
@@ -189,13 +226,21 @@ export function CoverflowCarousel({
     const pitch = widthRef.current * (1 + gap);
     if (!pitch) return;
     const now = performance.now();
-    const previous = posRef.current;
     const dx = event.clientX - drag.x;
     if (Math.abs(dx) > 3) drag.moved = true;
     posRef.current = clamp(drag.pos - dx / pitch);
-    // Cards per second, for the throw.
-    drag.v = ((posRef.current - previous) / Math.max(now - drag.t, 1)) * 1000;
-    drag.t = now;
+
+    // Keep a trailing window of positions. Velocity read at release from the
+    // oldest sample in that window is far steadier than the last frame alone:
+    // a finger that pauses before lifting yields 0 rather than a stale throw,
+    // and a fast flick is not under-read by one noisy sample.
+    drag.samples.push({ t: now, pos: posRef.current });
+    while (
+      drag.samples.length > 2 &&
+      now - drag.samples[0].t > VELOCITY_WINDOW_MS
+    ) {
+      drag.samples.shift();
+    }
 
     const index = indexAt(posRef.current);
     if (index !== selected) setSelected(index);
@@ -206,9 +251,22 @@ export function CoverflowCarousel({
     const drag = dragRef.current;
     if (!drag || drag.id !== event.pointerId) return;
     dragRef.current = null;
-    // Let a flick carry, but never more than two cards.
-    const carried = Math.max(-2, Math.min(2, drag.v * 0.18));
-    settle(clamp(Math.round(posRef.current + carried)));
+
+    const samples = drag.samples;
+    const first = samples[0];
+    const last = samples[samples.length - 1];
+    const dt = last.t - first.t;
+    // Cards per second, straight off the window above.
+    const velocity = dt > 0 ? (last.pos - first.pos) / (dt / 1000) : 0;
+
+    // Below this the gesture was a placement, not a throw: land on the nearest
+    // card without projecting a stray drift out of rounding noise.
+    const throwDistance =
+      Math.abs(velocity) < 0.05
+        ? 0
+        : Math.max(-MAX_THROW, Math.min(MAX_THROW, project(velocity)));
+
+    settle(clamp(Math.round(posRef.current + throwDistance)), velocity);
   };
 
   const onCardClick = (index, event) => {
@@ -302,7 +360,7 @@ export function CoverflowCarousel({
                 aria-label={`${index + 1} of ${count}`}
                 onClick={(e) => onCardClick(index, e)}
                 className={cn(
-                  'absolute left-1/2 top-0 aspect-square overflow-hidden rounded-lg bg-[#0a0a0a] shadow-2xl will-change-transform cursor-pointer',
+                  'absolute left-1/2 top-0 aspect-square overflow-hidden rounded-lg bg-[#0a0a0a] shadow-2xl cursor-pointer',
                   cardClassName
                 )}
                 style={{ width: 'var(--cf-card)' }}
@@ -325,17 +383,17 @@ export function CoverflowCarousel({
               type="button"
               aria-label="Previous slide"
               onClick={() => nudge(-1)}
-              className="interactive absolute left-3 top-1/2 z-[200] -translate-y-1/2 w-11 h-11 rounded-full border border-white/[0.14] text-white/80 hover:text-white hover:border-white/40 hover:bg-white/[0.05] backdrop-blur-sm bg-black/30 transition-colors duration-300 flex items-center justify-center"
+              className="interactive absolute left-3 top-1/2 z-nav -translate-y-1/2 size-11 rounded-full border border-white/[0.14] text-white/80 hover:text-white hover:border-white/40 hover:bg-white/[0.05] backdrop-blur-sm bg-black/30 transition-all duration-300 active:duration-100 active:scale-90 flex items-center justify-center"
             >
-              <ChevronLeft className="w-5 h-5" />
+              <ChevronLeft className="size-5" />
             </button>
             <button
               type="button"
               aria-label="Next slide"
               onClick={() => nudge(1)}
-              className="interactive absolute right-3 top-1/2 z-[200] -translate-y-1/2 w-11 h-11 rounded-full border border-white/[0.14] text-white/80 hover:text-white hover:border-white/40 hover:bg-white/[0.05] backdrop-blur-sm bg-black/30 transition-colors duration-300 flex items-center justify-center"
+              className="interactive absolute right-3 top-1/2 z-nav -translate-y-1/2 size-11 rounded-full border border-white/[0.14] text-white/80 hover:text-white hover:border-white/40 hover:bg-white/[0.05] backdrop-blur-sm bg-black/30 transition-all duration-300 active:duration-100 active:scale-90 flex items-center justify-center"
             >
-              <ChevronRight className="w-5 h-5" />
+              <ChevronRight className="size-5" />
             </button>
           </>
         )}

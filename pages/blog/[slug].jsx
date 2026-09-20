@@ -76,7 +76,7 @@ export default function BlogPost({ post, slug }) {
         />
       </Head>
 
-      <div className="min-h-screen bg-[#0a0a0a] text-neutral-200">
+      <div className="min-h-dvh bg-[#0a0a0a] text-neutral-200">
         <article className="max-w-3xl mx-auto px-6 md:px-8 py-16 md:py-24">
           <Link
             href="/blog"

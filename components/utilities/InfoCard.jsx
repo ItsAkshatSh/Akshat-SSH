@@ -20,7 +20,7 @@ const InfoCard = ({ isVisible }) => {
 
   return (
     <div
-      className={`absolute left-full top-1/2 -translate-y-1/2 ml-6 z-[150] pointer-events-none transition-all duration-400 ease-premium hidden lg:block ${
+      className={`absolute left-full top-1/2 -translate-y-1/2 ml-6 z-tooltip pointer-events-none transition-all duration-400 ease-premium hidden lg:block ${
         isVisible ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-3'
       }`}
     >

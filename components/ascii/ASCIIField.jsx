@@ -870,9 +870,19 @@ export default function ASCIIField({ paused = false, targetFps = TARGET_FPS, pro
     };
 
     // ----- Main loop, throttled to targetFps, paused when a panel is open -----
+    // Background tabs still get rAF ticks (throttled, but not free), so the
+    // loop also stops outright while the page is hidden.
+    let pageHidden = document.hidden;
+    const onVisibility = () => {
+      pageHidden = document.hidden;
+      // Drop the stale timestamp so there is no catch-up frame on return.
+      lastFrame = 0;
+    };
+    document.addEventListener('visibilitychange', onVisibility);
+
     const loop = (t) => {
       raf = requestAnimationFrame(loop);
-      if (pausedRef.current) return;
+      if (pausedRef.current || pageHidden) return;
       if (t - lastFrame < targetInterval) return;
       lastFrame = t;
       update(t);
@@ -892,6 +902,7 @@ export default function ASCIIField({ paused = false, targetFps = TARGET_FPS, pro
     raf = requestAnimationFrame(loop);
 
     return () => {
+      document.removeEventListener('visibilitychange', onVisibility);
       window.removeEventListener('resize', handleResize);
       if (!profileMode) {
         window.removeEventListener('mousemove', onMouseMove);

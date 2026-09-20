@@ -18,13 +18,24 @@ import { motion } from 'framer-motion';
 
 const ease = [0.22, 1, 0.36, 1];
 
+// Springs, not durations.
+// The pill is something the user grabs and throws, so its morph has to stay
+// re-targetable mid-flight: tapping again while it is still opening just
+// changes the target and the motion continues from wherever the panel is.
+// Bounce is only granted to the opening morph, because that is the direction
+// that carries the user's momentum; closing settles critically.
+const OPEN_SPRING = { type: 'spring', bounce: 0.2, duration: 0.55 };
+const CLOSE_SPRING = { type: 'spring', bounce: 0.12, duration: 0.38 };
+const HOVER_SPRING = { type: 'spring', bounce: 0, duration: 0.25 };
+const REVEAL_SPRING = { type: 'spring', bounce: 0.18, duration: 0.6 };
+
 // The two panels: cream (collapsed) and dark (expanded reveal).
 const CREAM = '#e8e6df';
 const CREAM_BORDER = '#c4c1b8';
 const INK = '#0a0a0a';
 const INK_TEXT = '#e8e6df';
 
-function MenuButton({ label, onClick, isOpen, index }) {
+function MenuButton({ label, onClick, isOpen, index, tabbable }) {
   const [hovered, setHovered] = useState(false);
   const animatingRef = useRef(false);
   const pendingLeaveRef = useRef(false);
@@ -53,11 +64,20 @@ function MenuButton({ label, onClick, isOpen, index }) {
     }
   }, []);
 
+  // Items stay out of the tab order unless the panel is actually showing.
+  //
+  // The roll effect renders every glyph twice (the twin is aria-hidden), and
+  // character-by-character inline blocks make the computed accessible name
+  // something like "B l o g". An explicit label keeps the announcement clean.
   return (
     <motion.button
+      type="button"
+      aria-label={label}
       onClick={onClick}
       onMouseEnter={handleEnter}
       onMouseLeave={handleLeave}
+      whileTap={{ opacity: 0.65 }}
+      tabIndex={tabbable ? 0 : -1}
       className="interactive uppercase leading-none overflow-hidden"
       style={{
         color: INK_TEXT,
@@ -108,6 +128,10 @@ function MenuButton({ label, onClick, isOpen, index }) {
 export default function FloatingMenu({ items, hidden = false }) {
   const [isOpen, setIsOpen] = useState(false);
   const containerRef = useRef(null);
+  // Items are only reachable when the panel is actually showing: closed items
+  // are transparent, not just pointer-events:none, and pointer-events alone
+  // leaves them tabbable.
+  const itemsTabbable = isOpen && !hidden;
 
   const menuItems = items ?? [
     { label: 'Home' },
@@ -143,22 +167,26 @@ export default function FloatingMenu({ items, hidden = false }) {
   return (
     <motion.div
       ref={containerRef}
-      className="fixed bottom-6 left-1/2 z-[80]"
+      className="safe-b fixed bottom-6 left-1/2 z-menu"
       style={{ x: '-50%', pointerEvents: hidden ? 'none' : 'auto' }}
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: hidden ? 0 : 1, y: hidden ? 20 : 0 }}
-      transition={{ duration: 0.35, ease }}
+      transition={HOVER_SPRING}
       aria-hidden={hidden}
     >
+      {/*
+        The panel morphs its own size. That is a layout animation, which is
+        normally worth avoiding — it is contained here on purpose: the panel is
+        `fixed`, holds two absolutely-positioned layers and one flex column, and
+        `contain-paint` keeps the reflow and repaint inside its own box, so no
+        page content around it is ever re-measured. A transform-based morph was
+        the alternative and it distorts the monospace label.
+      */}
       <motion.div
-        className="interactive relative overflow-hidden flex flex-col"
-        onClick={() => {
-          if (!isOpen) setIsOpen(true);
-        }}
+        className="interactive contain-paint relative overflow-hidden flex flex-col"
         style={{
           fontFamily: "'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, Consolas, monospace",
           letterSpacing: '-0.01em',
-          cursor: isOpen ? 'default' : 'pointer',
         }}
         animate={{
           width: isOpen ? 296 : 156,
@@ -166,11 +194,10 @@ export default function FloatingMenu({ items, hidden = false }) {
           borderRadius: isOpen ? 28 : 72,
         }}
         whileHover={isOpen ? undefined : { scale: 1.04 }}
+        whileTap={isOpen ? undefined : { scale: 0.97 }}
         transition={{
-          duration: 0.8,
-          ease,
-          height: { duration: isOpen ? 0.8 : 0.15 },
-          scale: { duration: 0.25, ease },
+          ...(isOpen ? OPEN_SPRING : CLOSE_SPRING),
+          scale: HOVER_SPRING,
         }}
       >
         {/* Cream background layer (always present, becomes the pill outline) */}
@@ -189,8 +216,11 @@ export default function FloatingMenu({ items, hidden = false }) {
         />
 
         {/* Dark disc expanding from bottom to reveal the menu space */}
+        {/* `y` is a compositor-side move, where the previous `bottom` was a
+            layout property. 0% covers the panel; 110% of its own height parks
+            it entirely below the panel, clipped by overflow-hidden. */}
         <motion.div
-          className="absolute left-1/2"
+          className="absolute bottom-0 left-1/2"
           style={{
             width: '200%',
             height: '200%',
@@ -198,16 +228,14 @@ export default function FloatingMenu({ items, hidden = false }) {
             x: '-50%',
             backgroundColor: INK,
           }}
-          animate={{ bottom: isOpen ? '-20%' : '-200%' }}
-          transition={{
-            duration: 0.8,
-            ease,
-            delay: isOpen ? 0.1 : 0,
-          }}
+          animate={{ y: isOpen ? '0%' : '110%' }}
+          transition={{ ...REVEAL_SPRING, delay: isOpen ? 0.08 : 0 }}
         />
 
         {/* Menu items */}
         <div
+          id="floating-menu-items"
+          aria-hidden={!isOpen}
           className="relative z-10 flex flex-col gap-5 items-center justify-center"
           style={{
             pointerEvents: isOpen ? 'auto' : 'none',
@@ -226,25 +254,29 @@ export default function FloatingMenu({ items, hidden = false }) {
               }}
               isOpen={isOpen}
               index={idx}
+              tabbable={itemsTabbable}
             />
           ))}
         </div>
 
-        {/* Bottom bar: MENU label + hamburger */}
-        <motion.div
-          className="interactive relative z-10 flex items-center justify-between w-full shrink-0"
-          onClick={(e) => {
-            e.stopPropagation();
-            setIsOpen(!isOpen);
-          }}
+        {/* Bottom bar: the toggle. It is the control that fills the collapsed
+            pill, so a single real button covers "open" and "close" and stays
+            reachable by keyboard. */}
+        <motion.button
+          type="button"
+          aria-expanded={isOpen}
+          aria-controls="floating-menu-items"
+          tabIndex={hidden ? -1 : 0}
+          onClick={() => setIsOpen((open) => !open)}
+          className="interactive relative z-10 flex items-center justify-between w-full shrink-0 cursor-pointer"
           animate={{
             paddingLeft: isOpen ? 22 : 20,
             paddingRight: isOpen ? 22 : 20,
             paddingBottom: isOpen ? 22 : 0,
             height: 48,
           }}
-          transition={{ duration: 0.8, ease }}
-          style={{ alignItems: 'center', cursor: 'pointer' }}
+          transition={isOpen ? OPEN_SPRING : CLOSE_SPRING}
+          whileTap={{ opacity: 0.72 }}
         >
           <motion.span
             className="leading-none uppercase"
@@ -258,7 +290,7 @@ export default function FloatingMenu({ items, hidden = false }) {
           >
             Menu
           </motion.span>
-          <div className="relative w-[24px] h-[24px] flex items-center justify-center">
+          <div className="relative size-6 flex items-center justify-center">
             <motion.span
               className="absolute block w-[18px] h-[2px] rounded-full"
               animate={{
@@ -278,7 +310,7 @@ export default function FloatingMenu({ items, hidden = false }) {
               transition={{ duration: 0.4, ease }}
             />
           </div>
-        </motion.div>
+        </motion.button>
       </motion.div>
     </motion.div>
   );

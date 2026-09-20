@@ -4,6 +4,7 @@
  * background, the hero, the floating menu, and overlay sections.
  */
 import { useState, useEffect } from 'react';
+import { AnimatePresence, motion } from 'framer-motion';
 
 import ScrambleText from './utilities/ScrambleText';
 import SectionOverlay from './ui/SectionOverlay';
@@ -13,11 +14,27 @@ import ASCIIField from './ascii/ASCIIField';
 import ASCIICanvas from './ascii/ASCIICanvas';
 import BlogWindow from './blog/BlogWindow';
 import FloatingMenu from './ui/FloatingMenu';
-import { SmoothCursor } from './ui/smooth-cursor';
 
 import ProjectsContent from './content/ProjectsContent';
 import PhotographyContent from './content/PhotographyContent';
 import ExperienceContent from './content/ExperienceContent';
+
+// Hero entrance. Each element rides the same critically damped spring, offset
+// by a short stagger — the stagger orders attention (portrait, then name, then
+// actions) without any element appearing to wait its turn.
+const HERO_STAGGER = {
+  hidden: {},
+  visible: { transition: { staggerChildren: 0.06, delayChildren: 0.04 } },
+};
+
+const HERO_ITEM = {
+  hidden: { opacity: 0, y: 14 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { type: 'spring', bounce: 0, duration: 0.5 },
+  },
+};
 
 const SOCIAL_ICONS = {
   GitHub: (
@@ -103,23 +120,21 @@ const App = () => {
   const isPhotography = activeSection === 'photography';
 
   return (
-    <div className="fixed inset-0 z-10 min-h-screen bg-[#060a10] text-slate-200 overflow-x-hidden overflow-y-auto">
-      <ASCIIField paused={false} />
+    <div className="fixed inset-0 z-content min-h-dvh bg-[#060a10] text-slate-200 overflow-x-hidden overflow-y-auto">
+      {/* The ocean is a looping animation behind a blurred scrim while a panel
+          is open — nothing about it is visible then, so it stops. */}
+      <ASCIIField paused={Boolean(activeSection || isBlogOpen)} />
 
-      {isFinePointer && <SmoothCursor />}
-
-      <main className="relative z-10 w-full min-h-screen flex items-center justify-center px-6 md:px-10 py-20 md:py-24">
-        <div
-          className={`w-full max-w-6xl grid lg:grid-cols-[minmax(260px,320px)_1fr] gap-10 lg:gap-16 xl:gap-20 items-center transition-all duration-700 ease-premium ${
-            contentIn ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-3'
-          }`}
+      <main className="relative z-content w-full min-h-dvh flex items-center justify-center px-6 md:px-10 py-20 md:py-24">
+        <motion.div
+          className="w-full max-w-6xl grid lg:grid-cols-[minmax(260px,320px)_1fr] gap-10 lg:gap-16 xl:gap-20 items-center"
+          variants={HERO_STAGGER}
+          initial="hidden"
+          animate={contentIn ? 'visible' : 'hidden'}
         >
-          <div
+          <motion.div
+            variants={HERO_ITEM}
             className="interactive relative mx-auto lg:mx-0 w-full max-w-[280px] lg:max-w-none"
-            style={{
-              opacity: 0,
-              animation: 'slideUpFade 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards 0.05s',
-            }}
           >
             <div className="relative aspect-[3/4] rounded-2xl overflow-hidden border border-white/[0.08] bg-[#0a0f16] shadow-card">
               <ASCIICanvas
@@ -134,33 +149,21 @@ const App = () => {
                 fps={30}
               />
             </div>
-          </div>
+          </motion.div>
 
           <div className="flex flex-col gap-9 lg:gap-11">
-            <header
-              className="max-w-xl"
-              style={{
-                opacity: 0,
-                animation: 'slideUpFade 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards 0.1s',
-              }}
-            >
-              <h2 className="text-4xl sm:text-5xl lg:text-[3.4rem] leading-[1.02] font-medium text-white tracking-[-0.02em] mb-6">
+            <motion.header variants={HERO_ITEM} className="max-w-xl">
+              <h2 className="text-balance text-4xl sm:text-5xl lg:text-[3.4rem] leading-[1.02] font-medium text-white tracking-[-0.02em] mb-6">
                 {HERO.nameLines[0]}
                 <br />
                 {HERO.nameLines[1]}
               </h2>
-              <p className="text-neutral-200 text-[15px] sm:text-base leading-[1.75] max-w-md">
+              <p className="text-pretty text-neutral-200 text-[15px] sm:text-base leading-[1.75] max-w-md">
                 {HERO.bio}
               </p>
-            </header>
+            </motion.header>
 
-            <div
-              className="flex items-center gap-3 pt-1"
-              style={{
-                opacity: 0,
-                animation: 'slideUpFade 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards 0.2s',
-              }}
-            >
+            <motion.div variants={HERO_ITEM} className="flex items-center gap-3 pt-1">
               {SOCIALS.map(({ label, href }) => (
                 <a
                   key={label}
@@ -168,14 +171,14 @@ const App = () => {
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label={label}
-                  className="interactive group flex items-center justify-center w-11 h-11 rounded-full border border-white/[0.1] text-neutral-200 hover:text-white hover:border-white/30 hover:bg-white/[0.05] transition-all duration-300"
+                  className="interactive press group flex items-center justify-center size-11 rounded-full border border-white/[0.1] text-neutral-200 hover:text-white hover:border-white/30 hover:bg-white/[0.05]"
                 >
-                  <span className="w-[18px] h-[18px] block">{SOCIAL_ICONS[label]}</span>
+                  <span className="block size-[18px]">{SOCIAL_ICONS[label]}</span>
                 </a>
               ))}
-            </div>
+            </motion.div>
           </div>
-        </div>
+        </motion.div>
       </main>
 
       <FloatingMenu
@@ -183,22 +186,27 @@ const App = () => {
         hidden={Boolean(activeSection || isBlogOpen)}
       />
 
-      {isBlogOpen && <BlogWindow onClose={() => setIsBlogOpen(false)} />}
+      <AnimatePresence>
+        {isBlogOpen && <BlogWindow key="blog" onClose={() => setIsBlogOpen(false)} />}
+      </AnimatePresence>
 
-      {activeSection && (
-        <SectionOverlay
-          ariaLabel={sectionTitle}
-          onClose={() => setActiveSection(null)}
-          variant={isPhotography ? 'fullpage' : 'default'}
-          showVignettes={!isPhotography}
-          contentKey={activeSection}
-          title={<ScrambleText text={sectionTitle} active />}
-        >
-          {activeSection === 'projects' && <ProjectsContent />}
-          {activeSection === 'photography' && <PhotographyContent />}
-          {activeSection === 'experience' && <ExperienceContent />}
-        </SectionOverlay>
-      )}
+      <AnimatePresence>
+        {activeSection && (
+          <SectionOverlay
+            key={activeSection}
+            ariaLabel={sectionTitle}
+            onClose={() => setActiveSection(null)}
+            variant={isPhotography ? 'fullpage' : 'default'}
+            showVignettes={!isPhotography}
+            contentKey={activeSection}
+            title={<ScrambleText text={sectionTitle} active />}
+          >
+            {activeSection === 'projects' && <ProjectsContent />}
+            {activeSection === 'photography' && <PhotographyContent />}
+            {activeSection === 'experience' && <ExperienceContent />}
+          </SectionOverlay>
+        )}
+      </AnimatePresence>
     </div>
   );
 };

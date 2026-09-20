@@ -66,11 +66,13 @@ const ProjectsContent = () => {
 
       {projects.map((project, i) => (
         <StaggerItem key={project.id} index={i}>
+          {/* A surface this large answers a press with a highlight rather than
+              a scale — displacing a block this size would read as clumsy. */}
           <a
             href={project.link}
             target="_blank"
             rel="noopener noreferrer"
-            className="interactive group block rounded-xl border border-white/[0.08] bg-white/[0.03] p-5 sm:p-6 hover:border-white/20 hover:bg-white/[0.05] transition-all duration-300"
+            className="interactive group block rounded-xl border border-white/[0.08] bg-white/[0.03] p-5 sm:p-6 hover:border-white/20 hover:bg-white/[0.05] active:bg-white/[0.08] active:border-white/25 transition-colors duration-300 active:duration-100"
           >
             <div className="flex justify-between items-start gap-4 mb-4">
               <div className="flex-1 min-w-0">

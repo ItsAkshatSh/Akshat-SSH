@@ -1,6 +1,7 @@
 import '../styles/globals.css';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
+import { MotionConfig } from 'framer-motion';
 
 const SITE_URL =
   process.env.NEXT_PUBLIC_SITE_URL || 'https://akshatshh.vercel.app';
@@ -85,7 +86,16 @@ export default function MyApp({ Component, pageProps }) {
           dangerouslySetInnerHTML={{ __html: JSON.stringify(PERSON_SCHEMA) }}
         />
       </Head>
-      <Component {...pageProps} />
+
+      {/*
+        One switch for the whole app: when the OS asks for reduced motion,
+        every framer-motion animation below downgrades from transform/spring
+        motion to a plain cross-fade. Feedback is never removed — only the
+        movement is. This replaces the need for every component to remember.
+      */}
+      <MotionConfig reducedMotion="user">
+        <Component {...pageProps} />
+      </MotionConfig>
     </>
   );
 }

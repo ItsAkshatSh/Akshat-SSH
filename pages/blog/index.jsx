@@ -57,7 +57,7 @@ export default function BlogIndex({ posts }) {
         />
       </Head>
 
-      <div className="min-h-screen bg-[#0a0a0a] text-neutral-200">
+      <div className="min-h-dvh bg-[#0a0a0a] text-neutral-200">
         <div className="max-w-3xl mx-auto px-6 md:px-8 py-16 md:py-24">
           <div className="mb-16">
             <Link

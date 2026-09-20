@@ -9,10 +9,10 @@ export default function HeroShell() {
   return (
     <div
       id="hero-shell"
-      className="min-h-screen bg-[#060a10] text-slate-200"
+      className="min-h-dvh bg-[#060a10] text-slate-200"
       aria-label="Akshat Sharma portfolio"
     >
-      <main className="w-full min-h-screen flex items-center justify-center px-6 md:px-10 py-20 md:py-24">
+      <main className="w-full min-h-dvh flex items-center justify-center px-6 md:px-10 py-20 md:py-24">
         <div className="w-full max-w-6xl grid lg:grid-cols-[minmax(260px,320px)_1fr] gap-10 lg:gap-16 xl:gap-20 items-center">
           <div className="relative mx-auto lg:mx-0 w-full max-w-[280px] lg:max-w-none">
             <div className="relative aspect-[3/4] rounded-2xl overflow-hidden border border-white/[0.08] bg-[#0a0f16]">
@@ -28,12 +28,12 @@ export default function HeroShell() {
 
           <div className="flex flex-col gap-9 lg:gap-11">
             <header className="max-w-xl">
-              <h1 className="text-4xl sm:text-5xl lg:text-[3.4rem] leading-[1.02] font-medium text-white tracking-[-0.02em] mb-6">
+              <h1 className="text-balance text-4xl sm:text-5xl lg:text-[3.4rem] leading-[1.02] font-medium text-white tracking-[-0.02em] mb-6">
                 {HERO.nameLines[0]}
                 <br />
                 {HERO.nameLines[1]}
               </h1>
-              <p className="text-neutral-200 text-[15px] sm:text-base leading-[1.75] max-w-md">
+              <p className="text-pretty text-neutral-200 text-[15px] sm:text-base leading-[1.75] max-w-md">
                 {HERO.bio}
               </p>
             </header>
@@ -46,7 +46,7 @@ export default function HeroShell() {
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label={label}
-                  className="flex items-center justify-center w-11 h-11 rounded-full border border-white/[0.1] text-neutral-200 hover:text-white hover:border-white/30"
+                  className="press flex items-center justify-center size-11 rounded-full border border-white/[0.1] text-neutral-200 hover:text-white hover:border-white/30"
                 >
                   <span className="text-[10px] tracking-[0.2em] uppercase">{label.slice(0, 2)}</span>
                 </a>

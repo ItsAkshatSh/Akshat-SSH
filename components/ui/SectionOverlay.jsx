@@ -4,7 +4,14 @@
  * corner brackets, animated header, scroll region, and keyboard focus trap.
  */
 import { useRef } from 'react';
+import { motion, useReducedMotion } from 'framer-motion';
 import useFocusTrap from '../utilities/useFocusTrap';
+
+// Critically damped by default: nothing was flicked to open this panel, so it
+// should settle without overshoot. Bounce is reserved for gestures that carry
+// the user's momentum (see FloatingMenu).
+const PANEL_SPRING = { type: 'spring', bounce: 0, duration: 0.42 };
+const STATE_EASE = [0.4, 0, 0.2, 1];
 
 export const SectionCorner = ({ position }) => {
   const anchor = {
@@ -17,7 +24,7 @@ export const SectionCorner = ({ position }) => {
   return (
     <div
       aria-hidden="true"
-      className={`absolute w-4 h-4 pointer-events-none ${anchor}`}
+      className={`absolute size-4 pointer-events-none ${anchor}`}
       style={{
         borderTop: '1px solid rgba(255,255,255,0.25)',
         borderLeft: '1px solid rgba(255,255,255,0.25)',
@@ -29,7 +36,7 @@ export const SectionCorner = ({ position }) => {
 };
 
 const overlayButtonClass =
-  'interactive h-10 px-4 rounded-full border border-white/[0.14] text-neutral-200 hover:text-white hover:border-white/30 hover:bg-white/[0.05] transition-all duration-300 text-[11px] tracking-[0.25em] uppercase';
+  'interactive press h-10 px-4 rounded-full border border-white/[0.14] text-neutral-200 hover:text-white hover:border-white/30 hover:bg-white/[0.05] text-[11px] tracking-[0.25em] uppercase';
 
 export const OverlayButton = ({ children, className = '', ...props }) => (
   <button type="button" className={`${overlayButtonClass} ${className}`.trim()} {...props}>
@@ -48,34 +55,53 @@ export default function SectionOverlay({
   variant = 'default',
   zIndex = 40,
   showVignettes = true,
-  titleClassName = 'text-4xl sm:text-5xl md:text-6xl font-medium text-white tracking-[-0.02em] capitalize leading-none',
+  titleClassName = 'text-balance text-4xl sm:text-5xl md:text-6xl font-medium text-white tracking-[-0.02em] capitalize leading-none',
 }) {
   const dialogRef = useRef(null);
   const isFullPage = variant === 'fullpage';
+  const reducedMotion = useReducedMotion();
 
   useFocusTrap(dialogRef, true);
 
   const handleBackdropClose = onBackdropClose ?? onClose;
 
+  // The scrim is a material, not a black rectangle: it arrives a hair over its
+  // resting size and settles down, instead of just fading. Only transform and
+  // opacity are animated — blurring a full-viewport surface every frame
+  // re-rasterises the entire backdrop, which is far too expensive to run on a
+  // phone. The blur itself comes from the CSS token, so reduced transparency
+  // swaps it for an opaque surface with no JS involved. It never scales below
+  // 1, so the viewport stays covered on every frame of the path.
+  const scrimMotion = reducedMotion
+    ? { initial: { opacity: 0 }, animate: { opacity: 1 }, exit: { opacity: 0 } }
+    : {
+        initial: { opacity: 0, scale: 1.06 },
+        animate: { opacity: 1, scale: 1 },
+        exit: { opacity: 0, scale: 1.03 },
+      };
+  const scrimDuration = reducedMotion ? 0.18 : 0.32;
+
   return (
-    <div
+    <motion.div
       ref={dialogRef}
       className="fixed inset-0 flex flex-col overflow-hidden"
       style={{ zIndex }}
       role="dialog"
       aria-modal="true"
       aria-label={ariaLabel}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.22, ease: STATE_EASE }}
     >
-      <button
+      <motion.button
         type="button"
         aria-label={`Close ${ariaLabel}`}
         onClick={handleBackdropClose}
-        className="absolute inset-0 w-full h-full bg-[#060a10]/55 backdrop-blur-2xl cursor-default"
+        className="material-scrim absolute inset-0 size-full cursor-default"
         tabIndex={-1}
-        style={{
-          opacity: 0,
-          animation: 'sectionBackdrop 0.35s cubic-bezier(0.4, 0, 0.2, 1) forwards',
-        }}
+        {...scrimMotion}
+        transition={{ duration: scrimDuration, ease: STATE_EASE }}
       />
 
       {showVignettes && !isFullPage && (
@@ -91,11 +117,15 @@ export default function SectionOverlay({
         </>
       )}
 
-      <div
+      <motion.div
         className={`relative flex flex-col h-full w-full pointer-events-none ${
           isFullPage ? '' : 'readable-on-blur max-w-5xl mx-auto'
         }`}
         onClick={(e) => e.stopPropagation()}
+        initial={{ y: 10, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        exit={{ y: 6, opacity: 0 }}
+        transition={reducedMotion ? { duration: 0.2, ease: STATE_EASE } : PANEL_SPRING}
       >
         <SectionCorner position="tl" />
         <SectionCorner position="tr" />
@@ -105,7 +135,7 @@ export default function SectionOverlay({
         {isFullPage ? (
           <OverlayButton
             onClick={onClose}
-            className="absolute top-6 right-6 sm:top-8 sm:right-8 z-50 pointer-events-auto"
+            className="safe-t safe-r absolute top-6 right-6 sm:top-8 sm:right-8 z-chrome pointer-events-auto"
             aria-label="Close"
             style={{
               opacity: 0,
@@ -115,7 +145,7 @@ export default function SectionOverlay({
             Close
           </OverlayButton>
         ) : (
-          <div className="relative flex justify-between items-start gap-4 px-6 sm:px-10 md:px-14 pt-16 md:pt-20 pb-6 md:pb-8 shrink-0 pointer-events-auto">
+          <div className="safe-t safe-l safe-r relative flex justify-between items-start gap-4 px-6 sm:px-10 md:px-14 pt-16 md:pt-20 pb-6 md:pb-8 shrink-0 pointer-events-auto">
             <div className="min-w-0 flex-1">
               <h2
                 className={titleClassName}
@@ -170,7 +200,7 @@ export default function SectionOverlay({
             {children}
           </div>
         </div>
-      </div>
-    </div>
+      </motion.div>
+    </motion.div>
   );
 }

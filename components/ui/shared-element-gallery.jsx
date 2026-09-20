@@ -126,7 +126,7 @@ function GalleryModal() {
   return (
     <AnimatePresence>
       {selected && (
-        <div className="fixed inset-0 z-[300] flex items-center justify-center">
+        <div className="fixed inset-0 z-lightbox flex items-center justify-center">
           {/* Frosted backdrop */}
           <motion.div
             initial={{ opacity: 0 }}
@@ -153,6 +153,8 @@ function GalleryModal() {
             }}
             onClick={() => setSelected(null)}
           >
+            {/* will-change is earned here: this node only exists for the
+                duration of the shared-element flight. */}
             <motion.img
               layoutId={`image-${selected.id}`}
               src={selected.src}
@@ -191,11 +193,11 @@ function GalleryModal() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -12 }}
             transition={{ delay: 0.1, duration: 0.2 }}
-            className="interactive absolute top-6 right-6 z-[400] w-10 h-10 rounded-full flex items-center justify-center bg-white/10 text-white backdrop-blur-md hover:bg-white/20 transition-colors"
+            className="safe-t safe-r interactive absolute top-6 right-6 z-lightboxChrome size-10 rounded-full flex items-center justify-center bg-white/10 text-white backdrop-blur-md hover:bg-white/20 transition-colors active:duration-100 active:scale-90"
             onClick={() => setSelected(null)}
             aria-label="Close photo"
           >
-            <CloseIcon className="w-5 h-5" />
+            <CloseIcon className="size-5" />
           </motion.button>
         </div>
       )}

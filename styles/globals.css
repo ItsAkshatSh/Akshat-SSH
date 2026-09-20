@@ -22,6 +22,24 @@
     --text: #f5f5f5;
     --text-muted: #a3a3a3;
     --accent: #a3a3a3;
+
+    /* Motion system.
+       --dur-press is short on purpose: feedback that arrives on pointer-down
+       has to land inside the perception threshold or the control feels dead.
+       Hover/state changes get the longer, softer curve because they are not
+       on the critical input path. */
+    /* Both curves are the Tailwind defaults (`ease-out`, `ease-in-out`);
+       nothing bespoke is needed for a press. */
+    --dur-press: 110ms;
+    --dur-state: 300ms;
+    --ease-press: cubic-bezier(0, 0, 0.2, 1);
+    --ease-state: cubic-bezier(0.4, 0, 0.2, 1);
+
+    /* Translucent chrome. One token per material weight so the reduced
+       transparency / increased contrast overrides below only have to
+       restate a color, never re-derive one. */
+    --scrim-bg: rgba(6, 10, 16, 0.55);
+    --scrim-blur: blur(24px) saturate(140%);
   }
 
   html {
@@ -36,6 +54,7 @@
     margin: 0;
     font-family: 'Endless', 'JetBrains Mono', ui-monospace, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
     font-feature-settings: "ss01", "cv02", "cv14";
+    font-optical-sizing: auto;
     background: var(--bg);
     color: var(--text);
     -webkit-font-smoothing: antialiased;
@@ -67,6 +86,55 @@
 .readable-on-blur,
 .readable-on-blur * {
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.55), 0 0 8px rgba(0, 0, 0, 0.35);
+}
+
+/* Translucent scrim used behind every overlay panel. Its opacity and blur
+   live in tokens so the accessibility overrides at the bottom of this file
+   can trade the material for legibility without touching component code. */
+.material-scrim {
+  background: var(--scrim-bg);
+  -webkit-backdrop-filter: var(--scrim-blur);
+  backdrop-filter: var(--scrim-blur);
+}
+
+/* Press feedback.
+   Commit on pointer-*down*, not on release (see also: :active below). The
+   transform is deliberately the only fast transition here — color and
+   border stay on the softer curve so hover still feels unhurried. Written
+   outside @layer so it wins over the Tailwind transition utilities it
+   replaces on the same element. */
+.press {
+  transition:
+    transform var(--dur-press) var(--ease-press),
+    background-color var(--dur-state) var(--ease-state),
+    border-color var(--dur-state) var(--ease-state),
+    color var(--dur-state) var(--ease-state),
+    opacity var(--dur-state) var(--ease-state);
+}
+
+.press:active,
+.press[data-pressed='true'] {
+  transform: scale(0.97);
+}
+
+/* A panel that morphs its own size: keep the reflow and repaint inside its
+   own box so surrounding content is never re-measured. */
+.contain-paint { contain: layout paint; }
+
+/* Safe-area insets for fixed chrome. Margins, not padding, so the element
+   keeps its size while its box clears the notch and the home indicator. Apply
+   only where no Tailwind margin utility owns that axis. */
+.safe-t { margin-top: env(safe-area-inset-top, 0px); }
+.safe-b { margin-bottom: env(safe-area-inset-bottom, 0px); }
+.safe-l { margin-left: env(safe-area-inset-left, 0px); }
+.safe-r { margin-right: env(safe-area-inset-right, 0px); }
+
+/* Kill the ~300ms double-tap-zoom wait on taps. Nothing on the input path
+   should make the user wait for the browser to guess. */
+button,
+a,
+[role='button'] {
+  touch-action: manipulation;
 }
 
 /* DomeGallery (React Bits) styles. Kept in globals so the component can
@@ -381,6 +449,13 @@ body.dg-scroll-lock { overflow: hidden; }
   font-weight: 600;
 }
 
+/* Reduced motion.
+   Entrance animations in this codebase author their own "forward" state via
+   `animation-fill-mode: forwards`, so they cannot simply be switched off
+   without leaving content stuck at opacity 0 — instead every animation is
+   collapsed to its end state, which reads as a direct, non-vestibular cut.
+   Transform-driven JS motion (framer-motion) is handled separately by the
+   MotionConfig in pages/_app.jsx, which downgrades springs to cross-fades. */
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
@@ -389,5 +464,49 @@ body.dg-scroll-lock { overflow: hidden; }
     animation-iteration-count: 1 !important;
     transition-duration: 0.001ms !important;
     scroll-behavior: auto !important;
+  }
+
+  /* Feedback survives: the press still registers instantly, it just no
+     longer scales. Opacity carries the same information without motion. */
+  .press:active,
+  .press[data-pressed='true'] {
+    transform: none;
+    opacity: 0.72;
+  }
+}
+
+/* Reduced transparency: the material becomes opaque rather than merely
+   blurrier, so text sitting on it keeps its contrast. */
+@media (prefers-reduced-transparency: reduce) {
+  :root {
+    --scrim-bg: rgba(6, 10, 16, 0.94);
+    --scrim-blur: none;
+  }
+
+  .overlay--blur {
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+
+  .viewer .scrim {
+    background: rgba(0, 0, 0, 0.82);
+    backdrop-filter: none;
+  }
+}
+
+/* Increased contrast: solid surfaces plus a defined edge. */
+@media (prefers-contrast: more) {
+  :root {
+    --scrim-bg: #060a10;
+    --scrim-blur: none;
+  }
+
+  .material-scrim {
+    border: 1px solid rgba(255, 255, 255, 0.55);
+  }
+
+  .readable-on-blur,
+  .readable-on-blur * {
+    text-shadow: none;
   }
 }

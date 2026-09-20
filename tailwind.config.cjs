@@ -23,6 +23,19 @@ module.exports = {
         mono: ['JetBrains Mono', 'ui-monospace', 'SFMono-Regular', 'Menlo', 'monospace'],
         display: ['Silkscreen', 'cursive'],
       },
+      // One fixed z scale for the whole site. Layers are named for what they
+      // are, not for a number someone guessed at the call site.
+      zIndex: {
+        ocean: '0',
+        content: '10',
+        chrome: '40',
+        menu: '80',
+        overlay: '100',
+        tooltip: '150',
+        nav: '200',
+        lightbox: '300',
+        lightboxChrome: '400',
+      },
       transitionDuration: {
         '400': '400ms',
         '600': '600ms',
