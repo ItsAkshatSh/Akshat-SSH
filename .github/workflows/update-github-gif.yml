@@ -21,8 +21,8 @@ jobs:
     env:
       GITHUB_TOKEN: ${{ secrets.PROFILE_TOKEN }}
       GITHUB_USERNAME: ItsAkshatSh
-      GIF_FPS: '15'
-      GIF_DURATION_SEC: '2.5'
+      GIF_FPS: '20'
+      GIF_DURATION_SEC: '4'
 
     steps:
       - name: Checkout

@@ -28,8 +28,8 @@ const SITE_URL =
   process.env.PROFILE_SITE_URL || process.env.NEXT_PUBLIC_SITE_URL || 'https://www.akshaaaat.xyz';
 
 const BASE_URL = process.env.GIF_BASE_URL || 'http://localhost:3999';
-const FPS = Number(process.env.GIF_FPS || 15);
-const DURATION_SEC = Number(process.env.GIF_DURATION_SEC || 2.5);
+const FPS = Number(process.env.GIF_FPS || 20);
+const DURATION_SEC = Number(process.env.GIF_DURATION_SEC || 4);
 const FRAME_COUNT = Math.round(FPS * DURATION_SEC);
 const FRAME_DELAY_CS = Math.round(100 / FPS); // gifenc uses centiseconds
 
@@ -101,14 +101,42 @@ async function captureGif(baseUrl) {
   const capture = page.locator('#github-gif-capture');
   const frameCount = process.env.GIF_STATIC === '1' ? 1 : FRAME_COUNT;
 
+  // Screenshots take far longer than a frame interval, so wall-clock waits
+  // sample the CSS animations at uneven, drifting offsets — the GIF then plays
+  // back too fast and jittery. Pause every animation and drive it to an exact
+  // point in the loop for each frame instead.
+  const animationCount = await page.evaluate(() => {
+    const animations = document.getAnimations();
+    animations.forEach((animation) => animation.pause());
+    return animations.length;
+  });
+
+  const seekAnimations = (ms) =>
+    page.evaluate(
+      (time) =>
+        new Promise((resolve) => {
+          document.getAnimations().forEach((animation) => {
+            animation.currentTime = time;
+          });
+          requestAnimationFrame(() => requestAnimationFrame(resolve));
+        }),
+      ms
+    );
+
   console.log(
-    frameCount === 1
-      ? 'Capturing static frame…'
-      : `Capturing ${frameCount} frames at ${FPS}fps…`
+    animationCount === 0
+      ? 'No CSS animations found; falling back to timed capture.'
+      : frameCount === 1
+        ? 'Capturing static frame…'
+        : `Capturing ${frameCount} frames over ${DURATION_SEC}s at ${FPS}fps…`
   );
 
   const frames = [];
   for (let i = 0; i < frameCount; i += 1) {
+    if (animationCount > 0) {
+      await seekAnimations((i / FPS) * 1000);
+    }
+
     const pngBuffer = await capture.screenshot({ type: 'png' });
     frames.push(pngToRgba(pngBuffer));
 
@@ -116,7 +144,7 @@ async function captureGif(baseUrl) {
       console.log(`  frame ${i + 1}/${frameCount}`);
     }
 
-    if (i < frameCount - 1) {
+    if (animationCount === 0 && i < frameCount - 1) {
       await page.waitForTimeout(1000 / FPS);
     }
   }
