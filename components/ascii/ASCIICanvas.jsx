@@ -388,7 +388,14 @@ export default function ASCIICanvas({
     img.onload = () => {
       if (cancelled) return;
       imgRef.current = img;
-      rebuild();
+      // The image can finish loading before ResizeObserver delivers the
+      // first measurable frame. Rebuild on the next paint as well so the
+      // resting ASCII is visible without requiring pointer movement.
+      window.requestAnimationFrame(() => {
+        if (cancelled) return;
+        rebuild();
+        drawFrame();
+      });
     };
     img.onerror = () => { /* leave blank */ };
     img.src = src;
