@@ -1,36 +1,23 @@
 /**
  * PhotographyContent
- * 3D dome of photographs (React Bits' DomeGallery). Drag to rotate the
- * dome, tap any tile to enlarge it with a shared-element transition.
+ * Photoyoshi-style infinite horizontal scroll of photographs. Wheel /
+ * trackpad / drag drive the strip; click a frame to open the lightbox.
  */
-import { useMemo } from 'react';
-import DomeGallery from '../ui/DomeGallery';
+import { useState } from 'react';
 import { PHOTOS } from './photographyPhotos';
+import PhotoScrollGallery from './PhotoScrollGallery';
+import PhotographyLightbox from './PhotographyLightbox';
 
 const PhotographyContent = () => {
-  const images = useMemo(
-    () =>
-      PHOTOS.map((p) => ({
-        src: `/images/photography/${p.file}`,
-        alt: `${p.date} · ${p.place}`,
-      })),
-    []
-  );
+  const [selectedImg, setSelectedImg] = useState(null);
 
   return (
     <div className="relative h-full w-full">
-      <DomeGallery
-        images={images}
-        fit={0.9}
-        minRadius={680}
-        dragDampening={1.2}
-        grayscale={false}
-        overlayBlurColor="#060a10"
-        imageBorderRadius="14px"
-        openedImageBorderRadius="14px"
-        openedImageWidth="min(560px, 82vw)"
-        openedImageHeight="min(680px, 80vh)"
-        segments={35}
+      <PhotoScrollGallery photos={PHOTOS} onSelect={setSelectedImg} />
+      <PhotographyLightbox
+        selectedImg={selectedImg}
+        onClose={() => setSelectedImg(null)}
+        onSelect={setSelectedImg}
       />
     </div>
   );
