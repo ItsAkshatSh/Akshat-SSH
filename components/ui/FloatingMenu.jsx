@@ -30,10 +30,10 @@ const HOVER_SPRING = { type: 'spring', bounce: 0, duration: 0.25 };
 const REVEAL_SPRING = { type: 'spring', bounce: 0.18, duration: 0.6 };
 
 // The two panels: bone (collapsed) and warm ink (expanded reveal).
-const CREAM = '#ece5db';
-const CREAM_BORDER = '#c9bfb2';
-const INK = '#171110';
-const INK_TEXT = '#ece5db';
+const CREAM = '#fff';
+const CREAM_BORDER = '#ddd';
+const INK = '#0d0d0d';
+const INK_TEXT = '#f2f2f2';
 
 function MenuButton({ label, onClick, isOpen, index, tabbable }) {
   const [hovered, setHovered] = useState(false);
@@ -334,6 +334,7 @@ export default function FloatingMenu({ items, hidden = false }) {
           }}
           transition={isOpen ? OPEN_SPRING : CLOSE_SPRING}
           whileTap={{ opacity: 0.72 }}
+          style={{ border: 0, background: 'transparent', appearance: 'none' }}
         >
           <motion.span
             className="leading-none uppercase"
