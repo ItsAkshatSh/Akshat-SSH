@@ -88,7 +88,7 @@ const AmbientOcean = () => {
         className="absolute inset-0 pointer-events-none"
         style={{
           background:
-            'radial-gradient(ellipse 65% 90% at 92% -8%, rgba(255, 224, 196, 0.055), transparent 62%)',
+            'radial-gradient(ellipse 65% 90% at 92% -8%, rgba(220, 232, 244, 0.045), transparent 62%)',
         }}
       />
       {/* Rising ASCII bubbles. */}

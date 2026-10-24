@@ -14,20 +14,16 @@
 
 @layer base {
   :root {
-    /* Organic ink palette (OKLCH). Every neutral is tinted toward the umber
-       hue (H≈55-80) so neither pure black nor paper white appears anywhere;
-       chroma tapers as lightness approaches either extreme. Ochre is the
-       single committed accent — it carries glow and links, never fill. */
-    --bg: oklch(0.13 0.015 55);
-    --surface: oklch(0.17 0.02 55);
-    --surface-raised: oklch(0.21 0.024 58);
-    --border: oklch(0.9 0.02 80 / 0.08);
-    --border-hover: oklch(0.9 0.02 80 / 0.17);
-    --text: oklch(0.94 0.014 80);
-    --text-muted: oklch(0.64 0.02 70);
-    --accent: oklch(0.68 0.13 75);
-    --accent-soft: oklch(0.68 0.13 75 / 0.15);
-    --accent-deep: oklch(0.46 0.09 70);
+    --bg: #000;
+    --surface: #111;
+    --surface-raised: #181818;
+    --border: rgba(255, 255, 255, 0.1);
+    --border-hover: rgba(255, 255, 255, 0.22);
+    --text: #f2f2f2;
+    --text-muted: #a1a1a1;
+    --accent: #d8d8d8;
+    --accent-soft: rgba(216, 216, 216, 0.15);
+    --accent-deep: #888;
 
     /* Motion system.
        --dur-press is short on purpose: feedback that arrives on pointer-down
@@ -44,8 +40,8 @@
     /* Translucent chrome. One token per material weight so the reduced
        transparency / increased contrast overrides below only have to
        restate a color, never re-derive one. */
-    --scrim-bg: oklch(0.13 0.015 55 / 0.55);
-    --scrim-blur: blur(24px) saturate(140%);
+    --scrim-bg: rgba(0, 0, 0, 0.96);
+    --scrim-blur: none;
   }
 
   html {
@@ -152,49 +148,6 @@
   background: var(--scrim-bg);
   -webkit-backdrop-filter: var(--scrim-blur);
   backdrop-filter: var(--scrim-blur);
-}
-
-.photography-intro {
-  animation: photographyIntroExit 0.7s cubic-bezier(0.22, 1, 0.36, 1) 1.25s forwards;
-}
-
-.photography-intro__wordmark {
-  animation:
-    photographyWordmarkIn 1.05s cubic-bezier(0.22, 1, 0.36, 1) both,
-    photographyWordmarkOut 0.65s cubic-bezier(0.22, 1, 0.36, 1) 1.05s forwards;
-}
-
-.photography-intro__frame {
-  animation: photographyFrameIn 1.15s cubic-bezier(0.22, 1, 0.36, 1) both;
-}
-
-.photography-intro__label,
-.photography-intro__meta {
-  animation: slideUpFade 0.65s cubic-bezier(0.22, 1, 0.36, 1) 0.25s both;
-}
-
-@keyframes photographyWordmarkIn {
-  from { opacity: 0; transform: scale(1.16); letter-spacing: -0.16em; }
-  to { opacity: 0.92; transform: scale(1); letter-spacing: -0.08em; }
-}
-
-@keyframes photographyWordmarkOut {
-  to { opacity: 0; transform: scale(0.92); }
-}
-
-@keyframes photographyFrameIn {
-  from { opacity: 0; transform: scale(0.24); filter: saturate(0.2) contrast(0.8); }
-  to { opacity: 1; transform: scale(1); filter: saturate(1) contrast(1); }
-}
-
-@keyframes photographyIntroExit {
-  to { opacity: 0; visibility: hidden; }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .photography-intro {
-    display: none;
-  }
 }
 
 /* A quiet print-like grain keeps the large dark surfaces from feeling
@@ -605,7 +558,7 @@ body.dg-scroll-lock { overflow: hidden; }
    blurrier, so text sitting on it keeps its contrast. */
 @media (prefers-reduced-transparency: reduce) {
   :root {
-    --scrim-bg: oklch(0.13 0.015 55 / 0.96);
+    --scrim-bg: rgba(0, 0, 0, 0.98);
     --scrim-blur: none;
   }
 
@@ -615,7 +568,7 @@ body.dg-scroll-lock { overflow: hidden; }
   }
 
   .viewer .scrim {
-    background: oklch(0.13 0.015 55 / 0.82);
+    background: rgba(0, 0, 0, 0.9);
     backdrop-filter: none;
   }
 }
@@ -623,7 +576,7 @@ body.dg-scroll-lock { overflow: hidden; }
 /* Increased contrast: solid surfaces plus a defined edge. */
 @media (prefers-contrast: more) {
   :root {
-    --scrim-bg: oklch(0.13 0.015 55);
+    --scrim-bg: #000;
     --scrim-blur: none;
   }
 

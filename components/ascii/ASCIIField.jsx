@@ -609,8 +609,8 @@ export default function ASCIIField({
     const MAIN_RAY_COUNT = 2;
     const MICRO_RAY_COUNT = 6;
     // Colour applied to any ASCII cell that falls under a ray.
-    const RAY_COLOR_MAIN = [255, 226, 196];   // warm cream
-    const RAY_COLOR_MICRO = [255, 241, 220];  // one shade up, thin scatter
+    const RAY_COLOR_MAIN = [220, 232, 244];
+    const RAY_COLOR_MICRO = [242, 248, 255];
     // Deep-teal for kelp — sits in the cool palette without introducing
     // saturated green.
     const KELP_COLOR = [90, 140, 128];

@@ -46,7 +46,6 @@ const PhotoScrollGallery = ({ photos, onSelect }) => {
   const [activeIndex, setActiveIndex] = useState(0);
   const [hintVisible, setHintVisible] = useState(true);
   const [ready, setReady] = useState(false);
-  const [introActive, setIntroActive] = useState(!reducedMotion);
   const hintRef = useRef(true);
 
   // Duplicate the strip so wrapping never shows a gap.
@@ -155,13 +154,10 @@ const PhotoScrollGallery = ({ photos, onSelect }) => {
         if (hintRef.current) s.target += INTRO_NUDGE;
       }, 700);
     }
-    const revealTimer = window.setTimeout(() => setIntroActive(false), reducedMotion ? 0 : 1900);
-
     return () => {
       cancelAnimationFrame(s.raf);
       window.removeEventListener('resize', onResize);
       if (introTimer) clearTimeout(introTimer);
-      clearTimeout(revealTimer);
     };
   }, [tick, measure, reducedMotion]);
 
@@ -241,23 +237,6 @@ const PhotoScrollGallery = ({ photos, onSelect }) => {
       aria-label="Photography gallery. Scroll or drag horizontally."
       aria-roledescription="carousel"
     >
-      {introActive && (
-        <div className="photography-intro absolute inset-0 z-overlay flex flex-col items-center justify-center overflow-hidden bg-[color:var(--bg)]">
-          <div className="photography-intro__wordmark pointer-events-none absolute inset-x-0 top-1/2 -translate-y-1/2 whitespace-nowrap text-center font-display text-[clamp(4.4rem,15vw,14rem)] leading-none tracking-[-0.08em] text-bone/90">
-            PHOTOGRAPHY
-          </div>
-          <div className="photography-intro__frame relative z-10 h-[38vh] w-[min(38vw,420px)] min-w-[220px] overflow-hidden bg-surface">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={`/images/photography/${photos[1]?.file || photos[0]?.file}`}
-              alt=""
-              className="h-full w-full object-cover"
-              draggable={false}
-            />
-          </div>
-        </div>
-      )}
-
       {/* Soft edge fades */}
       <div
         aria-hidden="true"

@@ -162,7 +162,10 @@ export default function FloatingMenu({ items, hidden = false }) {
 
   const navigateTo = useCallback((item) => {
     if (transitionTimerRef.current) clearTimeout(transitionTimerRef.current);
-    setTransitioningLabel(item.label);
+    const image = item.images?.length
+      ? item.images[Math.floor(Math.random() * item.images.length)]
+      : null;
+    setTransitioningLabel({ label: item.label, image });
     setIsOpen(false);
     transitionTimerRef.current = window.setTimeout(() => {
       item.onClick?.();
@@ -187,19 +190,38 @@ export default function FloatingMenu({ items, hidden = false }) {
       <AnimatePresence>
         {transitioningLabel && (
           <motion.div
-            className="pointer-events-none fixed inset-0 z-nav flex items-center justify-center"
-            initial={{ opacity: 0, scale: 0.45, y: 150, filter: 'blur(8px)' }}
-            animate={{ opacity: 1, scale: 2.8, y: 0, filter: 'blur(0px)' }}
-            exit={{ opacity: 0, scale: 7, filter: 'blur(10px)' }}
-            transition={{ duration: 0.52, ease }}
+            className="pointer-events-none fixed inset-0 z-nav flex items-center justify-center overflow-hidden"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2, ease }}
+            style={{ backgroundColor: 'var(--bg)' }}
             aria-hidden="true"
           >
-            <span
-              className="font-mono text-[clamp(1.4rem,2.4vw,2.4rem)] uppercase tracking-[0.24em] text-bone"
-              style={{ textShadow: '0 0 26px color-mix(in oklab, var(--accent) 38%, transparent)' }}
+            <motion.span
+              className="pointer-events-none absolute inset-x-0 top-1/2 -translate-y-1/2 whitespace-nowrap text-center font-display text-[clamp(4.4rem,15vw,14rem)] leading-none tracking-[-0.08em] text-bone/90"
+              initial={{ opacity: 0, scale: 1.16, letterSpacing: '-0.16em' }}
+              animate={{ opacity: 0.92, scale: 1, letterSpacing: '-0.08em' }}
+              transition={{ duration: 0.72, ease }}
             >
-              {transitioningLabel}
-            </span>
+              {transitioningLabel.label}
+            </motion.span>
+            {transitioningLabel.image && (
+              <motion.div
+                className="relative z-10 h-[38vh] w-[min(38vw,420px)] min-w-[220px] overflow-hidden bg-surface"
+                initial={{ opacity: 0, scale: 0.24, filter: 'saturate(0.2) contrast(0.8)' }}
+                animate={{ opacity: 1, scale: 1, filter: 'saturate(1) contrast(1)' }}
+                transition={{ duration: 0.82, ease }}
+              >
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={transitioningLabel.image}
+                  alt=""
+                  className="h-full w-full object-cover"
+                  draggable={false}
+                />
+              </motion.div>
+            )}
           </motion.div>
         )}
       </AnimatePresence>

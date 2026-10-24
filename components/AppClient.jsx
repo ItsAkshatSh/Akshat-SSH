@@ -18,6 +18,7 @@ import FloatingMenu from './ui/FloatingMenu';
 import ProjectsContent from './content/ProjectsContent';
 import PhotographyContent from './content/PhotographyContent';
 import ExperienceContent from './content/ExperienceContent';
+import { PHOTOS } from './content/photographyPhotos';
 
 // Hero entrance. Each element rides the same critically damped spring, offset
 // by a short stagger — the stagger orders attention (portrait, then name, then
@@ -109,7 +110,11 @@ const App = () => {
 
   const navItems = [
     { label: 'Projects', onClick: () => setActiveSection('projects') },
-    { label: 'Photography', onClick: () => setActiveSection('photography') },
+    {
+      label: 'Photography',
+      images: PHOTOS.map((photo) => `/images/photography/${photo.file}`),
+      onClick: () => setActiveSection('photography'),
+    },
     { label: 'Experience', onClick: () => setActiveSection('experience') },
     { label: 'Blog', onClick: () => setIsBlogOpen(true) },
   ];
@@ -190,7 +195,7 @@ const App = () => {
       </main>
 
       <FloatingMenu
-        items={navItems.map((n) => ({ label: n.label, onClick: n.onClick }))}
+        items={navItems}
         hidden={Boolean(activeSection || isBlogOpen)}
       />
 
