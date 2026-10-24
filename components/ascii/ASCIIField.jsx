@@ -159,12 +159,21 @@ function makeStrandGeometry(length, thickness, curl) {
   return g;
 }
 
-export default function ASCIIField({ paused = false, targetFps = TARGET_FPS, profileMode = false } = {}) {
+export default function ASCIIField({
+  paused = false,
+  targetFps = TARGET_FPS,
+  profileMode = false,
+  timeScale = 1,
+} = {}) {
   const displayCanvasRef = useRef(null);
   const pausedRef = useRef(paused);
+  const timeScaleRef = useRef(timeScale);
   useEffect(() => {
     pausedRef.current = paused;
   }, [paused]);
+  useEffect(() => {
+    timeScaleRef.current = timeScale;
+  }, [timeScale]);
 
   useEffect(() => {
     const displayCanvas = displayCanvasRef.current;
@@ -872,11 +881,16 @@ export default function ASCIIField({ paused = false, targetFps = TARGET_FPS, pro
     // ----- Main loop, throttled to targetFps, paused when a panel is open -----
     // Background tabs still get rAF ticks (throttled, but not free), so the
     // loop also stops outright while the page is hidden.
+    // Scene time advances at timeScaleRef rate so 'reduced' motion calms
+    // creatures, rays, kelp and bubbles together, on one shared clock.
+    let sceneClock = 0;
+    let lastRaw = 0;
     let pageHidden = document.hidden;
     const onVisibility = () => {
       pageHidden = document.hidden;
       // Drop the stale timestamp so there is no catch-up frame on return.
       lastFrame = 0;
+      lastRaw = 0;
     };
     document.addEventListener('visibilitychange', onVisibility);
 
@@ -885,8 +899,10 @@ export default function ASCIIField({ paused = false, targetFps = TARGET_FPS, pro
       if (pausedRef.current || pageHidden) return;
       if (t - lastFrame < targetInterval) return;
       lastFrame = t;
-      update(t);
-      paintScene(t);
+      if (lastRaw) sceneClock += (t - lastRaw) * timeScaleRef.current;
+      lastRaw = t;
+      update(sceneClock);
+      paintScene(sceneClock);
       renderASCII();
     };
 
