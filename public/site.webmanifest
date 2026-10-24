@@ -1,0 +1,16 @@
+{
+  "name": "Akshat Sharma",
+  "short_name": "Akshat Sharma",
+  "description": "Akshat Sharma's personal portfolio, projects, writing and photography.",
+  "start_url": "/",
+  "display": "browser",
+  "background_color": "#171110",
+  "theme_color": "#171110",
+  "icons": [
+    {
+      "src": "/images/icon.ico",
+      "sizes": "any",
+      "type": "image/x-icon"
+    }
+  ]
+}
