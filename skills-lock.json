@@ -1,0 +1,11 @@
+{
+  "version": 1,
+  "skills": {
+    "awwwards": {
+      "source": "ga14ctic/awwwards-skill",
+      "sourceType": "github",
+      "skillPath": "awwwards/skills/awwwards/SKILL.md",
+      "computedHash": "b9f84469fb2ca535552498c3869b6380df4913ccaa11a9ad4ca9db2e0103bebd"
+    }
+  }
+}
