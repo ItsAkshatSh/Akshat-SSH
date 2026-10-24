@@ -30,4 +30,4 @@ Allow: /
 User-agent: Applebot-Extended
 Allow: /
 
-Sitemap: https://akshatshh.vercel.app/sitemap.xml
+Sitemap: https://akshaaaat.xyz/sitemap.xml
