@@ -6,22 +6,27 @@ module.exports = {
   theme: {
     extend: {
       colors: {
+        // Warm organic ink palette. Hex mirrors of the OKLCH tokens in
+        // globals.css (Tailwind's opacity modifiers need plain colors);
+        // components that can read vars should use the vars instead.
         surface: {
-          DEFAULT: '#0a0a0a',
-          elevated: '#111111',
-          overlay: '#0d0d0d',
-          raised: '#141414',
+          DEFAULT: '#16110d',
+          elevated: '#1f1813',
+          overlay: '#1b1510',
+          raised: '#28211a',
         },
         accent: {
-          green: '#22c55e',
-          cyan: '#22d3ee',
-          muted: 'rgba(255,255,255,0.06)',
+          green: '#8a9a5b',
+          cyan: '#cf9457',
+          muted: 'rgba(236, 229, 220, 0.06)',
         },
+        bone: '#ece5db',
+        umber: '#16110d',
       },
       fontFamily: {
-        sans: ['Inter', 'ui-sans-serif', 'system-ui', '-apple-system', 'Segoe UI', 'Roboto', 'sans-serif'],
+        sans: ['Newsreader', 'Georgia', 'ui-serif', 'system-ui', 'sans-serif'],
         mono: ['JetBrains Mono', 'ui-monospace', 'SFMono-Regular', 'Menlo', 'monospace'],
-        display: ['Silkscreen', 'cursive'],
+        display: ['Endless', 'Newsreader', 'Georgia', 'serif'],
       },
       // One fixed z scale for the whole site. Layers are named for what they
       // are, not for a number someone guessed at the call site.
@@ -54,10 +59,10 @@ module.exports = {
         slideUpFade: { '0%': { opacity: 0, transform: 'translateY(20px)' }, '100%': { opacity: 1, transform: 'translateY(0)' } },
       },
       boxShadow: {
-        glow: '0 0 40px -10px rgba(34, 211, 238, 0.12)',
-        'glow-soft': '0 0 80px -20px rgba(255,255,255,0.06)',
-        card: '0 4px 24px -4px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.04)',
-        'card-hover': '0 8px 40px -8px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.08)',
+        glow: '0 0 40px -10px rgba(207, 148, 87, 0.16)',
+        'glow-soft': '0 0 80px -20px rgba(236,229,220,0.06)',
+        card: '0 4px 24px -4px rgba(10, 7, 5, 0.5), 0 0 0 1px rgba(236,229,220,0.05)',
+        'card-hover': '0 8px 40px -8px rgba(10, 7, 5, 0.6), 0 0 0 1px rgba(236,229,220,0.09)',
       },
     },
   },
