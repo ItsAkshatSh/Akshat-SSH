@@ -4,7 +4,7 @@ import { getAllPosts, getPostContent } from '../../lib/blog';
 import { format } from 'date-fns';
 
 const SITE_URL =
-  process.env.NEXT_PUBLIC_SITE_URL || 'https://akshatshh.vercel.app';
+  process.env.NEXT_PUBLIC_SITE_URL || 'https://akshaaaat.xyz';
 
 export default function BlogPost({ post, slug }) {
   const { data, contentHtml } = post;
@@ -76,26 +76,30 @@ export default function BlogPost({ post, slug }) {
         />
       </Head>
 
-      <div className="min-h-dvh bg-[#0a0a0a] text-neutral-200">
+      <div className="min-h-dvh bg-ink text-bone">
         <article className="max-w-3xl mx-auto px-6 md:px-8 py-16 md:py-24">
           <Link
             href="/blog"
-            className="inline-flex items-center text-neutral-400 hover:text-white transition-colors mb-10 text-sm"
+            className="inline-flex items-center text-muted-warm hover:text-accent transition-colors mb-10 text-sm"
           >
             ← All posts
           </Link>
 
-          <h1 className="text-3xl md:text-5xl font-light tracking-tight text-neutral-50 mb-3">
+          <p className="font-mono text-[11px] tracking-[0.28em] uppercase text-accent mb-4">
+            Journal
+          </p>
+          <h1 className="font-display text-4xl md:text-6xl tracking-[-0.01em] leading-[1.05] text-bone mb-5">
             {data.title}
           </h1>
           {data.date && (
             <time
               dateTime={data.date}
-              className="block text-sm text-neutral-400 font-mono mb-10"
+              className="block text-[11px] tracking-[0.22em] uppercase text-muted-warm font-mono mb-6"
             >
               {format(new Date(data.date), 'MMMM d, yyyy')}
             </time>
           )}
+          <div className="ink-rule w-28 mb-10"></div>
 
           <div
             className="prose-wrapper"
