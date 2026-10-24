@@ -1,5 +1,5 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
-import { motion } from 'framer-motion';
+import { AnimatePresence, motion } from 'framer-motion';
 
 /**
  * Liquid-morph floating menu.
@@ -11,8 +11,8 @@ import { motion } from 'framer-motion';
  * upward in a staggered wave), so the interaction feels like a subtle
  * split-flap board, which fits the monospace/ASCII aesthetic.
  *
- * Adapted from the source ref to a black-and-white monochrome palette
- * and JetBrains Mono typography so it reads as part of the ASCII world
+ * Adapted from the source ref to a warm bone-and-umber palette and
+ * JetBrains Mono typography so it reads as part of the ink world
  * rather than a splash of colour.
  */
 
@@ -29,11 +29,11 @@ const CLOSE_SPRING = { type: 'spring', bounce: 0.12, duration: 0.38 };
 const HOVER_SPRING = { type: 'spring', bounce: 0, duration: 0.25 };
 const REVEAL_SPRING = { type: 'spring', bounce: 0.18, duration: 0.6 };
 
-// The two panels: cream (collapsed) and dark (expanded reveal).
-const CREAM = '#e8e6df';
-const CREAM_BORDER = '#c4c1b8';
-const INK = '#0a0a0a';
-const INK_TEXT = '#e8e6df';
+// The two panels: bone (collapsed) and warm ink (expanded reveal).
+const CREAM = '#ece5db';
+const CREAM_BORDER = '#c9bfb2';
+const INK = '#171110';
+const INK_TEXT = '#ece5db';
 
 function MenuButton({ label, onClick, isOpen, index, tabbable }) {
   const [hovered, setHovered] = useState(false);
@@ -127,7 +127,9 @@ function MenuButton({ label, onClick, isOpen, index, tabbable }) {
 
 export default function FloatingMenu({ items, hidden = false }) {
   const [isOpen, setIsOpen] = useState(false);
+  const [transitioningLabel, setTransitioningLabel] = useState(null);
   const containerRef = useRef(null);
+  const transitionTimerRef = useRef(null);
   // Items are only reachable when the panel is actually showing: closed items
   // are transparent, not just pointer-events:none, and pointer-events alone
   // leaves them tabbable.
@@ -154,6 +156,22 @@ export default function FloatingMenu({ items, hidden = false }) {
     return () => document.removeEventListener('mousedown', handler);
   }, [isOpen]);
 
+  useEffect(() => () => {
+    if (transitionTimerRef.current) clearTimeout(transitionTimerRef.current);
+  }, []);
+
+  const navigateTo = useCallback((item) => {
+    if (transitionTimerRef.current) clearTimeout(transitionTimerRef.current);
+    setTransitioningLabel(item.label);
+    setIsOpen(false);
+    transitionTimerRef.current = window.setTimeout(() => {
+      item.onClick?.();
+      transitionTimerRef.current = window.setTimeout(() => {
+        setTransitioningLabel(null);
+      }, 340);
+    }, 520);
+  }, []);
+
   // Close on Esc for keyboard users.
   useEffect(() => {
     if (!isOpen) return;
@@ -165,7 +183,28 @@ export default function FloatingMenu({ items, hidden = false }) {
   }, [isOpen]);
 
   return (
-    <motion.div
+    <>
+      <AnimatePresence>
+        {transitioningLabel && (
+          <motion.div
+            className="pointer-events-none fixed inset-0 z-nav flex items-center justify-center"
+            initial={{ opacity: 0, scale: 0.45, y: 150, filter: 'blur(8px)' }}
+            animate={{ opacity: 1, scale: 2.8, y: 0, filter: 'blur(0px)' }}
+            exit={{ opacity: 0, scale: 7, filter: 'blur(10px)' }}
+            transition={{ duration: 0.52, ease }}
+            aria-hidden="true"
+          >
+            <span
+              className="font-mono text-[clamp(1.4rem,2.4vw,2.4rem)] uppercase tracking-[0.24em] text-bone"
+              style={{ textShadow: '0 0 26px color-mix(in oklab, var(--accent) 38%, transparent)' }}
+            >
+              {transitioningLabel}
+            </span>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      <motion.div
       ref={containerRef}
       className="safe-b fixed bottom-6 left-1/2 z-menu"
       style={{ x: '-50%', pointerEvents: hidden ? 'none' : 'auto' }}
@@ -248,17 +287,13 @@ export default function FloatingMenu({ items, hidden = false }) {
             <MenuButton
               key={item.label}
               label={item.label}
-              onClick={() => {
-                item.onClick?.();
-                setIsOpen(false);
-              }}
+              onClick={() => navigateTo(item)}
               isOpen={isOpen}
               index={idx}
               tabbable={itemsTabbable}
             />
           ))}
         </div>
-
         {/* Bottom bar: the toggle. It is the control that fills the collapsed
             pill, so a single real button covers "open" and "close" and stays
             reachable by keyboard. */}
@@ -312,6 +347,7 @@ export default function FloatingMenu({ items, hidden = false }) {
           </div>
         </motion.button>
       </motion.div>
-    </motion.div>
+      </motion.div>
+    </>
   );
 }
