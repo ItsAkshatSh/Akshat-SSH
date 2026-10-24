@@ -9,11 +9,13 @@ import { AnimatePresence, motion } from 'framer-motion';
 import ScrambleText from './utilities/ScrambleText';
 import SectionOverlay from './ui/SectionOverlay';
 import { HERO, SOCIALS } from '../lib/siteContent';
+import { BG_MODES, useSettings } from '../lib/settingsStore';
 
-import ASCIIField from './ascii/ASCIIField';
+import BackgroundField from './BackgroundField';
 import ASCIICanvas from './ascii/ASCIICanvas';
 import BlogWindow from './blog/BlogWindow';
 import FloatingMenu from './ui/FloatingMenu';
+import SettingsOverlay from './settings/SettingsOverlay';
 
 import ProjectsContent from './content/ProjectsContent';
 import PhotographyContent from './content/PhotographyContent';
@@ -59,8 +61,10 @@ const SOCIAL_ICONS = {
 const App = () => {
   const [activeSection, setActiveSection] = useState(null);
   const [isBlogOpen, setIsBlogOpen] = useState(false);
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isFinePointer, setIsFinePointer] = useState(false);
   const [contentIn, setContentIn] = useState(false);
+  const { bgMode } = useSettings();
 
   useEffect(() => {
     const shell = document.getElementById('hero-shell');
@@ -88,11 +92,12 @@ const App = () => {
     const handleKeyDown = (e) => {
       if (e.key !== 'Escape') return;
       if (isBlogOpen) setIsBlogOpen(false);
+      else if (isSettingsOpen) setIsSettingsOpen(false);
       else if (activeSection) setActiveSection(null);
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isBlogOpen, activeSection]);
+  }, [isBlogOpen, isSettingsOpen, activeSection]);
 
   // Open sections from hash links in the SSR hero shell (e.g. /#projects).
   useEffect(() => {
@@ -112,6 +117,7 @@ const App = () => {
     { label: 'Photography', onClick: () => setActiveSection('photography') },
     { label: 'Experience', onClick: () => setActiveSection('experience') },
     { label: 'Blog', onClick: () => setIsBlogOpen(true) },
+    { label: 'Settings', onClick: () => setIsSettingsOpen(true) },
   ];
 
   const sectionTitle = activeSection
@@ -120,12 +126,19 @@ const App = () => {
   const isPhotography = activeSection === 'photography';
 
   return (
-    <div className="fixed inset-0 z-content min-h-dvh bg-[#060a10] text-slate-200 overflow-x-hidden overflow-y-auto">
-      {/* The ocean is a looping animation behind a blurred scrim while a panel
-          is open — nothing about it is visible then, so it stops. */}
-      <ASCIIField paused={Boolean(activeSection || isBlogOpen)} />
+    <div
+      id="app-root"
+      className={`theme-${bgMode === BG_MODES.ocean ? 'ocean' : 'orbit'} bg-ink text-bone fixed inset-0 z-content min-h-dvh overflow-x-hidden overflow-y-auto`}
+    >
+      {/* The living background (Void black-hole / Ocean ASCII scenes) rests
+          behind a blurred scrim while a panel is open — nothing about it is
+          visible then, so it stops. Mode is user-persisted. */}
+      <BackgroundField paused={Boolean(activeSection || isBlogOpen || isSettingsOpen)} />
 
       <main className="relative z-content w-full min-h-dvh flex items-center justify-center px-6 md:px-10 py-20 md:py-24">
+        <div className="pointer-events-none absolute inset-x-6 md:inset-x-10 top-8 md:top-10 flex items-center justify-end font-mono text-[9px] uppercase tracking-[0.28em] text-muted-warm/70">
+          <span>Dubai · UAE</span>
+        </div>
         <motion.div
           className="w-full max-w-6xl grid lg:grid-cols-[minmax(260px,320px)_1fr] gap-10 lg:gap-16 xl:gap-20 items-center"
           variants={HERO_STAGGER}
@@ -136,12 +149,13 @@ const App = () => {
             variants={HERO_ITEM}
             className="interactive relative mx-auto lg:mx-0 w-full max-w-[280px] lg:max-w-none"
           >
-            <div className="relative aspect-[3/4] rounded-2xl overflow-hidden border border-white/[0.08] bg-[#0a0f16] shadow-card">
+            <div className="relative aspect-[3/4] rounded-[1.75rem] border-hair overflow-hidden bg-surface">
               <ASCIICanvas
                 src="/images/ascii/real_pfp.jpg"
                 cellSize={4}
-                preserveColor
-                glitchUseSampled
+                color={bgMode === BG_MODES.ocean ? '#b9d9e8' : '#d0a477'}
+                glitchColor={bgMode === BG_MODES.ocean ? '#e3f5ff' : '#f1d2a6'}
+                preserveColor={false}
                 gamma={0.6}
                 radius={100}
                 displace={12}
@@ -153,12 +167,12 @@ const App = () => {
 
           <div className="flex flex-col gap-9 lg:gap-11">
             <motion.header variants={HERO_ITEM} className="max-w-xl">
-              <h2 className="text-balance text-4xl sm:text-5xl lg:text-[3.4rem] leading-[1.02] font-medium text-white tracking-[-0.02em] mb-6">
+              <h2 className="font-display text-balance text-5xl sm:text-6xl lg:text-[4.4rem] leading-[1.02] text-bone tracking-[-0.01em] mb-6">
                 {HERO.nameLines[0]}
                 <br />
                 {HERO.nameLines[1]}
               </h2>
-              <p className="text-pretty text-neutral-200 text-[15px] sm:text-base leading-[1.75] max-w-md">
+              <p className="text-pretty text-muted-warm text-[16px] sm:text-[17px] leading-[1.8] max-w-md">
                 {HERO.bio}
               </p>
             </motion.header>
@@ -171,12 +185,13 @@ const App = () => {
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label={label}
-                  className="interactive press group flex items-center justify-center size-11 rounded-full border border-white/[0.1] text-neutral-200 hover:text-white hover:border-white/30 hover:bg-white/[0.05]"
+                  className="interactive press group flex items-center justify-center size-11 rounded-full border-hair text-muted-warm hover:text-accent hover:border-[color:var(--border-hover)] hover:bg-white/[0.05]"
                 >
                   <span className="block size-[18px]">{SOCIAL_ICONS[label]}</span>
                 </a>
               ))}
             </motion.div>
+
           </div>
         </motion.div>
       </main>
@@ -188,6 +203,12 @@ const App = () => {
 
       <AnimatePresence>
         {isBlogOpen && <BlogWindow key="blog" onClose={() => setIsBlogOpen(false)} />}
+      </AnimatePresence>
+
+      <AnimatePresence>
+        {isSettingsOpen && (
+          <SettingsOverlay key="settings" onClose={() => setIsSettingsOpen(false)} />
+        )}
       </AnimatePresence>
 
       <AnimatePresence>
