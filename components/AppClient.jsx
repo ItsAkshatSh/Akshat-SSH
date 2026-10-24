@@ -9,7 +9,6 @@ import { AnimatePresence, motion } from 'framer-motion';
 import ScrambleText from './utilities/ScrambleText';
 import SectionOverlay from './ui/SectionOverlay';
 import { HERO, SOCIALS } from '../lib/siteContent';
-import { BG_MODES, useSettings } from '../lib/settingsStore';
 
 import BackgroundField from './BackgroundField';
 import ASCIICanvas from './ascii/ASCIICanvas';
@@ -64,7 +63,6 @@ const App = () => {
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isFinePointer, setIsFinePointer] = useState(false);
   const [contentIn, setContentIn] = useState(false);
-  const { bgMode } = useSettings();
 
   useEffect(() => {
     const shell = document.getElementById('hero-shell');
@@ -128,7 +126,7 @@ const App = () => {
   return (
     <div
       id="app-root"
-      className={`theme-${bgMode === BG_MODES.ocean ? 'ocean' : 'orbit'} bg-ink text-bone fixed inset-0 z-content min-h-dvh overflow-x-hidden overflow-y-auto`}
+      className="bg-ink text-bone fixed inset-0 z-content min-h-dvh overflow-x-hidden overflow-y-auto"
     >
       {/* The living background (Void black-hole / Ocean ASCII scenes) rests
           behind a blurred scrim while a panel is open — nothing about it is
@@ -153,9 +151,8 @@ const App = () => {
               <ASCIICanvas
                 src="/images/ascii/real_pfp.jpg"
                 cellSize={4}
-                color={bgMode === BG_MODES.ocean ? '#b9d9e8' : '#d0a477'}
-                glitchColor={bgMode === BG_MODES.ocean ? '#e3f5ff' : '#f1d2a6'}
-                preserveColor={false}
+                preserveColor
+                glitchUseSampled
                 gamma={0.6}
                 radius={100}
                 displace={12}

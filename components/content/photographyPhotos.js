@@ -1,6 +1,6 @@
 export const PHOTOS = [
   { file: 'imag1.JPG',     date: 'Aug 2025', place: 'Back Bay, Boston' },
-  { file: 'IMG_4793.JPG',  date: 'Aug 2025', place: 'Sedona, Arizona' },
+  { file: 'IMG_4793.JPG',  date: 'Aug 2025', place: 'Hatta, Dubai' },
   { file: 'IMG_5043.JPG',  date: 'Aug 2025', place: 'Boston, Massachusetts' },
   { file: 'IMG_5058.JPG',  date: 'Aug 2025', place: 'Boston Common' },
   { file: 'IMG_5135.JPG',  date: 'Aug 2025', place: 'Massachusetts State House' },

@@ -9,7 +9,7 @@ export default function HeroShell() {
   return (
     <div
       id="hero-shell"
-      className="theme-orbit min-h-dvh bg-ink text-bone"
+      className="min-h-dvh bg-ink text-bone"
       aria-label="Akshat Sharma portfolio"
     >
       <main className="w-full min-h-dvh flex items-center justify-center px-6 md:px-10 py-20 md:py-24">
