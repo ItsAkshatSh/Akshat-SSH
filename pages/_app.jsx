@@ -4,11 +4,11 @@ import { useRouter } from 'next/router';
 import { MotionConfig } from 'framer-motion';
 
 const SITE_URL =
-  process.env.NEXT_PUBLIC_SITE_URL || 'https://akshatshh.vercel.app';
+  process.env.NEXT_PUBLIC_SITE_URL || 'https://akshaaaat.xyz';
 
-const DEFAULT_TITLE = 'Akshat Sharma';
+const DEFAULT_TITLE = 'Akshat Sharma — Personal Portfolio';
 const DEFAULT_DESCRIPTION =
-  'Akshat Sharma. Aspiring Computer Engineer based in Dubai. Portfolio featuring hardware, mobile apps, games and photography — rendered inside a reactive ASCII ocean.';
+  'Akshat Sharma. Aspiring Computer Engineer based in Dubai. Portfolio featuring hardware, mobile apps, games and photography — rendered inside a cursor-reactive ink terrain.';
 const OG_IMAGE = `${SITE_URL}/images/ascii/real_pfp.jpg`;
 
 // Structured data describing Akshat as a Person. Search engines and LLMs
@@ -34,6 +34,15 @@ const PERSON_SCHEMA = {
   ],
 };
 
+const WEBSITE_SCHEMA = {
+  '@context': 'https://schema.org',
+  '@type': 'WebSite',
+  name: 'Akshat Sharma',
+  alternateName: 'Akshat Sharma — Personal Portfolio',
+  url: SITE_URL,
+  description: DEFAULT_DESCRIPTION,
+};
+
 export default function MyApp({ Component, pageProps }) {
   const router = useRouter();
   const canonical = `${SITE_URL}${(router.asPath || '/').split('?')[0]}`;
@@ -44,6 +53,7 @@ export default function MyApp({ Component, pageProps }) {
         <title>{DEFAULT_TITLE}</title>
         <meta name="description" content={DEFAULT_DESCRIPTION} />
         <meta name="author" content="Akshat Sharma" />
+        <meta name="application-name" content="Akshat Sharma" />
         <meta
           name="keywords"
           content="Akshat Sharma, akshat.ssh, portfolio, Dubai, computer engineer, developer, hardware, PCB design, Flutter, game development, ASCII art, personal website"
@@ -56,12 +66,13 @@ export default function MyApp({ Component, pageProps }) {
           name="viewport"
           content="width=device-width, initial-scale=1, viewport-fit=cover"
         />
-        <meta name="theme-color" content="#060a10" />
+        <meta name="theme-color" content="#171110" />
         <meta name="color-scheme" content="dark" />
 
         {/* Favicons */}
         <link rel="icon" href="/images/icon.ico" />
         <link rel="apple-touch-icon" href="/images/ascii/real_pfp.jpg" />
+        <link rel="manifest" href="/site.webmanifest" />
 
         {/* Open Graph */}
         <meta property="og:type" content="website" />
@@ -84,6 +95,10 @@ export default function MyApp({ Component, pageProps }) {
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(PERSON_SCHEMA) }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(WEBSITE_SCHEMA) }}
         />
       </Head>
 
