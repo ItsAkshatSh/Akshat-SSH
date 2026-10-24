@@ -14,7 +14,6 @@ import BackgroundField from './BackgroundField';
 import ASCIICanvas from './ascii/ASCIICanvas';
 import BlogWindow from './blog/BlogWindow';
 import FloatingMenu from './ui/FloatingMenu';
-import SettingsOverlay from './settings/SettingsOverlay';
 
 import ProjectsContent from './content/ProjectsContent';
 import PhotographyContent from './content/PhotographyContent';
@@ -60,7 +59,6 @@ const SOCIAL_ICONS = {
 const App = () => {
   const [activeSection, setActiveSection] = useState(null);
   const [isBlogOpen, setIsBlogOpen] = useState(false);
-  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isFinePointer, setIsFinePointer] = useState(false);
   const [contentIn, setContentIn] = useState(false);
 
@@ -90,12 +88,11 @@ const App = () => {
     const handleKeyDown = (e) => {
       if (e.key !== 'Escape') return;
       if (isBlogOpen) setIsBlogOpen(false);
-      else if (isSettingsOpen) setIsSettingsOpen(false);
       else if (activeSection) setActiveSection(null);
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isBlogOpen, isSettingsOpen, activeSection]);
+  }, [isBlogOpen, activeSection]);
 
   // Open sections from hash links in the SSR hero shell (e.g. /#projects).
   useEffect(() => {
@@ -115,7 +112,6 @@ const App = () => {
     { label: 'Photography', onClick: () => setActiveSection('photography') },
     { label: 'Experience', onClick: () => setActiveSection('experience') },
     { label: 'Blog', onClick: () => setIsBlogOpen(true) },
-    { label: 'Settings', onClick: () => setIsSettingsOpen(true) },
   ];
 
   const sectionTitle = activeSection
@@ -131,7 +127,7 @@ const App = () => {
       {/* The living background (Void black-hole / Ocean ASCII scenes) rests
           behind a blurred scrim while a panel is open — nothing about it is
           visible then, so it stops. Mode is user-persisted. */}
-      <BackgroundField paused={Boolean(activeSection || isBlogOpen || isSettingsOpen)} />
+      <BackgroundField paused={Boolean(activeSection || isBlogOpen)} />
 
       <main className="relative z-content w-full min-h-dvh flex items-center justify-center px-6 md:px-10 py-20 md:py-24">
         <div className="pointer-events-none absolute inset-x-6 md:inset-x-10 top-8 md:top-10 flex items-center justify-end font-mono text-[9px] uppercase tracking-[0.28em] text-muted-warm/70">
@@ -203,9 +199,6 @@ const App = () => {
       </AnimatePresence>
 
       <AnimatePresence>
-        {isSettingsOpen && (
-          <SettingsOverlay key="settings" onClose={() => setIsSettingsOpen(false)} />
-        )}
       </AnimatePresence>
 
       <AnimatePresence>

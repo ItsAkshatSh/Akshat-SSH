@@ -243,8 +243,8 @@ export default function FloatingMenu({ items, hidden = false }) {
         <motion.div
           className="absolute inset-0"
           animate={{
-            backgroundColor: CREAM,
-            borderColor: isOpen ? CREAM : CREAM_BORDER,
+            backgroundColor: isOpen ? INK : CREAM,
+            borderColor: isOpen ? INK : CREAM_BORDER,
           }}
           transition={{ duration: isOpen ? 0.1 : 0.3, ease }}
           style={{
