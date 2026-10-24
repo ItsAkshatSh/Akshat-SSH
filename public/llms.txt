@@ -19,17 +19,17 @@ Akshat is a student and maker from Dubai, UAE. His work spans four areas:
 
 ## Overview
 
-- [Home](https://akshatshh.vercel.app/): Single-page portfolio with a
+- [Home](https://akshaaaat.xyz/): Single-page portfolio with a
   procedural three.js jellyfish + fish rendered as ASCII, sub-pages for
   projects / photography / experience, and an ASCII cursor.
-- [Blog Index](https://akshatshh.vercel.app/blog): List of writing.
+- [Blog Index](https://akshaaaat.xyz/blog): List of writing.
 
 ## Blog Posts
 
-- [Welcome](https://akshatshh.vercel.app/blog/welcome)
-- [Genius Hour](https://akshatshh.vercel.app/blog/geniusHour)
-- [Campfire Dubai](https://akshatshh.vercel.app/blog/campFireDubai)
-- [HisabiPocket](https://akshatshh.vercel.app/blog/hisabi)
+- [Welcome](https://akshaaaat.xyz/blog/welcome)
+- [Genius Hour](https://akshaaaat.xyz/blog/geniusHour)
+- [Campfire Dubai](https://akshaaaat.xyz/blog/campFireDubai)
+- [HisabiPocket](https://akshaaaat.xyz/blog/hisabi)
 
 ## Contact
 
