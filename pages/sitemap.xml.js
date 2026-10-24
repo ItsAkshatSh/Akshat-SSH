@@ -6,7 +6,7 @@
 import { getAllPosts } from '../lib/blog';
 
 const SITE_URL =
-  process.env.NEXT_PUBLIC_SITE_URL || 'https://akshatshh.vercel.app';
+  process.env.NEXT_PUBLIC_SITE_URL || 'https://akshaaaat.xyz';
 
 const escapeXml = (unsafe) =>
   unsafe.replace(/[<>&'"]/g, (c) =>
