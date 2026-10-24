@@ -26,8 +26,8 @@ export const SectionCorner = ({ position }) => {
       aria-hidden="true"
       className={`absolute size-4 pointer-events-none ${anchor}`}
       style={{
-        borderTop: '1px solid rgba(255,255,255,0.25)',
-        borderLeft: '1px solid rgba(255,255,255,0.25)',
+        borderTop: '1px solid var(--border-hover)',
+        borderLeft: '1px solid var(--border-hover)',
         opacity: 0,
         animation: 'sectionBackdrop 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards 0.4s',
       }}
@@ -36,7 +36,7 @@ export const SectionCorner = ({ position }) => {
 };
 
 const overlayButtonClass =
-  'interactive press h-10 px-4 rounded-full border border-white/[0.14] text-neutral-200 hover:text-white hover:border-white/30 hover:bg-white/[0.05] text-[11px] tracking-[0.25em] uppercase';
+  'interactive press h-11 px-4 rounded-full border-hair text-muted-warm hover:text-bone hover:bg-white/[0.05] text-[11px] tracking-[0.25em] uppercase';
 
 export const OverlayButton = ({ children, className = '', ...props }) => (
   <button type="button" className={`${overlayButtonClass} ${className}`.trim()} {...props}>
@@ -55,7 +55,7 @@ export default function SectionOverlay({
   variant = 'default',
   zIndex = 40,
   showVignettes = true,
-  titleClassName = 'text-balance text-4xl sm:text-5xl md:text-6xl font-medium text-white tracking-[-0.02em] capitalize leading-none',
+  titleClassName = 'font-display text-balance text-4xl sm:text-5xl md:text-6xl text-bone tracking-[-0.01em] capitalize leading-none',
 }) {
   const dialogRef = useRef(null);
   const isFullPage = variant === 'fullpage';
@@ -108,11 +108,11 @@ export default function SectionOverlay({
         <>
           <div
             aria-hidden="true"
-            className="absolute inset-x-0 top-0 h-40 bg-gradient-to-b from-[#060a10]/80 to-transparent pointer-events-none"
+            className="vignette-top absolute inset-x-0 top-0 h-40 pointer-events-none"
           />
           <div
             aria-hidden="true"
-            className="absolute inset-x-0 bottom-0 h-56 bg-gradient-to-t from-[#060a10]/90 via-[#060a10]/45 to-transparent pointer-events-none"
+            className="vignette-bottom absolute inset-x-0 bottom-0 h-56 pointer-events-none"
           />
         </>
       )}
