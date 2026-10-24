@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Newsreader:ital,opsz,wght@0,6..72,300..600;1,6..72,300..500&display=swap');
 
 @font-face {
   font-family: 'Endless';
@@ -14,14 +14,20 @@
 
 @layer base {
   :root {
-    --bg: #070707;
-    --surface: #0f0f0f;
-    --surface-raised: #141414;
-    --border: rgba(255, 255, 255, 0.08);
-    --border-hover: rgba(255, 255, 255, 0.16);
-    --text: #f5f5f5;
-    --text-muted: #a3a3a3;
-    --accent: #a3a3a3;
+    /* Organic ink palette (OKLCH). Every neutral is tinted toward the umber
+       hue (H≈55-80) so neither pure black nor paper white appears anywhere;
+       chroma tapers as lightness approaches either extreme. Ochre is the
+       single committed accent — it carries glow and links, never fill. */
+    --bg: oklch(0.13 0.015 55);
+    --surface: oklch(0.17 0.02 55);
+    --surface-raised: oklch(0.21 0.024 58);
+    --border: oklch(0.9 0.02 80 / 0.08);
+    --border-hover: oklch(0.9 0.02 80 / 0.17);
+    --text: oklch(0.94 0.014 80);
+    --text-muted: oklch(0.64 0.02 70);
+    --accent: oklch(0.68 0.13 75);
+    --accent-soft: oklch(0.68 0.13 75 / 0.15);
+    --accent-deep: oklch(0.46 0.09 70);
 
     /* Motion system.
        --dur-press is short on purpose: feedback that arrives on pointer-down
@@ -38,8 +44,34 @@
     /* Translucent chrome. One token per material weight so the reduced
        transparency / increased contrast overrides below only have to
        restate a color, never re-derive one. */
-    --scrim-bg: rgba(6, 10, 16, 0.55);
+    --scrim-bg: oklch(0.13 0.015 55 / 0.55);
     --scrim-blur: blur(24px) saturate(140%);
+  }
+
+  .theme-orbit {
+    --bg: oklch(0.13 0.015 55);
+    --surface: oklch(0.17 0.02 55);
+    --surface-raised: oklch(0.21 0.024 58);
+    --text: oklch(0.94 0.014 80);
+    --text-muted: oklch(0.64 0.02 70);
+    --accent: oklch(0.68 0.13 75);
+    --accent-soft: oklch(0.68 0.13 75 / 0.15);
+    --accent-deep: oklch(0.46 0.09 70);
+    --border: oklch(0.9 0.02 80 / 0.08);
+    --border-hover: oklch(0.9 0.02 80 / 0.17);
+  }
+
+  .theme-ocean {
+    --bg: oklch(0.13 0.025 235);
+    --surface: oklch(0.17 0.035 230);
+    --surface-raised: oklch(0.22 0.045 228);
+    --text: oklch(0.94 0.025 220);
+    --text-muted: oklch(0.68 0.035 220);
+    --accent: oklch(0.76 0.1 205);
+    --accent-soft: oklch(0.76 0.1 205 / 0.15);
+    --accent-deep: oklch(0.5 0.08 220);
+    --border: oklch(0.9 0.04 220 / 0.1);
+    --border-hover: oklch(0.9 0.04 220 / 0.2);
   }
 
   html {
@@ -52,7 +84,8 @@
 
   body {
     margin: 0;
-    font-family: 'Endless', 'JetBrains Mono', ui-monospace, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+    font-family: 'Newsreader', 'Endless', Georgia, serif;
+    font-optical-sizing: auto;
     font-feature-settings: "ss01", "cv02", "cv14";
     font-optical-sizing: auto;
     background: var(--bg);
@@ -60,11 +93,61 @@
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
+
+  body::selection {
+    background: var(--accent);
+    color: var(--bg);
+  }
 }
 
 @layer utilities {
   .text-balance {
     text-wrap: balance;
+  }
+
+  /* Palette utilities so components consume tokens instead of hardcoded
+     shades. --bg / --text / --accent are the three load-bearing ones. */
+  .bg-ink { background: var(--bg); }
+  .bg-surface { background: var(--surface); }
+  .text-bone { color: var(--text); }
+  .text-muted-warm { color: var(--text-muted); }
+  .text-accent { color: var(--accent); }
+  .border-hair { border-color: var(--border); }
+
+  /* Endless stays the committed display voice: headings and few else. */
+  .font-display {
+    font-family: 'Endless', 'Newsreader', Georgia, serif;
+    font-weight: 400;
+  }
+
+  /* Organic vignettes used by overlays. Tokens, not hardcoded darks, so
+     the accessibility overrides restate them in one place. */
+  .vignette-top {
+    background: linear-gradient(
+      to bottom,
+      color-mix(in oklab, var(--bg) 80%, transparent),
+      transparent
+    );
+  }
+  .vignette-bottom {
+    background: linear-gradient(
+      to top,
+      color-mix(in oklab, var(--bg) 92%, transparent) 0%,
+      color-mix(in oklab, var(--bg) 48%, transparent) 45%,
+      transparent
+    );
+  }
+
+  /* Brushed ink rule — the organic replacement for a straight <hr>. */
+  .ink-rule {
+    height: 2px;
+    border-radius: 2px;
+    background: linear-gradient(
+      to right,
+      var(--accent) 0%,
+      var(--accent-deep) 55%,
+      transparent 100%
+    );
   }
 }
 
@@ -85,7 +168,7 @@
    the ambient bubbles or god rays drift behind the words. */
 .readable-on-blur,
 .readable-on-blur * {
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.55), 0 0 8px rgba(0, 0, 0, 0.35);
+  text-shadow: 0 1px 2px oklch(0.08 0.012 55 / 0.55), 0 0 8px oklch(0.08 0.012 55 / 0.35);
 }
 
 /* Translucent scrim used behind every overlay panel. Its opacity and blur
@@ -95,6 +178,68 @@
   background: var(--scrim-bg);
   -webkit-backdrop-filter: var(--scrim-blur);
   backdrop-filter: var(--scrim-blur);
+}
+
+.photography-intro {
+  animation: photographyIntroExit 0.7s cubic-bezier(0.22, 1, 0.36, 1) 1.25s forwards;
+}
+
+.photography-intro__wordmark {
+  animation:
+    photographyWordmarkIn 1.05s cubic-bezier(0.22, 1, 0.36, 1) both,
+    photographyWordmarkOut 0.65s cubic-bezier(0.22, 1, 0.36, 1) 1.05s forwards;
+}
+
+.photography-intro__frame {
+  animation: photographyFrameIn 1.15s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.photography-intro__label,
+.photography-intro__meta {
+  animation: slideUpFade 0.65s cubic-bezier(0.22, 1, 0.36, 1) 0.25s both;
+}
+
+@keyframes photographyWordmarkIn {
+  from { opacity: 0; transform: scale(1.16); letter-spacing: -0.16em; }
+  to { opacity: 0.92; transform: scale(1); letter-spacing: -0.08em; }
+}
+
+@keyframes photographyWordmarkOut {
+  to { opacity: 0; transform: scale(0.92); }
+}
+
+@keyframes photographyFrameIn {
+  from { opacity: 0; transform: scale(0.24); filter: saturate(0.2) contrast(0.8); }
+  to { opacity: 1; transform: scale(1); filter: saturate(1) contrast(1); }
+}
+
+@keyframes photographyIntroExit {
+  to { opacity: 0; visibility: hidden; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .photography-intro {
+    display: none;
+  }
+}
+
+/* A quiet print-like grain keeps the large dark surfaces from feeling
+   digitally empty without competing with the ASCII field or photography. */
+#app-root::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  opacity: 0.035;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 160 160' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.35'/%3E%3C/svg%3E");
+  mix-blend-mode: soft-light;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #app-root::after {
+    opacity: 0.02;
+  }
 }
 
 /* Press feedback.
@@ -267,7 +412,7 @@ main.sphere-main {
   position: absolute;
   inset: 0;
   z-index: 10;
-  background: rgba(0, 0, 0, 0.4);
+  background: oklch(0.08 0.012 55 / 0.5);
   pointer-events: none;
   opacity: 0;
   transition: opacity 500ms ease;
@@ -333,12 +478,12 @@ body.dg-scroll-lock { overflow: hidden; }
 /* Text selection uses the site's mono/white palette instead of the
    browser's default blue. Applied globally. */
 ::selection {
-  background: #ffffff;
-  color: #050810;
+  background: var(--text);
+  color: var(--bg);
 }
 ::-moz-selection {
-  background: #ffffff;
-  color: #050810;
+  background: var(--text);
+  color: var(--bg);
 }
 
 @keyframes slideUpFade {
@@ -376,6 +521,12 @@ body.dg-scroll-lock { overflow: hidden; }
   100% { opacity: 1; transform: scale(1); }
 }
 
+/* Photoyoshi-style gallery: nudge the scroll-hint rule sideways. */
+@keyframes photoScrollHint {
+  0%, 100% { transform: translateX(0); opacity: 0.35; }
+  50% { transform: translateX(10px); opacity: 0.7; }
+}
+
 @keyframes spin {
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
@@ -393,11 +544,11 @@ body.dg-scroll-lock { overflow: hidden; }
 
 /* Markdown reader body copy, tuned for long-form legibility. */
 .prose-wrapper {
-  font-family: 'JetBrains Mono', ui-monospace, "SF Mono", Menlo, Consolas, monospace;
-  font-size: 1rem;
-  line-height: 1.9;
-  color: #e5e5e5;
-  letter-spacing: -0.005em;
+  font-family: 'Newsreader', 'Endless', Georgia, serif;
+  font-size: 1.08rem;
+  line-height: 1.85;
+  color: var(--text);
+  letter-spacing: 0.002em;
 }
 
 .prose-wrapper p { margin-bottom: 1.25rem; }
@@ -405,26 +556,27 @@ body.dg-scroll-lock { overflow: hidden; }
 .prose-wrapper h1,
 .prose-wrapper h2,
 .prose-wrapper h3 {
-  color: #ffffff;
-  line-height: 1.3;
+  font-family: 'Endless', 'Newsreader', Georgia, serif;
+  color: var(--text);
+  line-height: 1.25;
   margin: 2rem 0 0.9rem;
-  font-weight: 500;
-  letter-spacing: -0.015em;
+  font-weight: 400;
+  letter-spacing: -0.01em;
 }
 
 .prose-wrapper a {
-  color: #ffffff;
+  color: var(--accent);
   text-decoration: underline;
   text-underline-offset: 3px;
-  text-decoration-color: rgba(255, 255, 255, 0.4);
+  text-decoration-color: color-mix(in oklab, var(--accent) 45%, transparent);
 }
 .prose-wrapper a:hover {
-  text-decoration-color: rgba(255, 255, 255, 1);
+  text-decoration-color: var(--accent);
 }
 
 .prose-wrapper strong {
   font-weight: 600;
-  color: #ffffff;
+  color: var(--text);
 }
 
 .prose-wrapper em {
@@ -439,13 +591,13 @@ body.dg-scroll-lock { overflow: hidden; }
 
 .prose-wrapper table th,
 .prose-wrapper table td {
-  border: 1px solid #404040;
+  border: 1px solid var(--border-hover);
   padding: 0.75rem;
   text-align: left;
 }
 
 .prose-wrapper table th {
-  background-color: #1a1a1a;
+  background-color: var(--surface);
   font-weight: 600;
 }
 
@@ -479,7 +631,7 @@ body.dg-scroll-lock { overflow: hidden; }
    blurrier, so text sitting on it keeps its contrast. */
 @media (prefers-reduced-transparency: reduce) {
   :root {
-    --scrim-bg: rgba(6, 10, 16, 0.94);
+    --scrim-bg: oklch(0.13 0.015 55 / 0.96);
     --scrim-blur: none;
   }
 
@@ -489,7 +641,7 @@ body.dg-scroll-lock { overflow: hidden; }
   }
 
   .viewer .scrim {
-    background: rgba(0, 0, 0, 0.82);
+    background: oklch(0.13 0.015 55 / 0.82);
     backdrop-filter: none;
   }
 }
@@ -497,7 +649,7 @@ body.dg-scroll-lock { overflow: hidden; }
 /* Increased contrast: solid surfaces plus a defined edge. */
 @media (prefers-contrast: more) {
   :root {
-    --scrim-bg: #060a10;
+    --scrim-bg: oklch(0.13 0.015 55);
     --scrim-blur: none;
   }
 
