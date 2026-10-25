@@ -6,8 +6,20 @@ const token = process.env.GITHUB_TOKEN;
 const root = process.cwd();
 const outputDir = path.join(root, 'public', 'images', 'projects');
 const outputData = path.join(root, 'public', 'projects.json');
-const excluded = new Set(['akshat-ssh', 'itsakshatsh', 'share.', 'devhud', 'test', 'tests', 'dotfiles', 'config']);
+const excluded = new Set([
+  'akshat-ssh',
+  'itsakshatsh',
+  'share.',
+  'devhud',
+  'sylvoria',
+  'zoners',
+  'test',
+  'tests',
+  'dotfiles',
+  'config',
+]);
 const featured = ['bathunt', 'thedeck', 'neko'];
+const forkExceptions = new Set(['neko']);
 const projectLimit = 8;
 const candidateLimit = 20;
 const imagePattern = /\.(png|jpe?g|webp|gif)$/i;
@@ -112,7 +124,9 @@ async function syncRepo(repo) {
 
 const repos = await github(`/users/${encodeURIComponent(username)}/repos?per_page=100&sort=updated`);
 const candidates = repos
-  .filter((repo) => !repo.fork && !repo.archived && !excluded.has(repo.name.toLowerCase()))
+  .filter((repo) => (!repo.fork || forkExceptions.has(repo.name.toLowerCase())) &&
+    !repo.archived &&
+    !excluded.has(repo.name.toLowerCase()))
   .sort((a, b) => {
     const aFeatured = featured.indexOf(a.name.toLowerCase());
     const bFeatured = featured.indexOf(b.name.toLowerCase());

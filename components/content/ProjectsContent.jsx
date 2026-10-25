@@ -19,7 +19,7 @@ const CURATED_PROJECTS = [
   {
     id: 'neko',
     title: 'Neko',
-    mark: 'NK',
+    image: 'https://opengraph.githubassets.com/1/ItsAkshatSh/Neko',
     subtitle: 'Cat-care companion app · #HackTheKitty 2026',
     date: 'Jun 2026 → Jul 2026',
     link: 'https://github.com/ItsAkshatSh/Neko',
@@ -49,7 +49,7 @@ const CURATED_PROJECTS = [
   {
     id: 'hisabipocket',
     title: 'HisabiPocket',
-    mark: 'HP',
+    image: 'https://opengraph.githubassets.com/1/ItsAkshatSh/HisabiPocket',
     subtitle: 'Next-gen finance tracker · voice-first expense logging',
     date: 'Nov 2025 → Present',
     link: 'https://github.com/ItsAkshatSh/HisabiPocket',
