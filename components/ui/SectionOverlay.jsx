@@ -55,6 +55,7 @@ export default function SectionOverlay({
   variant = 'default',
   zIndex = 40,
   showVignettes = true,
+  wide = false,
   titleClassName = 'font-display text-balance text-4xl sm:text-5xl md:text-6xl text-bone tracking-[-0.01em] capitalize leading-none',
 }) {
   const dialogRef = useRef(null);
@@ -119,7 +120,7 @@ export default function SectionOverlay({
 
       <motion.div
         className={`relative flex flex-col h-full w-full pointer-events-none ${
-          isFullPage ? '' : `readable-on-blur ${contentKey === 'projects' ? 'max-w-7xl' : 'max-w-5xl'} mx-auto`
+          isFullPage ? '' : `readable-on-blur ${wide ? 'max-w-7xl' : 'max-w-5xl'} mx-auto`
         }`}
         onClick={(e) => e.stopPropagation()}
         initial={{ y: 10, opacity: 0 }}
