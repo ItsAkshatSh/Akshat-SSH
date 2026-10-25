@@ -1,0 +1,127 @@
+{
+  "refreshedAt": "2026-10-25T08:19:33.174Z",
+  "projects": [
+    {
+      "id": "BatHunt",
+      "title": "BatHunt",
+      "subtitle": "GDScript project",
+      "date": "Mar 2026",
+      "link": "https://github.com/ItsAkshatSh/BatHunt",
+      "stack": [
+        "GDScript"
+      ],
+      "desc": "Bat Hunter **A cave-themed remake of Duck Hunt where you hunt bats instead of ducks!",
+      "banner": "/images/projects/bathunt.png",
+      "artworkFallback": false,
+      "mark": "BA",
+      "accent": 0
+    },
+    {
+      "id": "thedeck",
+      "title": "thedeck",
+      "subtitle": "Python project",
+      "date": "Apr 2026",
+      "link": "https://github.com/ItsAkshatSh/thedeck",
+      "stack": [
+        "Python"
+      ],
+      "desc": "TheDeck The Deck runs on a Seeed Studio XIAO RP2040, which powers a 2.",
+      "banner": "/images/projects/thedeck.jpg",
+      "artworkFallback": false,
+      "mark": "TH",
+      "accent": 1
+    },
+    {
+      "id": "Neko",
+      "title": "Neko",
+      "subtitle": "An Android Application that mimics the apple dynamic Island and moree BUT with cat features this serves as my submission to the #HackTheKitty Hackathon",
+      "date": "Jul 2026",
+      "link": "https://github.com/ItsAkshatSh/Neko",
+      "stack": [],
+      "desc": "An Android Application that mimics the apple dynamic Island and moree BUT with cat features this serves as my submission to the #HackTheKitty Hackathon",
+      "banner": "/images/projects/neko.gif",
+      "artworkFallback": false,
+      "mark": "NE",
+      "accent": 2
+    },
+    {
+      "id": "iPlayer",
+      "title": "iPlayer",
+      "subtitle": "A re-engineered iPod Gen 5, using apple's click wheel and a 2.4\" LCD Screen",
+      "date": "Aug 2026",
+      "link": "https://github.com/ItsAkshatSh/iPlayer",
+      "stack": [
+        "Python",
+        "easyeda",
+        "easyeda-pro",
+        "embedded-systems",
+        "ipod-video"
+      ],
+      "desc": "A re-engineered iPod Gen 5, using apple's click wheel and a 2.4\" LCD Screen",
+      "banner": "/images/projects/iplayer.png",
+      "artworkFallback": false,
+      "mark": "IP",
+      "accent": 0
+    },
+    {
+      "id": "Glyph",
+      "title": "Glyph",
+      "subtitle": "A NFC card but with an EINK display and three Cherry MX switches!",
+      "date": "Jul 2026",
+      "link": "https://github.com/ItsAkshatSh/Glyph",
+      "stack": [
+        "Python"
+      ],
+      "desc": "A NFC card but with an EINK display and three Cherry MX switches!",
+      "banner": "/images/projects/glyph.gif",
+      "artworkFallback": false,
+      "mark": "GL",
+      "accent": 1
+    },
+    {
+      "id": "keytop",
+      "title": "keytop",
+      "subtitle": "C project",
+      "date": "May 2026",
+      "link": "https://github.com/ItsAkshatSh/keytop",
+      "stack": [
+        "C"
+      ],
+      "desc": "Ever wanted a bluetooth keyboard that acted like a laptop keyboard, introducing keytop.",
+      "banner": "/images/projects/keytop.png",
+      "artworkFallback": false,
+      "mark": "KE",
+      "accent": 2
+    },
+    {
+      "id": "hisabipocket",
+      "title": "hisabipocket",
+      "subtitle": "Your budgeting/expense companion, to help you make budgeting fun",
+      "date": "Oct 2026",
+      "link": "https://github.com/ItsAkshatSh/hisabipocket",
+      "stack": [
+        "Dart"
+      ],
+      "desc": "Your budgeting/expense companion, to help you make budgeting fun",
+      "banner": "/images/projects/hisabipocket.png",
+      "artworkFallback": true,
+      "mark": "HI",
+      "accent": 0
+    },
+    {
+      "id": "Vision",
+      "title": "Vision",
+      "subtitle": "THE iphone duo animation but on android phones",
+      "date": "Sep 2026",
+      "link": "https://github.com/ItsAkshatSh/Vision",
+      "stack": [
+        "Kotlin"
+      ],
+      "desc": "THE iphone duo animation but on android phones",
+      "banner": "/images/projects/vision.png",
+      "artworkFallback": true,
+      "mark": "VI",
+      "accent": 1
+    }
+  ]
+}
