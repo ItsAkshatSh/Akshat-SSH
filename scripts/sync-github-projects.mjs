@@ -52,12 +52,16 @@ function normalizeImageUrl(url) {
 }
 
 function description(repo, readme) {
-  if (repo.description) return repo.description;
+  const repository = repo.description?.trim() || '';
   const text = Buffer.from(readme.content || '', 'base64').toString('utf8')
     .replace(/<[^>]+>/g, ' ')
     .replace(/!\[[^\]]*]\([^)]*\)/g, ' ')
     .replace(/\s+/g, ' ');
-  return text.match(/[A-Z][^.?!]{45,220}[.?!]/)?.[0] || 'A project from my public GitHub archive.';
+  const readmeDescription = text.match(/[A-Z][^.?!]{45,220}[.?!]/)?.[0] || '';
+  if (readmeDescription && readmeDescription.toLowerCase() !== repository.toLowerCase()) {
+    return readmeDescription;
+  }
+  return repository || readmeDescription || 'A project from my public GitHub archive.';
 }
 
 async function syncRepo(repo) {

@@ -89,6 +89,13 @@ function ProjectArtwork({ project, index }) {
   );
 }
 
+function projectDescription(project) {
+  const subtitle = project.subtitle?.replace(/\s+/g, ' ').trim().toLowerCase();
+  const description = project.desc?.replace(/\s+/g, ' ').trim();
+  if (description && description.toLowerCase() !== subtitle) return description;
+  return `Explore the ${project.title} project on GitHub.`;
+}
+
 const ProjectsContent = () => {
   const [projects, setProjects] = useState(CURATED_PROJECTS);
   const [isLive, setIsLive] = useState(false);
@@ -157,7 +164,7 @@ const ProjectsContent = () => {
                   </span>
                 </div>
 
-                <p className="text-neutral-200 leading-[1.7] mb-5 text-[15px]">{project.desc}</p>
+                <p className="text-neutral-200 leading-[1.7] mb-5 text-[15px]">{projectDescription(project)}</p>
 
                 <div className="mt-auto flex flex-wrap gap-2">
                   {project.stack.map((tech) => (
