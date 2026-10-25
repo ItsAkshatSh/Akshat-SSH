@@ -119,11 +119,7 @@ export default function SectionOverlay({
 
       <motion.div
         className={`relative flex flex-col h-full w-full pointer-events-none ${
-          isFullPage
-            ? ''
-            : variant === 'wide'
-              ? 'readable-on-blur max-w-[min(96vw,1440px)] mx-auto'
-              : 'readable-on-blur max-w-5xl mx-auto'
+          isFullPage ? '' : 'readable-on-blur max-w-5xl mx-auto'
         }`}
         onClick={(e) => e.stopPropagation()}
         initial={{ y: 10, opacity: 0 }}
