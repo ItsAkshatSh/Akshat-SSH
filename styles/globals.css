@@ -133,6 +133,42 @@
 }
 .custom-scrollbar { scrollbar-width: thin; scrollbar-color: rgba(255, 255, 255, 0.14) transparent; }
 
+.project-art {
+  height: 100%;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  padding: 1.25rem;
+  background-color: #080808;
+  background-image:
+    linear-gradient(135deg, transparent 0 45%, rgba(255,255,255,0.08) 45.5% 46%, transparent 46.5%),
+    radial-gradient(circle at 80% 20%, rgba(255,255,255,0.14), transparent 42%);
+}
+.project-art__window {
+  position: absolute;
+  inset: 1.25rem;
+  border: 1px solid rgba(255,255,255,0.12);
+  background: rgba(0,0,0,0.22);
+  padding: 0.75rem;
+  transform: rotate(-3deg);
+}
+.project-art__dots { display: flex; gap: 0.3rem; margin-bottom: 1rem; }
+.project-art__dots i { width: 0.35rem; height: 0.35rem; border-radius: 999px; background: rgba(255,255,255,0.4); }
+.project-art__line { width: 42%; height: 0.35rem; margin-top: 0.55rem; background: rgba(255,255,255,0.2); }
+.project-art__line--long { width: 76%; background: rgba(255,255,255,0.55); }
+.project-art__line--short { width: 28%; }
+.project-art--1 {
+  background-image:
+    linear-gradient(90deg, transparent 49.5%, rgba(255,255,255,0.08) 50%, transparent 50.5%),
+    linear-gradient(0deg, transparent 49.5%, rgba(255,255,255,0.08) 50%, transparent 50.5%),
+    radial-gradient(circle at 20% 30%, rgba(255,255,255,0.14), transparent 36%);
+}
+.project-art--2 {
+  background-image:
+    repeating-linear-gradient(135deg, rgba(255,255,255,0.06) 0 1px, transparent 1px 14px),
+    radial-gradient(circle at 70% 20%, rgba(255,255,255,0.16), transparent 40%);
+}
+
 /* Sub-page overlays sit on a translucent backdrop over the ASCII ocean.
    A subtle dark text-shadow on prose keeps it fully legible even where
    the ambient bubbles or god rays drift behind the words. */
