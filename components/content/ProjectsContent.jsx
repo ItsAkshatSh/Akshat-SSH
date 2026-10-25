@@ -134,7 +134,7 @@ const ProjectsContent = () => {
               rel="noopener noreferrer"
               className="interactive group flex h-full flex-col overflow-hidden rounded-2xl border border-white/[0.1] bg-white/[0.025] hover:border-white/20 hover:bg-white/[0.05] active:bg-white/[0.08] active:border-white/25 transition-colors duration-300 active:duration-100 md:flex-row"
             >
-              <div className="relative h-44 shrink-0 overflow-hidden border-b border-white/[0.08] bg-black sm:h-52 md:h-auto md:min-h-[17rem] md:w-[38%] md:border-b-0 md:border-r">
+              <div className="relative h-56 shrink-0 overflow-hidden border-b border-white/[0.08] bg-black sm:h-64 md:h-auto md:min-h-[24rem] md:w-[42%] md:border-b-0 md:border-r">
                 <ProjectArtwork project={project} index={i} />
                 <span className="absolute left-4 top-4 font-mono text-[9px] uppercase tracking-[0.25em] text-white/65">
                   {String(i + 1).padStart(2, '0')}
