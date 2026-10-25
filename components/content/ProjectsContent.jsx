@@ -125,23 +125,23 @@ const ProjectsContent = () => {
         </p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-5">
+      <div className="grid grid-cols-1 gap-4 sm:gap-5">
         {projects.map((project, i) => (
           <StaggerItem key={project.id} index={i} className="h-full">
             <a
               href={project.link}
               target="_blank"
               rel="noopener noreferrer"
-              className="interactive group flex h-full flex-col overflow-hidden rounded-2xl border border-white/[0.1] bg-white/[0.025] hover:border-white/20 hover:bg-white/[0.05] active:bg-white/[0.08] active:border-white/25 transition-colors duration-300 active:duration-100"
+              className="interactive group flex h-full flex-col overflow-hidden rounded-2xl border border-white/[0.1] bg-white/[0.025] hover:border-white/20 hover:bg-white/[0.05] active:bg-white/[0.08] active:border-white/25 transition-colors duration-300 active:duration-100 md:flex-row"
             >
-              <div className="relative h-36 sm:h-40 overflow-hidden border-b border-white/[0.08] bg-black">
+              <div className="relative h-44 shrink-0 overflow-hidden border-b border-white/[0.08] bg-black sm:h-52 md:h-auto md:min-h-[17rem] md:w-[38%] md:border-b-0 md:border-r">
                 <ProjectArtwork project={project} index={i} />
                 <span className="absolute left-4 top-4 font-mono text-[9px] uppercase tracking-[0.25em] text-white/65">
                   {String(i + 1).padStart(2, '0')}
                 </span>
               </div>
 
-              <div className="flex flex-1 flex-col p-5 sm:p-6">
+              <div className="flex flex-1 flex-col p-5 sm:p-7 md:p-8">
                 <div className="flex justify-between items-start gap-4 mb-4">
                   <div className="flex-1 min-w-0">
                     <h3 className="text-xl sm:text-2xl text-white font-medium tracking-[-0.01em] leading-tight">
