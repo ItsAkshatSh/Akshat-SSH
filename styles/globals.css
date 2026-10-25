@@ -44,6 +44,20 @@
     --scrim-blur: none;
   }
 
+  :root[data-theme='signal'] {
+    --bg: #050505;
+    --surface: #10100f;
+    --surface-raised: #181715;
+    --border: rgba(231, 218, 192, 0.14);
+    --border-hover: rgba(221, 174, 103, 0.42);
+    --text: #eee8dc;
+    --text-muted: #a9a092;
+    --accent: #ddae67;
+    --accent-soft: rgba(221, 174, 103, 0.15);
+    --accent-deep: #8d7046;
+    --scrim-bg: rgba(5, 5, 5, 0.96);
+  }
+
   html {
     scroll-behavior: smooth;
   }

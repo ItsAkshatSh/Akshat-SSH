@@ -125,7 +125,32 @@ function MenuButton({ label, onClick, isOpen, index, tabbable }) {
   );
 }
 
-export default function FloatingMenu({ items, hidden = false }) {
+function ThemeToggle({ theme, onThemeChange, isOpen, tabbable }) {
+  const nextTheme = theme === 'ocean' ? 'signal' : 'ocean';
+  return (
+    <motion.button
+      type="button"
+      aria-label={`Switch to ${nextTheme === 'signal' ? 'Signal Archive' : 'Ocean'} theme`}
+      aria-hidden={!isOpen}
+      tabIndex={tabbable ? 0 : -1}
+      onClick={() => onThemeChange?.(nextTheme)}
+      className="interactive mt-1 flex items-center gap-2 uppercase leading-none"
+      style={{
+        color: 'rgba(242, 242, 242, 0.58)',
+        fontFamily: "'JetBrains Mono', ui-monospace, monospace",
+        fontSize: '9px',
+        letterSpacing: '0.18em',
+      }}
+      animate={{ opacity: isOpen ? 1 : 0 }}
+      transition={{ duration: 0.35, delay: isOpen ? 0.62 : 0, ease }}
+    >
+      <span className="size-1.5 rounded-full" style={{ background: theme === 'signal' ? '#ddaE67' : '#b7d5d0' }} />
+      {theme === 'signal' ? 'Signal Archive' : 'Ocean'}
+    </motion.button>
+  );
+}
+
+export default function FloatingMenu({ items, hidden = false, theme = 'ocean', onThemeChange }) {
   const [isOpen, setIsOpen] = useState(false);
   const [transitioningLabel, setTransitioningLabel] = useState(null);
   const containerRef = useRef(null);
@@ -142,7 +167,7 @@ export default function FloatingMenu({ items, hidden = false }) {
   ];
 
   // Grow the expanded panel to fit any number of items comfortably.
-  const expandedHeight = Math.max(220, 60 + menuItems.length * 48);
+  const expandedHeight = Math.max(250, 80 + menuItems.length * 48);
 
   // Close when clicking outside.
   useEffect(() => {
@@ -315,6 +340,12 @@ export default function FloatingMenu({ items, hidden = false }) {
               tabbable={itemsTabbable}
             />
           ))}
+          <ThemeToggle
+            theme={theme}
+            onThemeChange={onThemeChange}
+            isOpen={isOpen}
+            tabbable={itemsTabbable}
+          />
         </div>
         {/* Bottom bar: the toggle. It is the control that fills the collapsed
             pill, so a single real button covers "open" and "close" and stays
