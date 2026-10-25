@@ -7,7 +7,9 @@ const root = process.cwd();
 const outputDir = path.join(root, 'public', 'images', 'projects');
 const outputData = path.join(root, 'public', 'projects.json');
 const excluded = new Set(['akshat-ssh', 'itsakshatsh', 'share.', 'devhud', 'test', 'tests', 'dotfiles', 'config']);
-const featured = ['bathunt', 'thedeck'];
+const featured = ['bathunt', 'thedeck', 'neko'];
+const projectLimit = 8;
+const candidateLimit = 20;
 const imagePattern = /\.(png|jpe?g|webp|gif)$/i;
 
 const headers = {
@@ -23,6 +25,10 @@ async function github(pathname) {
 
 function rawUrl(repo, file) {
   return `https://raw.githubusercontent.com/${repo.full_name}/${repo.default_branch}/${file}`;
+}
+
+function githubSocialPreviewUrl(repo) {
+  return `https://opengraph.githubassets.com/1/${repo.full_name}`;
 }
 
 function normalizeImageUrl(url) {
@@ -71,9 +77,11 @@ async function syncRepo(repo) {
     };
     return score(b) - score(a);
   });
-  const banner = readmeBanner || (rankedFiles[0] && /banner|header|cover|hero|preview|screenshot/i.test(rankedFiles[0].path)
+  const preferredBanner = rankedFiles[0] && /banner|header|cover|hero|preview|screenshot/i.test(rankedFiles[0].path)
     ? rawUrl(repo, rankedFiles[0].path)
-    : null);
+    : null;
+  const banner = readmeBanner || preferredBanner || githubSocialPreviewUrl(repo);
+  const isFallback = !readmeBanner && !preferredBanner;
   let localBanner = null;
   if (banner) {
     try {
@@ -95,7 +103,8 @@ async function syncRepo(repo) {
     link: repo.html_url,
     stack: [...new Set([repo.language, ...(repo.topics || [])].filter(Boolean))].slice(0, 5),
     desc: description(repo, readme),
-    banner: localBanner ? `/images/projects/${localBanner}` : null,
+    banner: localBanner ? `/images/projects/${localBanner}` : githubSocialPreviewUrl(repo),
+    artworkFallback: isFallback,
     mark: repo.name.slice(0, 2).toUpperCase(),
     accent: Math.abs(repo.name.length) % 3,
   };
@@ -110,10 +119,10 @@ const candidates = repos
     if (aFeatured !== -1 || bFeatured !== -1) return (aFeatured === -1 ? 99 : aFeatured) - (bFeatured === -1 ? 99 : bFeatured);
     return new Date(b.pushed_at) - new Date(a.pushed_at);
   })
-  .slice(0, 8);
+  .slice(0, candidateLimit);
 await fs.rm(outputDir, { recursive: true, force: true });
 await fs.mkdir(outputDir, { recursive: true });
-const projects = (await Promise.all(candidates.map(async (repo) => {
+const syncedProjects = (await Promise.all(candidates.map(async (repo) => {
   try {
     return await syncRepo(repo);
   } catch (error) {
@@ -121,6 +130,10 @@ const projects = (await Promise.all(candidates.map(async (repo) => {
     return null;
   }
 }))).filter(Boolean);
+const projects = syncedProjects
+  .sort((a, b) => Number(a.artworkFallback) - Number(b.artworkFallback))
+  .slice(0, projectLimit)
+  .map((project, index) => ({ ...project, accent: index % 3 }));
 if (!projects.length) throw new Error('No projects were synced.');
 await fs.writeFile(outputData, `${JSON.stringify({ refreshedAt: new Date().toISOString(), projects }, null, 2)}\n`);
 console.log(`Synced ${projects.length} GitHub projects.`);
