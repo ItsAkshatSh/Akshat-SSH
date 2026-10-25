@@ -212,8 +212,7 @@ const App = () => {
             key={activeSection}
             ariaLabel={sectionTitle}
             onClose={() => setActiveSection(null)}
-            variant={isPhotography ? 'fullpage' : 'default'}
-            wide={activeSection === 'projects'}
+            variant={isPhotography ? 'fullpage' : activeSection === 'projects' ? 'wide' : 'default'}
             showVignettes={!isPhotography}
             contentKey={activeSection}
             title={<ScrambleText text={sectionTitle} active />}
