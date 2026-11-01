@@ -1,6 +1,6 @@
 /**
  * /sitemap.xml
- * Generated at request time. Includes the home page sections, the blog index,
+ * Generated at request time. Includes the home page, the blog index,
  * and every blog post with its `lastmod` derived from the post's date.
  */
 import { getAllPosts } from '../lib/blog';
@@ -16,9 +16,6 @@ const escapeXml = (unsafe) =>
 const generateSitemap = (posts) => {
   const staticEntries = [
     { loc: `${SITE_URL}/`, changefreq: 'weekly', priority: '1.0' },
-    { loc: `${SITE_URL}/#projects`, changefreq: 'weekly', priority: '0.8' },
-    { loc: `${SITE_URL}/#photography`, changefreq: 'weekly', priority: '0.8' },
-    { loc: `${SITE_URL}/#experience`, changefreq: 'monthly', priority: '0.7' },
     { loc: `${SITE_URL}/blog`, changefreq: 'weekly', priority: '0.8' },
   ];
 
