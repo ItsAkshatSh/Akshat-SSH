@@ -1,7 +1,7 @@
 /**
  * AppClient
- * Root of the single-page portfolio. Owns the animated background,
- * the hero, the floating menu, and overlay sections.
+ * Root of the single-page portfolio. Owns the animated ASCII ocean
+ * background, the hero, the floating menu, and overlay sections.
  */
 import { useState, useEffect } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
@@ -19,7 +19,6 @@ import ProjectsContent from './content/ProjectsContent';
 import PhotographyContent from './content/PhotographyContent';
 import ExperienceContent from './content/ExperienceContent';
 import { PHOTOS } from './content/photographyPhotos';
-import { DEFAULT_THEME, getStoredTheme, storeTheme } from '../lib/themePreference';
 
 // Hero entrance. Each element rides the same critically damped spring, offset
 // by a short stagger — the stagger orders attention (portrait, then name, then
@@ -63,7 +62,6 @@ const App = () => {
   const [isBlogOpen, setIsBlogOpen] = useState(false);
   const [isFinePointer, setIsFinePointer] = useState(false);
   const [contentIn, setContentIn] = useState(false);
-  const [theme, setTheme] = useState(DEFAULT_THEME);
 
   useEffect(() => {
     const shell = document.getElementById('hero-shell');
@@ -72,18 +70,6 @@ const App = () => {
       if (shell) shell.style.display = '';
     };
   }, []);
-
-  useEffect(() => {
-    const storedTheme = getStoredTheme();
-    setTheme(storedTheme);
-    document.documentElement.dataset.theme = storedTheme;
-  }, []);
-
-  const changeTheme = (nextTheme) => {
-    setTheme(nextTheme);
-    storeTheme(nextTheme);
-    document.documentElement.dataset.theme = nextTheme;
-  };
 
   useEffect(() => {
     const t = setTimeout(() => setContentIn(true), 60);
@@ -146,7 +132,7 @@ const App = () => {
       {/* The living background rests
           behind a blurred scrim while a panel is open — nothing about it is
           visible then, so it stops. Mode is user-persisted. */}
-      <BackgroundField paused={Boolean(activeSection || isBlogOpen)} theme={theme} />
+      <BackgroundField paused={Boolean(activeSection || isBlogOpen)} />
 
       <main className="relative z-content w-full min-h-dvh flex items-center justify-center px-6 md:px-10 py-20 md:py-24">
         <div className="pointer-events-none absolute inset-x-6 md:inset-x-10 top-8 md:top-10 flex items-center justify-end font-mono text-[9px] uppercase tracking-[0.28em] text-muted-warm/70">
@@ -211,8 +197,6 @@ const App = () => {
       <FloatingMenu
         items={navItems}
         hidden={Boolean(activeSection || isBlogOpen)}
-        theme={theme}
-        onThemeChange={changeTheme}
       />
 
       <AnimatePresence>
