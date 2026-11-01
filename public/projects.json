@@ -1,5 +1,5 @@
 {
-  "refreshedAt": "2026-10-25T08:19:33.174Z",
+  "refreshedAt": "2026-11-01T10:34:14.220Z",
   "projects": [
     {
       "id": "BatHunt",
@@ -38,11 +38,26 @@
       "date": "Jul 2026",
       "link": "https://github.com/ItsAkshatSh/Neko",
       "stack": [],
-      "desc": "An Android Application that mimics the apple dynamic Island and moree BUT with cat features this serves as my submission to the #HackTheKitty Hackathon",
+      "desc": "Neko is the purr-fect (and honestly, the only) cat owner companion app you'll need.",
       "banner": "/images/projects/neko.gif",
       "artworkFallback": false,
       "mark": "NE",
       "accent": 2
+    },
+    {
+      "id": "Glyph",
+      "title": "Glyph",
+      "subtitle": "A NFC card but with an EINK display and three Cherry MX switches!",
+      "date": "Oct 2026",
+      "link": "https://github.com/ItsAkshatSh/Glyph",
+      "stack": [
+        "Python"
+      ],
+      "desc": "Glyph Glyph is a NFC PCB card but with an e-ink screen and 3 Cherry MX switches, it includes a Seeed Studio XIAO nRF52840 which runs on a 200 mAH battery!",
+      "banner": "/images/projects/glyph.gif",
+      "artworkFallback": false,
+      "mark": "GL",
+      "accent": 0
     },
     {
       "id": "iPlayer",
@@ -57,25 +72,10 @@
         "embedded-systems",
         "ipod-video"
       ],
-      "desc": "A re-engineered iPod Gen 5, using apple's click wheel and a 2.4\" LCD Screen",
+      "desc": "Player iPlayer is the re-engineered version of the iPod Gen 5 Video, running on a Seeed Studio Xiao nRF52840, using a replacement apple click wheel with an 2.",
       "banner": "/images/projects/iplayer.png",
       "artworkFallback": false,
       "mark": "IP",
-      "accent": 0
-    },
-    {
-      "id": "Glyph",
-      "title": "Glyph",
-      "subtitle": "A NFC card but with an EINK display and three Cherry MX switches!",
-      "date": "Jul 2026",
-      "link": "https://github.com/ItsAkshatSh/Glyph",
-      "stack": [
-        "Python"
-      ],
-      "desc": "A NFC card but with an EINK display and three Cherry MX switches!",
-      "banner": "/images/projects/glyph.gif",
-      "artworkFallback": false,
-      "mark": "GL",
       "accent": 1
     },
     {
@@ -102,7 +102,7 @@
       "stack": [
         "Dart"
       ],
-      "desc": "Your budgeting/expense companion, to help you make budgeting fun",
+      "desc": "Log expenses by voice, scan receipts, and let an AI companion help you make sense of where your money goes.",
       "banner": "/images/projects/hisabipocket.png",
       "artworkFallback": true,
       "mark": "HI",
