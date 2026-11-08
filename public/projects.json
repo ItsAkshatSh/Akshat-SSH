@@ -1,5 +1,5 @@
 {
-  "refreshedAt": "2026-11-01T10:34:14.220Z",
+  "refreshedAt": "2026-11-08T10:29:21.623Z",
   "projects": [
     {
       "id": "BatHunt",
@@ -103,7 +103,7 @@
         "Dart"
       ],
       "desc": "Log expenses by voice, scan receipts, and let an AI companion help you make sense of where your money goes.",
-      "banner": "/images/projects/hisabipocket.png",
+      "banner": "https://opengraph.githubassets.com/1/ItsAkshatSh/hisabipocket",
       "artworkFallback": true,
       "mark": "HI",
       "accent": 0
