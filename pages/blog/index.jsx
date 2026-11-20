@@ -8,7 +8,7 @@ const SITE_URL =
 
 const BLOG_TITLE = 'Blog · Akshat Sharma';
 const BLOG_DESCRIPTION =
-  'Personal writing and long-form notes from Akshat Sharma — projects, community events, and the craft behind them.';
+  'Personal writing and long-form notes from Akshat Sharma: projects, community events, and the craft behind them.';
 const BLOG_URL = `${SITE_URL}/blog`;
 const BLOG_IMAGE = `${SITE_URL}/images/ascii/real_pfp.jpg`;
 
@@ -57,78 +57,71 @@ export default function BlogIndex({ posts }) {
         />
       </Head>
 
-      <div className="min-h-dvh bg-ink text-bone">
-        <div className="max-w-3xl mx-auto px-6 md:px-8 py-16 md:py-24">
-          <div className="mb-16">
+      <div id="app-root" className="blog-surface relative min-h-dvh text-bone">
+        <div className="relative mx-auto max-w-5xl px-6 sm:px-10 md:px-12 pb-28 pt-10 sm:pt-14 md:pt-16">
+          <header>
             <Link
               href="/"
-              className="inline-flex items-center text-muted-warm hover:text-accent transition-colors mb-8 text-sm"
+              className="font-mono text-[11px] uppercase text-muted-warm transition-colors duration-200 hover:text-bone"
             >
-              ← Back home
+              Home
             </Link>
-            <p className="font-mono text-[11px] tracking-[0.28em] uppercase text-accent mb-4">
-              Journal
-            </p>
-            <h1 className="font-display text-6xl md:text-7xl tracking-[-0.01em] mb-5 text-bone">
-              Blog
+          </header>
+
+          <div className="mt-14 md:mt-20">
+            <h1 className="max-w-2xl font-display text-[clamp(2.5rem,7vw,4.25rem)] leading-[0.94] text-balance">
+              Writing
             </h1>
-            <div className="ink-rule w-32"></div>
+            <p className="mt-5 max-w-xl text-[1.08rem] leading-[1.7] text-muted-warm text-pretty">
+              Notes on building, community, and learning in public.
+            </p>
           </div>
 
-          <div className="space-y-12">
-            {posts.length === 0 ? (
-              <div className="text-muted-warm text-lg">
-                No posts yet. Check back soon.
-              </div>
-            ) : (
-              posts.map((post) => (
-                <article
-                  key={post.slug}
-                  className="group border-l-2 border-transparent hover:border-[color:var(--accent)] pl-4 sm:pl-6 -ml-4 sm:-ml-6 transition-colors duration-300"
-                >
-                  <Link href={`/blog/${post.slug}`}>
-                    <div className="space-y-3">
-                      {post.image && (
-                        <img
-                          src={post.image}
-                          alt={post.title}
-                          className="w-full h-48 object-cover rounded-xl mb-3"
-                        />
-                      )}
-                      {post.date && (
-                        <time
-                          dateTime={post.date}
-                          className="text-[11px] tracking-[0.22em] uppercase text-muted-warm font-mono"
-                        >
-                          {format(new Date(post.date), 'MMMM d, yyyy')}
-                        </time>
-                      )}
-                      <h2 className="font-display text-3xl md:text-4xl tracking-[-0.01em] text-bone group-hover:text-accent transition-colors">
+          {posts.length === 0 ? (
+            <div className="mt-16 border-t border-hair pt-10">
+              <p className="text-[1.05rem] leading-[1.7] text-muted-warm text-pretty">
+                Nothing published yet. The first entry is still being written.
+              </p>
+              <Link
+                href="/"
+                className="mt-6 inline-block font-mono text-[11px] uppercase text-muted-warm transition-colors duration-200 hover:text-bone"
+              >
+                Back home
+              </Link>
+            </div>
+          ) : (
+            <ul className="mt-14 divide-y divide-[color:var(--border)] border-y border-hair" role="list">
+              {posts.map((post) => (
+                <li key={post.slug}>
+                  <Link
+                    href={`/blog/${post.slug}`}
+                    className="group grid grid-cols-1 gap-2.5 py-7 sm:grid-cols-[8.5rem_minmax(0,1fr)] sm:gap-10 sm:py-8"
+                  >
+                    {post.date ? (
+                      <time
+                        dateTime={post.date}
+                        className="font-mono text-[11px] uppercase leading-6 text-muted-warm tabular-nums sm:pt-1.5"
+                      >
+                        {format(new Date(post.date), 'd MMM yyyy')}
+                      </time>
+                    ) : (
+                      <span className="hidden sm:block" aria-hidden="true" />
+                    )}
+                    <div className="min-w-0">
+                      <h2 className="font-display text-balance text-[1.65rem] leading-[1.18] text-bone transition-opacity duration-200 group-hover:opacity-70 sm:text-[1.85rem]">
                         {post.title}
                       </h2>
                       {post.excerpt && (
-                        <p className="text-muted-warm leading-[1.8]">
+                        <p className="mt-2.5 max-w-3xl text-pretty text-[1rem] leading-[1.7] text-muted-warm">
                           {post.excerpt}
                         </p>
                       )}
-                      {post.tags && post.tags.length > 0 && (
-                        <div className="flex flex-wrap gap-2 mt-4">
-                          {post.tags.map((tag) => (
-                            <span
-                              key={tag}
-                              className="text-[10px] tracking-[0.12em] uppercase text-muted-warm border-hair border px-2 py-1 rounded-full"
-                            >
-                              {tag}
-                            </span>
-                          ))}
-                        </div>
-                      )}
                     </div>
                   </Link>
-                </article>
-              ))
-            )}
-          </div>
+                </li>
+              ))}
+            </ul>
+          )}
         </div>
       </div>
     </>

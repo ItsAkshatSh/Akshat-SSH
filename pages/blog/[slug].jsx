@@ -2,6 +2,7 @@ import Head from 'next/head';
 import Link from 'next/link';
 import { getAllPosts, getPostContent } from '../../lib/blog';
 import { format } from 'date-fns';
+import PostErrorBoundary from '../../components/utilities/ErrorBoundary';
 
 const SITE_URL =
   process.env.NEXT_PUBLIC_SITE_URL || 'https://akshaaaat.xyz';
@@ -12,7 +13,7 @@ export default function BlogPost({ post, slug }) {
   const title = `${data.title} · Akshat Sharma`;
   const description =
     data.excerpt ||
-    `${data.title} — a blog post by Akshat Sharma.`;
+    `${data.title} - a blog post by Akshat Sharma.`;
   const image = data.image
     ? data.image.startsWith('http')
       ? data.image
@@ -45,6 +46,8 @@ export default function BlogPost({ post, slug }) {
     keywords: (data.tags || []).join(', ') || undefined,
   };
 
+  const hasMeta = Boolean(data.date || data.tags?.length);
+
   return (
     <>
       <Head>
@@ -76,36 +79,55 @@ export default function BlogPost({ post, slug }) {
         />
       </Head>
 
-      <div className="min-h-dvh bg-ink text-bone">
-        <article className="max-w-3xl mx-auto px-6 md:px-8 py-16 md:py-24">
-          <Link
-            href="/blog"
-            className="inline-flex items-center text-muted-warm hover:text-accent transition-colors mb-10 text-sm"
-          >
-            ← All posts
-          </Link>
-
-          <p className="font-mono text-[11px] tracking-[0.28em] uppercase text-accent mb-4">
-            Journal
-          </p>
-          <h1 className="font-display text-4xl md:text-6xl tracking-[-0.01em] leading-[1.05] text-bone mb-5">
-            {data.title}
-          </h1>
-          {data.date && (
-            <time
-              dateTime={data.date}
-              className="block text-[11px] tracking-[0.22em] uppercase text-muted-warm font-mono mb-6"
+      {/* Flat ink reading surface: no living canvas behind long-form text. */}
+      <div id="app-root" className="blog-surface relative min-h-dvh text-bone">
+        <main className="relative mx-auto min-h-dvh w-full max-w-4xl px-6 sm:px-10 md:px-12 pb-28 pt-10 sm:pt-14 md:pt-16">
+          <header>
+            <Link
+              href="/blog"
+              className="font-mono text-[11px] uppercase text-muted-warm transition-colors duration-200 hover:text-bone"
             >
-              {format(new Date(data.date), 'MMMM d, yyyy')}
-            </time>
-          )}
-          <div className="ink-rule w-28 mb-10"></div>
+              All writing
+            </Link>
+          </header>
 
-          <div
-            className="prose-wrapper"
-            dangerouslySetInnerHTML={{ __html: contentHtml }}
-          />
-        </article>
+          <article className="pt-12 md:pt-16">
+            <h1 className="max-w-3xl text-balance font-display text-[clamp(2.25rem,5.5vw,3.6rem)] leading-[1.08]">
+              {data.title}
+            </h1>
+
+            {hasMeta && (
+              <p className="mt-4 flex flex-wrap items-center gap-x-3 gap-y-1 font-mono text-[11px] uppercase text-muted-warm">
+                {data.date && (
+                  <time dateTime={data.date} className="tabular-nums">
+                    {format(new Date(data.date), 'd MMM yyyy')}
+                  </time>
+                )}
+                {data.date && data.tags?.length > 0 && (
+                  <span aria-hidden="true">·</span>
+                )}
+                {data.tags?.length > 0 && (
+                  <span>{data.tags.slice(0, 3).join(' · ')}</span>
+                )}
+              </p>
+            )}
+
+            <div className="prose-wrapper mt-12 max-w-3xl border-t border-hair pt-10">
+              <PostErrorBoundary>
+                <div dangerouslySetInnerHTML={{ __html: contentHtml }} />
+              </PostErrorBoundary>
+            </div>
+
+            <footer className="mt-16 max-w-3xl border-t border-hair pt-8">
+              <Link
+                href="/blog"
+                className="font-mono text-[11px] uppercase text-muted-warm transition-colors duration-200 hover:text-bone"
+              >
+                More writing
+              </Link>
+            </footer>
+          </article>
+        </main>
       </div>
     </>
   );

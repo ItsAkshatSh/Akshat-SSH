@@ -13,17 +13,28 @@
 @tailwind utilities;
 
 @layer base {
+  /* One palette, warm ink and bone. These are THE values: the hexes in
+     tailwind.config.cjs mirror them so utility classes and hand-written CSS
+     resolve to the same colors, and `--text-muted-rgb` feeds the Tailwind
+     color that makes `text-muted-warm/70` work. */
   :root {
-    --bg: #000;
-    --surface: #111;
-    --surface-raised: #181818;
-    --border: rgba(255, 255, 255, 0.1);
-    --border-hover: rgba(255, 255, 255, 0.22);
-    --text: #f2f2f2;
-    --text-muted: #a1a1a1;
-    --accent: #d8d8d8;
-    --accent-soft: rgba(216, 216, 216, 0.15);
-    --accent-deep: #888;
+    --bg: #0d0a08;
+    --surface: #16110d;
+    --surface-raised: #1f1813;
+    --border: rgba(236, 229, 219, 0.14);
+    --border-hover: rgba(236, 229, 219, 0.32);
+    --text: #ece5db;
+    --text-muted: #a8a196;
+    --text-muted-rgb: 168 161 150;
+    --accent: #d8d0c3;
+    --accent-soft: rgba(216, 208, 195, 0.15);
+    --accent-deep: #8a8177;
+
+    /* Floating menu material. The pill is the one inverted surface on the
+       page: bone plate, ink label. */
+    --menu-pill: var(--text);
+    --menu-pill-ink: var(--bg);
+    --menu-pill-border: color-mix(in oklab, var(--text) 86%, var(--bg));
 
     /* Motion system.
        --dur-press is short on purpose: feedback that arrives on pointer-down
@@ -40,7 +51,7 @@
     /* Translucent chrome. One token per material weight so the reduced
        transparency / increased contrast overrides below only have to
        restate a color, never re-derive one. */
-    --scrim-bg: rgba(0, 0, 0, 0.96);
+    --scrim-bg: rgba(13, 10, 8, 0.96);
     --scrim-blur: none;
   }
 
@@ -80,9 +91,16 @@
   .bg-ink { background: var(--bg); }
   .bg-surface { background: var(--surface); }
   .text-bone { color: var(--text); }
-  .text-muted-warm { color: var(--text-muted); }
   .text-accent { color: var(--accent); }
-  .border-hair { border-color: var(--border); }
+
+  /* Hairline contract: `border-hair` supplies the color (and a style, since
+     preflight resets width to 0 and style to solid, so a class that only set
+     color painted nothing). Pair it with a width utility (`border`,
+     `border-b`, `border-y` …) for call sites that need a line. */
+  .border-hair {
+    border-color: var(--border);
+    border-style: solid;
+  }
 
   /* Endless stays the committed display voice: headings and few else. */
   .font-display {
@@ -108,7 +126,7 @@
     );
   }
 
-  /* Brushed ink rule — the organic replacement for a straight <hr>. */
+  /* Brushed ink rule: the organic replacement for a straight <hr>. */
   .ink-rule {
     height: 2px;
     border-radius: 2px;
@@ -124,14 +142,14 @@
 .custom-scrollbar::-webkit-scrollbar { width: 6px; height: 6px; }
 .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
 .custom-scrollbar::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.14);
+  background: var(--border);
   border-radius: 9999px;
   transition: background 0.2s ease;
 }
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.24);
+  background: var(--border-hover);
 }
-.custom-scrollbar { scrollbar-width: thin; scrollbar-color: rgba(255, 255, 255, 0.14) transparent; }
+.custom-scrollbar { scrollbar-width: thin; scrollbar-color: var(--border) transparent; }
 
 .project-art {
   height: 100%;
@@ -207,7 +225,7 @@
 
 /* Press feedback.
    Commit on pointer-*down*, not on release (see also: :active below). The
-   transform is deliberately the only fast transition here — color and
+   transform is deliberately the only fast transition here; color and
    border stay on the softer curve so hover still feels unhurried. Written
    outside @layer so it wins over the Tailwind transition utilities it
    replaces on the same element. */
@@ -505,33 +523,97 @@ body.dg-scroll-lock { overflow: hidden; }
   100% { background-position: 200% 0; }
 }
 
+/* Quiet reading surface for /blog: flat ink, no living canvas. */
+.blog-surface {
+  background-color: var(--bg);
+  color: var(--text);
+}
+
 /* Markdown reader body copy, tuned for long-form legibility. */
 .prose-wrapper {
   font-family: 'Newsreader', 'Endless', Georgia, serif;
-  font-size: 1.08rem;
+  font-size: 1.125rem;
   line-height: 1.85;
-  color: var(--text);
-  letter-spacing: 0.002em;
+  color: color-mix(in oklab, var(--text) 88%, var(--text-muted));
+  font-weight: 400;
 }
 
-.prose-wrapper p { margin-bottom: 1.25rem; }
+.prose-wrapper p,
+.prose-wrapper li,
+.prose-wrapper blockquote {
+  /* Pull a lone last word down beside the line above instead of leaving a hole. */
+  text-wrap: pretty;
+}
+
+.prose-wrapper p { margin-bottom: 1.35rem; }
+
+.prose-wrapper > *:first-child { margin-top: 0; }
+
+.prose-wrapper img {
+  display: block;
+  width: 100%;
+  height: auto;
+  margin: 2.25rem auto;
+  border-radius: 0.35rem;
+  outline: 1px solid var(--border);
+  outline-offset: -1px;
+}
+
+@media (min-width: 768px) {
+  /* Let photos breathe wider than the text measure. */
+  .prose-wrapper img {
+    width: calc(100% + 4rem);
+    max-width: none;
+    margin-left: -2rem;
+    margin-right: -2rem;
+  }
+}
 
 .prose-wrapper h1,
 .prose-wrapper h2,
 .prose-wrapper h3 {
   font-family: 'Endless', 'Newsreader', Georgia, serif;
   color: var(--text);
-  line-height: 1.25;
-  margin: 2rem 0 0.9rem;
+  line-height: 1.2;
+  margin: 2.75rem 0 0.9rem;
   font-weight: 400;
-  letter-spacing: -0.01em;
+  text-wrap: balance;
+}
+
+.prose-wrapper h1 { font-size: 1.65rem; }
+.prose-wrapper h2 { font-size: 1.4rem; }
+.prose-wrapper h3 { font-size: 1.2rem; }
+
+.prose-wrapper ul,
+.prose-wrapper ol {
+  margin: 0 0 1.35rem;
+  padding-left: 1.25rem;
+}
+
+.prose-wrapper li { margin-bottom: 0.45rem; }
+.prose-wrapper li::marker { color: var(--text-muted); }
+
+.prose-wrapper blockquote {
+  margin: 1.75rem 0;
+  padding: 0.15rem 0 0.15rem 1.15rem;
+  border-left: 1px solid var(--border-hover);
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+.prose-wrapper hr {
+  border: 0;
+  border-top: 1px solid var(--border);
+  margin: 2.5rem 0;
 }
 
 .prose-wrapper a {
-  color: var(--accent);
+  color: var(--text);
   text-decoration: underline;
-  text-underline-offset: 3px;
-  text-decoration-color: color-mix(in oklab, var(--accent) 45%, transparent);
+  text-underline-offset: 0.18em;
+  text-decoration-thickness: 1px;
+  text-decoration-color: color-mix(in oklab, var(--accent) 40%, transparent);
+  transition: text-decoration-color 200ms ease-out;
 }
 .prose-wrapper a:hover {
   text-decoration-color: var(--accent);
@@ -546,28 +628,55 @@ body.dg-scroll-lock { overflow: hidden; }
   font-style: italic;
 }
 
+.prose-wrapper code {
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-size: 0.86em;
+  padding: 0.12em 0.35em;
+  border-radius: 0.3rem;
+  background: var(--surface);
+  color: var(--text);
+}
+
+.prose-wrapper pre {
+  margin: 1.75rem 0;
+  padding: 1.1rem 1.2rem;
+  overflow-x: auto;
+  border-radius: 0.5rem;
+  border: 1px solid var(--border);
+  background: var(--surface);
+}
+
+.prose-wrapper pre code {
+  padding: 0;
+  background: transparent;
+  font-size: 0.84rem;
+  line-height: 1.65;
+}
+
 .prose-wrapper table {
   width: 100%;
   border-collapse: collapse;
-  margin: 1.5rem 0;
+  margin: 1.75rem 0;
+  font-size: 0.95rem;
 }
 
 .prose-wrapper table th,
 .prose-wrapper table td {
-  border: 1px solid var(--border-hover);
-  padding: 0.75rem;
+  border: 1px solid var(--border);
+  padding: 0.65rem 0.8rem;
   text-align: left;
 }
 
 .prose-wrapper table th {
   background-color: var(--surface);
   font-weight: 600;
+  color: var(--text);
 }
 
 /* Reduced motion.
    Entrance animations in this codebase author their own "forward" state via
    `animation-fill-mode: forwards`, so they cannot simply be switched off
-   without leaving content stuck at opacity 0 — instead every animation is
+   without leaving content stuck at opacity 0; instead every animation is
    collapsed to its end state, which reads as a direct, non-vestibular cut.
    Transform-driven JS motion (framer-motion) is handled separately by the
    MotionConfig in pages/_app.jsx, which downgrades springs to cross-fades. */
