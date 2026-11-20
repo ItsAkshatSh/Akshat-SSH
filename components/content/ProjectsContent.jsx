@@ -80,8 +80,8 @@ function ProjectArtwork({ project, index }) {
         <div className="project-art__line project-art__line--short" />
       </div>
       <div className="relative z-10 flex w-full items-end justify-between">
-        <span className="font-display text-6xl leading-none text-white/80">{project.mark}</span>
-        <span className="font-mono text-[9px] uppercase tracking-[0.3em] text-white/45">
+        <span className="font-display text-6xl leading-none text-bone/80">{project.mark}</span>
+        <span className="font-mono text-[11px] uppercase tracking-[0.3em] text-bone/45">
           {project.mockup?.language || 'github archive'}
         </span>
       </div>
@@ -123,11 +123,11 @@ const ProjectsContent = () => {
 
   return (
     <div className="pb-8">
-      <div className="mb-8 pb-6 border-b border-white/[0.06]">
-        <p className="text-[15px] text-neutral-200 leading-[1.7] max-w-lg">
+      <div className="mb-8 pb-6 border-b border-hair">
+        <p className="text-[15px] text-bone leading-[1.7] max-w-lg">
           Selected work across hardware, mobile, games and web. Click any card for the source or the live version.
         </p>
-        <p className="text-[11px] text-neutral-400 font-mono mt-3 uppercase tracking-[0.22em]">
+        <p className="text-[11px] text-muted-warm font-mono mt-3 uppercase tracking-[0.22em]">
           {String(projects.length).padStart(2, '0')} · Projects {isLive ? '· GitHub refreshed weekly' : ''}
         </p>
       </div>
@@ -139,11 +139,11 @@ const ProjectsContent = () => {
               href={project.link}
               target="_blank"
               rel="noopener noreferrer"
-              className="interactive group flex h-full flex-col overflow-hidden rounded-2xl border border-white/[0.1] bg-white/[0.025] hover:border-white/20 hover:bg-white/[0.05] active:bg-white/[0.08] active:border-white/25 transition-colors duration-300 active:duration-100"
+              className="interactive group flex h-full flex-col overflow-hidden rounded-2xl border border-hair bg-surface hover:border-[color:var(--border-hover)] hover:bg-surface-raised active:bg-surface-raised active:border-[color:var(--border-hover)] transition-colors duration-300 active:duration-100"
             >
-              <div className="relative h-36 sm:h-40 overflow-hidden border-b border-white/[0.08] bg-black">
+              <div className="relative h-36 sm:h-40 overflow-hidden border-b border-hair bg-ink">
                 <ProjectArtwork project={project} index={i} />
-                <span className="absolute left-4 top-4 font-mono text-[9px] uppercase tracking-[0.25em] text-white/65">
+                <span className="absolute left-4 top-4 font-mono text-[11px] uppercase tracking-[0.25em] text-bone/65">
                   {String(i + 1).padStart(2, '0')}
                 </span>
               </div>
@@ -151,24 +151,24 @@ const ProjectsContent = () => {
               <div className="flex flex-1 flex-col p-5 sm:p-6">
                 <div className="flex justify-between items-start gap-4 mb-4">
                   <div className="flex-1 min-w-0">
-                    <h3 className="text-xl sm:text-2xl text-white font-medium tracking-[-0.01em] leading-tight">
+                    <h3 className="text-xl sm:text-2xl text-bone font-medium tracking-[-0.01em] leading-tight">
                       {project.title}
                     </h3>
-                    <p className="text-neutral-300 text-[15px] mt-1.5 leading-snug">{project.subtitle}</p>
-                    <p className="text-neutral-400 text-[11px] mt-2 font-mono uppercase tracking-[0.22em]">
+                    <p className="text-muted-warm text-[15px] mt-1.5 leading-snug">{project.subtitle}</p>
+                    <p className="text-muted-warm text-[11px] mt-2 font-mono uppercase tracking-[0.22em]">
                       {project.date}
                     </p>
                   </div>
-                  <span className="text-neutral-300 group-hover:text-white text-[11px] whitespace-nowrap font-mono uppercase tracking-[0.22em] flex items-center gap-1.5 transition-colors duration-300">
+                  <span className="text-muted-warm group-hover:text-bone text-[11px] whitespace-nowrap font-mono uppercase tracking-[0.22em] flex items-center gap-1.5 transition-colors duration-300">
                     Open <span className="inline-block group-hover:translate-x-0.5 transition-transform">↗</span>
                   </span>
                 </div>
 
-                <p className="text-neutral-200 leading-[1.7] mb-5 text-[15px]">{projectDescription(project)}</p>
+                <p className="text-bone leading-[1.7] mb-5 text-[15px]">{projectDescription(project)}</p>
 
                 <div className="mt-auto flex flex-wrap gap-2">
                   {project.stack.map((tech) => (
-                    <span key={tech} className="text-[11px] border border-white/[0.12] bg-white/[0.04] px-2.5 py-1 rounded-md text-neutral-200 font-mono">
+                    <span key={tech} className="text-[11px] border border-hair bg-surface px-2.5 py-1 rounded-md text-bone font-mono">
                       {tech}
                     </span>
                   ))}

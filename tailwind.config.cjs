@@ -22,6 +22,10 @@ module.exports = {
         },
         bone: '#ece5db',
         umber: '#16110d',
+        // Same token as globals.css `--text-muted`, expressed as channels so
+        // the opacity modifiers (`text-muted-warm/70`) actually generate CSS
+        // instead of silently wiping out the de-emphasis.
+        'muted-warm': 'rgb(var(--text-muted-rgb) / <alpha-value>)',
       },
       fontFamily: {
         sans: ['Newsreader', 'Georgia', 'ui-serif', 'system-ui', 'sans-serif'],
@@ -47,7 +51,6 @@ module.exports = {
       },
       transitionTimingFunction: {
         smooth: 'cubic-bezier(0.4, 0, 0.2, 1)',
-        'bounce-soft': 'cubic-bezier(0.34, 1.56, 0.64, 1)',
         premium: 'cubic-bezier(0.16, 1, 0.3, 1)',
       },
       animation: {

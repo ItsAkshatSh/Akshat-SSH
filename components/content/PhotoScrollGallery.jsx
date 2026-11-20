@@ -55,7 +55,7 @@ const PhotoScrollGallery = ({ photos, onSelect }) => {
     const first = frameRefs.current[0];
     const twin = frameRefs.current[photos.length];
     if (!first || !twin) return;
-    // Distance from a frame to its duplicate — exact loop period.
+    // Distance from a frame to its duplicate: exact loop period.
     state.current.period = twin.offsetLeft - first.offsetLeft;
   }, [photos.length]);
 
@@ -272,7 +272,7 @@ const PhotoScrollGallery = ({ photos, onSelect }) => {
               ref={(el) => {
                 frameRefs.current[i] = el;
               }}
-              className="interactive relative shrink-0 h-full overflow-hidden rounded-sm bg-black/40 focus-visible:outline focus-visible:outline-2 focus-visible:outline-[color:var(--accent)] focus-visible:outline-offset-4"
+              className="interactive relative shrink-0 h-full overflow-hidden rounded-sm bg-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-[color:var(--accent)] focus-visible:outline-offset-4"
               style={{
                 transformOrigin: 'center center',
                 willChange: 'transform',
@@ -302,20 +302,20 @@ const PhotoScrollGallery = ({ photos, onSelect }) => {
 
       <div className="pointer-events-none absolute inset-x-6 sm:inset-x-10 top-6 sm:top-8 z-chrome flex items-start justify-between">
         <div>
-          <p className="font-mono text-[9px] uppercase tracking-[0.3em] text-accent">Visual archive</p>
+          <p className="font-mono text-[11px] uppercase tracking-[0.3em] text-accent">Visual archive</p>
         </div>
       </div>
 
       {/* Index + caption */}
       <div className="pointer-events-none absolute inset-x-0 bottom-6 sm:bottom-8 z-chrome flex flex-col items-center gap-2 px-6">
-        <p className="font-mono text-[10px] tracking-[0.28em] uppercase text-muted-warm">
+        <p className="font-mono text-[11px] tracking-[0.28em] uppercase text-muted-warm">
           {String(activeIndex + 1).padStart(2, '0')}
           <span className="mx-2 opacity-40">/</span>
           {String(photos.length).padStart(2, '0')}
         </p>
         <p className="font-display text-sm sm:text-base text-bone/90 tracking-wide">
           {photos[activeIndex]?.place}
-          <span className="mx-2 text-muted-warm/50">·</span>
+          <span className="mx-2 opacity-40">·</span>
           <span className="text-muted-warm">{photos[activeIndex]?.date}</span>
         </p>
       </div>
@@ -328,12 +328,12 @@ const PhotoScrollGallery = ({ photos, onSelect }) => {
           style={{ animation: 'slideUpFade 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards 0.5s', opacity: 0 }}
         >
           <div className="flex items-center gap-3 text-muted-warm">
-            <span className="font-mono text-[10px] tracking-[0.3em] uppercase">Scroll</span>
+            <span className="font-mono text-[11px] tracking-[0.3em] uppercase">Scroll</span>
             <span
               className="inline-block h-px w-10 bg-current opacity-50"
               style={{ animation: 'photoScrollHint 1.6s ease-in-out infinite' }}
             />
-            <span className="font-mono text-[10px] tracking-[0.3em] uppercase">or drag</span>
+            <span className="font-mono text-[11px] tracking-[0.3em] uppercase">or drag</span>
           </div>
         </div>
       )}

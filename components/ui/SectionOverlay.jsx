@@ -36,7 +36,7 @@ export const SectionCorner = ({ position }) => {
 };
 
 const overlayButtonClass =
-  'interactive press h-11 px-4 rounded-full border-hair text-muted-warm hover:text-bone hover:bg-white/[0.05] text-[11px] tracking-[0.25em] uppercase';
+  'interactive press h-11 px-4 rounded-full border border-hair text-muted-warm hover:text-bone hover:bg-surface-raised text-[11px] tracking-[0.25em] uppercase';
 
 export const OverlayButton = ({ children, className = '', ...props }) => (
   <button type="button" className={`${overlayButtonClass} ${className}`.trim()} {...props}>
@@ -55,6 +55,7 @@ export default function SectionOverlay({
   variant = 'default',
   zIndex = 40,
   showVignettes = true,
+  scrimStyle,
   titleClassName = 'font-display text-balance text-4xl sm:text-5xl md:text-6xl text-bone tracking-[-0.01em] capitalize leading-none',
 }) {
   const dialogRef = useRef(null);
@@ -67,7 +68,7 @@ export default function SectionOverlay({
 
   // The scrim is a material, not a black rectangle: it arrives a hair over its
   // resting size and settles down, instead of just fading. Only transform and
-  // opacity are animated — blurring a full-viewport surface every frame
+  // opacity are animated; blurring a full-viewport surface every frame
   // re-rasterises the entire backdrop, which is far too expensive to run on a
   // phone. The blur itself comes from the CSS token, so reduced transparency
   // swaps it for an opaque surface with no JS involved. It never scales below
@@ -84,7 +85,8 @@ export default function SectionOverlay({
   return (
     <motion.div
       ref={dialogRef}
-      className="fixed inset-0 flex flex-col overflow-hidden"
+      tabIndex={-1}
+      className="fixed inset-0 flex flex-col overflow-hidden outline-none"
       style={{ zIndex }}
       role="dialog"
       aria-modal="true"
@@ -100,6 +102,7 @@ export default function SectionOverlay({
         onClick={handleBackdropClose}
         className="material-scrim absolute inset-0 size-full cursor-default"
         tabIndex={-1}
+        style={scrimStyle}
         {...scrimMotion}
         transition={{ duration: scrimDuration, ease: STATE_EASE }}
       />
@@ -119,7 +122,7 @@ export default function SectionOverlay({
 
       <motion.div
         className={`relative flex flex-col h-full w-full pointer-events-none ${
-          isFullPage ? '' : 'readable-on-blur max-w-5xl mx-auto'
+          isFullPage ? '' : 'readable-on-blur max-w-6xl mx-auto'
         }`}
         onClick={(e) => e.stopPropagation()}
         initial={{ y: 10, opacity: 0 }}

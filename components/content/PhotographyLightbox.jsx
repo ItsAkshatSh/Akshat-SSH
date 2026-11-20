@@ -19,7 +19,7 @@ const CornerMark = ({ position }) => {
   return (
     <span
       aria-hidden="true"
-      className={`absolute w-3 h-3 border-white/50 pointer-events-none ${anchor}`}
+      className={`absolute w-3 h-3 border-[color:var(--border-hover)] pointer-events-none ${anchor}`}
     />
   );
 };
@@ -66,7 +66,7 @@ const PhotographyLightbox = ({ selectedImg, onClose, onSelect }) => {
 
   return createPortal(
     <div
-      className="fixed inset-0 z-lightbox bg-[#050810] flex flex-col overflow-hidden"
+      className="fixed inset-0 z-lightbox bg-ink flex flex-col overflow-hidden"
       role="dialog"
       aria-modal="true"
       aria-label={`Photo ${selectedIndex + 1} of ${total}`}
@@ -86,18 +86,18 @@ const PhotographyLightbox = ({ selectedImg, onClose, onSelect }) => {
             animation: 'slideUpFade 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards 0.1s',
           }}
         >
-          <span className="text-white text-sm tracking-[0.22em]">
+          <span className="text-bone text-sm tracking-[0.22em]">
             {String(selectedIndex + 1).padStart(2, '0')}
           </span>
-          <span className="text-neutral-500">/</span>
-          <span className="text-neutral-300">
+          <span className="text-muted-warm">/</span>
+          <span className="text-muted-warm">
             {String(total).padStart(2, '0')}
           </span>
-          <span className="hidden sm:inline text-neutral-500 ml-3">Frame</span>
+          <span className="hidden sm:inline text-muted-warm ml-3">Frame</span>
         </div>
         <button
           onClick={onClose}
-          className="interactive press h-10 px-4 rounded-full border border-white/[0.14] text-neutral-200 hover:text-white hover:border-white/30 hover:bg-white/[0.05] text-[11px] tracking-[0.25em] uppercase"
+          className="interactive press h-10 px-4 rounded-full border border-hair text-bone hover:text-bone hover:border-[color:var(--border-hover)] hover:bg-surface-raised text-[11px] tracking-[0.25em] uppercase"
           aria-label="Close"
           style={{
             opacity: 0,
@@ -114,7 +114,7 @@ const PhotographyLightbox = ({ selectedImg, onClose, onSelect }) => {
           <button
             onClick={() => goTo(selectedIndex - 1)}
             aria-label="Previous photo"
-            className="interactive absolute left-3 sm:left-8 top-1/2 -translate-y-1/2 z-content size-11 sm:size-12 rounded-full border border-white/[0.14] flex items-center justify-center text-white/80 hover:text-white hover:border-white/40 hover:bg-white/[0.05] transition-all duration-300 active:duration-100 active:scale-90 backdrop-blur-sm bg-black/30"
+            className="interactive absolute left-3 sm:left-8 top-1/2 -translate-y-1/2 z-content size-11 sm:size-12 rounded-full border border-hair flex items-center justify-center text-bone/80 hover:text-bone hover:border-[color:var(--border-hover)] hover:bg-surface-raised transition-all duration-300 active:duration-100 active:scale-90 backdrop-blur-sm bg-ink"
           >
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
               <path d="M15 6l-6 6 6 6" />
@@ -139,7 +139,7 @@ const PhotographyLightbox = ({ selectedImg, onClose, onSelect }) => {
           <button
             onClick={() => goTo(selectedIndex + 1)}
             aria-label="Next photo"
-            className="interactive absolute right-3 sm:right-8 top-1/2 -translate-y-1/2 z-content size-11 sm:size-12 rounded-full border border-white/[0.14] flex items-center justify-center text-white/80 hover:text-white hover:border-white/40 hover:bg-white/[0.05] transition-all duration-300 active:duration-100 active:scale-90 backdrop-blur-sm bg-black/30"
+            className="interactive absolute right-3 sm:right-8 top-1/2 -translate-y-1/2 z-content size-11 sm:size-12 rounded-full border border-hair flex items-center justify-center text-bone/80 hover:text-bone hover:border-[color:var(--border-hover)] hover:bg-surface-raised transition-all duration-300 active:duration-100 active:scale-90 backdrop-blur-sm bg-ink"
           >
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
               <path d="M9 6l6 6-6 6" />
@@ -170,18 +170,18 @@ const PhotographyLightbox = ({ selectedImg, onClose, onSelect }) => {
               aria-label={`Go to photo ${i + 1}`}
               className={`interactive h-1.5 rounded-full transition-all duration-300 ${
                 i === selectedIndex
-                  ? 'w-7 bg-white/90'
-                  : 'w-1.5 bg-white/25 hover:bg-white/60'
+                  ? 'w-7 bg-bone'
+                  : 'w-1.5 bg-bone/25 hover:bg-bone/60'
               }`}
             />
           ))}
         </div>
-        <div className="hidden sm:flex items-center gap-3 text-[10px] font-mono uppercase tracking-[0.25em] text-neutral-500">
+        <div className="hidden sm:flex items-center gap-3 text-[11px] font-mono uppercase tracking-[0.25em] text-muted-warm">
           <span className="flex items-center gap-1.5">
-            <kbd className="px-1.5 py-0.5 border border-white/[0.14] rounded text-neutral-300 text-[10px] not-italic normal-case tracking-normal">
+            <kbd className="px-1.5 py-0.5 border border-hair rounded text-muted-warm text-[11px] not-italic normal-case tracking-normal">
               ←
             </kbd>
-            <kbd className="px-1.5 py-0.5 border border-white/[0.14] rounded text-neutral-300 text-[10px] not-italic normal-case tracking-normal">
+            <kbd className="px-1.5 py-0.5 border border-hair rounded text-muted-warm text-[11px] not-italic normal-case tracking-normal">
               →
             </kbd>
             <span>Navigate</span>

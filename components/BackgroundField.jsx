@@ -10,6 +10,7 @@ const ASCIIOceanField = lazy(() => import('./ascii/ASCIIField'));
 export default function BackgroundField({ paused = false }) {
   return (
     <motion.div
+      aria-hidden="true"
       className="fixed inset-0 z-ocean pointer-events-none"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}

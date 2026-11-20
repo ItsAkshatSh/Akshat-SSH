@@ -4,6 +4,7 @@
  * background, the hero, the floating menu, and overlay sections.
  */
 import { useState, useEffect } from 'react';
+import { useRouter } from 'next/router';
 import { AnimatePresence, motion } from 'framer-motion';
 
 import ScrambleText from './utilities/ScrambleText';
@@ -12,7 +13,6 @@ import { HERO, SOCIALS } from '../lib/siteContent';
 
 import BackgroundField from './BackgroundField';
 import ASCIICanvas from './ascii/ASCIICanvas';
-import BlogWindow from './blog/BlogWindow';
 import FloatingMenu from './ui/FloatingMenu';
 
 import ProjectsContent from './content/ProjectsContent';
@@ -21,7 +21,7 @@ import ExperienceContent from './content/ExperienceContent';
 import { PHOTOS } from './content/photographyPhotos';
 
 // Hero entrance. Each element rides the same critically damped spring, offset
-// by a short stagger — the stagger orders attention (portrait, then name, then
+// by a short stagger: the stagger orders attention (portrait, then name, then
 // actions) without any element appearing to wait its turn.
 const HERO_STAGGER = {
   hidden: {},
@@ -58,9 +58,8 @@ const SOCIAL_ICONS = {
 };
 
 const App = () => {
+  const router = useRouter();
   const [activeSection, setActiveSection] = useState(null);
-  const [isBlogOpen, setIsBlogOpen] = useState(false);
-  const [isFinePointer, setIsFinePointer] = useState(false);
   const [contentIn, setContentIn] = useState(false);
 
   useEffect(() => {
@@ -77,23 +76,13 @@ const App = () => {
   }, []);
 
   useEffect(() => {
-    if (typeof window === 'undefined' || !window.matchMedia) return;
-    const mq = window.matchMedia('(hover: hover) and (pointer: fine)');
-    const update = () => setIsFinePointer(mq.matches);
-    update();
-    mq.addEventListener?.('change', update);
-    return () => mq.removeEventListener?.('change', update);
-  }, []);
-
-  useEffect(() => {
     const handleKeyDown = (e) => {
       if (e.key !== 'Escape') return;
-      if (isBlogOpen) setIsBlogOpen(false);
-      else if (activeSection) setActiveSection(null);
+      if (activeSection) setActiveSection(null);
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isBlogOpen, activeSection]);
+  }, [activeSection]);
 
   // Open sections from hash links in the SSR hero shell (e.g. /#projects).
   useEffect(() => {
@@ -116,7 +105,7 @@ const App = () => {
       onClick: () => setActiveSection('photography'),
     },
     { label: 'Experience', onClick: () => setActiveSection('experience') },
-    { label: 'Blog', onClick: () => setIsBlogOpen(true) },
+    { label: 'Blog', onClick: () => router.push('/blog') },
   ];
 
   const sectionTitle = activeSection
@@ -130,25 +119,38 @@ const App = () => {
       className="bg-ink text-bone fixed inset-0 z-content min-h-dvh overflow-x-hidden overflow-y-auto"
     >
       {/* The living background rests
-          behind a blurred scrim while a panel is open — nothing about it is
+          behind a blurred scrim while a panel is open; nothing about it is
           visible then, so it stops. Mode is user-persisted. */}
-      <BackgroundField paused={Boolean(activeSection || isBlogOpen)} />
+      <BackgroundField paused={Boolean(activeSection)} />
 
-      <main className="relative z-content w-full min-h-dvh flex items-center justify-center px-6 md:px-10 py-20 md:py-24">
-        <div className="pointer-events-none absolute inset-x-6 md:inset-x-10 top-8 md:top-10 flex items-center justify-end font-mono text-[9px] uppercase tracking-[0.28em] text-muted-warm/70">
+      {/* Bottom clearance for the fixed floating menu (48px tall + 24px
+          inset). Together with the compact mobile hero below it keeps the
+          social row out from under the pill at 390×844; on shorter phones it
+          is what the scroll ends against. */}
+      {/* While a section panel is open the page behind it is inert, so keyboard
+          and screen-reader users cannot wander back into the hero. */}
+      <main
+        inert={activeSection ? '' : undefined}
+        className="relative z-content w-full min-h-dvh flex items-center justify-center px-6 md:px-10 pt-16 md:pt-24 pb-28 md:pb-24"
+      >
+        <div className="readable-on-blur pointer-events-none absolute inset-x-6 md:inset-x-10 top-8 md:top-10 flex items-center justify-end font-mono text-[11px] uppercase tracking-[0.22em] text-muted-warm">
           <span>Dubai · UAE</span>
         </div>
         <motion.div
-          className="w-full max-w-6xl grid lg:grid-cols-[minmax(260px,320px)_1fr] gap-10 lg:gap-16 xl:gap-20 items-center"
+          className="w-full max-w-6xl grid lg:grid-cols-[minmax(260px,320px)_1fr] gap-8 lg:gap-16 xl:gap-20 items-center"
           variants={HERO_STAGGER}
           initial="hidden"
           animate={contentIn ? 'visible' : 'hidden'}
         >
           <motion.div
             variants={HERO_ITEM}
-            className="interactive relative mx-auto lg:mx-0 w-full max-w-[280px] lg:max-w-none"
+            className="interactive relative mx-auto lg:mx-0 w-full max-w-[210px] sm:max-w-[250px] md:max-w-[280px] lg:max-w-none"
           >
-            <div className="relative aspect-[3/4] rounded-[1.75rem] border-hair overflow-hidden bg-surface">
+            <div
+              role="img"
+              aria-label={`Portrait of ${HERO.name} rendered in ASCII`}
+              className="relative aspect-[3/4] rounded-[1.75rem] border border-hair overflow-hidden bg-surface"
+            >
               <ASCIICanvas
                 src="/images/ascii/real_pfp.jpg"
                 cellSize={4}
@@ -163,13 +165,24 @@ const App = () => {
             </div>
           </motion.div>
 
-          <div className="flex flex-col gap-9 lg:gap-11">
+          <div className="relative flex flex-col gap-8 lg:gap-11">
+            {/* The ocean glyphs drift behind this column, and the brightest
+                ones can out-contrast the bio. This is a soft scrim, not a
+                panel: a blurred ellipse so its edge dissolves into the field
+                instead of drawing a rectangle over the art. */}
+            <div
+              aria-hidden="true"
+              className="pointer-events-none absolute -inset-x-10 -inset-y-10 md:-inset-x-16 md:-inset-y-14 -z-10 rounded-[45%] blur-3xl"
+              style={{
+                background: 'color-mix(in oklab, var(--bg) 78%, transparent)',
+              }}
+            />
             <motion.header variants={HERO_ITEM} className="max-w-xl">
-              <h2 className="font-display text-balance text-5xl sm:text-6xl lg:text-[4.4rem] leading-[1.02] text-bone tracking-[-0.01em] mb-6">
+              <h1 className="font-display text-balance text-5xl sm:text-6xl lg:text-[4.4rem] leading-[1.02] text-bone tracking-[-0.01em] mb-5 md:mb-6">
                 {HERO.nameLines[0]}
                 <br />
                 {HERO.nameLines[1]}
-              </h2>
+              </h1>
               <p className="text-pretty text-muted-warm text-[16px] sm:text-[17px] leading-[1.8] max-w-md">
                 {HERO.bio}
               </p>
@@ -183,7 +196,7 @@ const App = () => {
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label={label}
-                  className="interactive press group flex items-center justify-center size-11 rounded-full border-hair text-muted-warm hover:text-accent hover:border-[color:var(--border-hover)] hover:bg-white/[0.05]"
+                  className="interactive press group flex items-center justify-center size-11 rounded-full border border-hair text-muted-warm hover:text-accent hover:border-[color:var(--border-hover)] hover:bg-surface"
                 >
                   <span className="block size-[18px]">{SOCIAL_ICONS[label]}</span>
                 </a>
@@ -194,17 +207,7 @@ const App = () => {
         </motion.div>
       </main>
 
-      <FloatingMenu
-        items={navItems}
-        hidden={Boolean(activeSection || isBlogOpen)}
-      />
-
-      <AnimatePresence>
-        {isBlogOpen && <BlogWindow key="blog" onClose={() => setIsBlogOpen(false)} />}
-      </AnimatePresence>
-
-      <AnimatePresence>
-      </AnimatePresence>
+      <FloatingMenu items={navItems} hidden={Boolean(activeSection)} />
 
       <AnimatePresence>
         {activeSection && (

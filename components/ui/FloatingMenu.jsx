@@ -29,11 +29,9 @@ const CLOSE_SPRING = { type: 'spring', bounce: 0.12, duration: 0.38 };
 const HOVER_SPRING = { type: 'spring', bounce: 0, duration: 0.25 };
 const REVEAL_SPRING = { type: 'spring', bounce: 0.18, duration: 0.6 };
 
-// The two panels: bone (collapsed) and warm ink (expanded reveal).
-const CREAM = '#fff';
-const CREAM_BORDER = '#ddd';
-const INK = '#0d0d0d';
-const INK_TEXT = '#f2f2f2';
+// One row: 24px tall so every label clears the minimum target size on its
+// own, rather than only through the 2.5.8 spacing exception.
+const ROW = 24;
 
 function MenuButton({ label, onClick, isOpen, index, tabbable }) {
   const [hovered, setHovered] = useState(false);
@@ -78,14 +76,13 @@ function MenuButton({ label, onClick, isOpen, index, tabbable }) {
       onMouseLeave={handleLeave}
       whileTap={{ opacity: 0.65 }}
       tabIndex={tabbable ? 0 : -1}
-      className="interactive uppercase leading-none overflow-hidden"
+      className="interactive font-mono uppercase leading-none overflow-hidden"
       style={{
-        color: INK_TEXT,
-        fontFamily: "'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, Consolas, monospace",
+        color: 'var(--text)',
         fontWeight: 500,
         fontSize: '22px',
         letterSpacing: '-0.01em',
-        height: '1em',
+        height: ROW,
       }}
       animate={{ opacity: isOpen ? 1 : 0 }}
       transition={{
@@ -99,7 +96,7 @@ function MenuButton({ label, onClick, isOpen, index, tabbable }) {
           <span
             key={i}
             className="inline-block overflow-hidden"
-            style={{ height: '1em' }}
+            style={{ height: ROW }}
           >
             <span
               className="flex flex-col"
@@ -111,10 +108,10 @@ function MenuButton({ label, onClick, isOpen, index, tabbable }) {
                 transitionTimingFunction: 'cubic-bezier(0.22, 1, 0.36, 1)',
               }}
             >
-              <span className="block" style={{ height: '1em', lineHeight: '1em' }}>
+              <span className="block" style={{ height: ROW, lineHeight: `${ROW}px` }}>
                 {char}
               </span>
-              <span className="block" style={{ height: '1em', lineHeight: '1em' }} aria-hidden>
+              <span className="block" style={{ height: ROW, lineHeight: `${ROW}px` }} aria-hidden>
                 {char}
               </span>
             </span>
@@ -234,19 +231,19 @@ export default function FloatingMenu({ items, hidden = false }) {
       animate={{ opacity: hidden ? 0 : 1, y: hidden ? 20 : 0 }}
       transition={HOVER_SPRING}
       aria-hidden={hidden}
+      inert={hidden ? '' : undefined}
     >
       {/*
         The panel morphs its own size. That is a layout animation, which is
-        normally worth avoiding — it is contained here on purpose: the panel is
+        normally worth avoiding; it is contained here on purpose: the panel is
         `fixed`, holds two absolutely-positioned layers and one flex column, and
         `contain-paint` keeps the reflow and repaint inside its own box, so no
         page content around it is ever re-measured. A transform-based morph was
         the alternative and it distorts the monospace label.
       */}
       <motion.div
-        className="interactive contain-paint relative overflow-hidden flex flex-col"
+        className="interactive contain-paint relative overflow-hidden flex flex-col font-mono"
         style={{
-          fontFamily: "'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, Consolas, monospace",
           letterSpacing: '-0.01em',
         }}
         animate={{
@@ -261,18 +258,16 @@ export default function FloatingMenu({ items, hidden = false }) {
           scale: HOVER_SPRING,
         }}
       >
-        {/* Cream background layer (always present, becomes the pill outline) */}
-        <motion.div
-          className="absolute inset-0"
-          animate={{
-            backgroundColor: isOpen ? INK : CREAM,
-            borderColor: isOpen ? INK : CREAM_BORDER,
-          }}
-          transition={{ duration: isOpen ? 0.1 : 0.3, ease }}
+        {/* Pill / panel plate. Its colors come from the CSS tokens and
+            cross-fade in CSS, so the palette is not restated as JS hexes
+            here. */}
+        <div
+          className="absolute inset-0 rounded-[inherit] border border-solid transition-colors"
           style={{
-            borderWidth: 1,
-            borderStyle: 'solid',
-            borderRadius: 'inherit',
+            backgroundColor: isOpen ? 'var(--bg)' : 'var(--menu-pill)',
+            borderColor: isOpen ? 'var(--bg)' : 'var(--menu-pill-border)',
+            transitionDuration: isOpen ? '100ms' : '300ms',
+            transitionTimingFunction: 'cubic-bezier(0.22, 1, 0.36, 1)',
           }}
         />
 
@@ -287,17 +282,74 @@ export default function FloatingMenu({ items, hidden = false }) {
             height: '200%',
             borderRadius: '50%',
             x: '-50%',
-            backgroundColor: INK,
+            backgroundColor: 'var(--bg)',
           }}
           animate={{ y: isOpen ? '0%' : '110%' }}
           transition={{ ...REVEAL_SPRING, delay: isOpen ? 0.08 : 0 }}
         />
 
+        {/* Bottom bar: the toggle. It is FIRST in the DOM so Tab from the
+            toggle walks straight into the items; the flex `order` below is
+            purely visual (order never changes sequential focus order), which
+            keeps the bar at the bottom of the panel. */}
+        <motion.button
+          type="button"
+          aria-expanded={isOpen}
+          aria-controls="floating-menu-items"
+          aria-label={isOpen ? 'Close menu' : 'Open menu'}
+          data-focus-return
+          tabIndex={hidden ? -1 : 0}
+          onClick={() => setIsOpen((open) => !open)}
+          className="interactive relative z-10 order-2 flex items-center justify-between w-full shrink-0 cursor-pointer"
+          animate={{
+            paddingLeft: isOpen ? 22 : 20,
+            paddingRight: isOpen ? 22 : 20,
+            paddingBottom: isOpen ? 22 : 0,
+            height: 48,
+          }}
+          transition={isOpen ? OPEN_SPRING : CLOSE_SPRING}
+          whileTap={{ opacity: 0.72 }}
+          style={{ border: 0, background: 'transparent', appearance: 'none' }}
+        >
+          <span
+            className="leading-none uppercase transition-colors"
+            style={{
+              color: isOpen ? 'var(--text)' : 'var(--menu-pill-ink)',
+              fontSize: '13px',
+              letterSpacing: '0.22em',
+              fontWeight: 600,
+              transitionDuration: '300ms',
+            }}
+          >
+            {isOpen ? 'Close' : 'Menu'}
+          </span>
+          <div className="relative size-6 flex items-center justify-center">
+            <motion.span
+              className="absolute block w-[18px] h-[2px] rounded-full transition-colors"
+              style={{
+                backgroundColor: isOpen ? 'var(--text)' : 'var(--menu-pill-ink)',
+                transitionDuration: '300ms',
+              }}
+              animate={{ rotate: isOpen ? 45 : 0, y: isOpen ? 0 : -3 }}
+              transition={{ duration: 0.4, ease }}
+            />
+            <motion.span
+              className="absolute block w-[18px] h-[2px] rounded-full transition-colors"
+              style={{
+                backgroundColor: isOpen ? 'var(--text)' : 'var(--menu-pill-ink)',
+                transitionDuration: '300ms',
+              }}
+              animate={{ rotate: isOpen ? -45 : 0, y: isOpen ? 0 : 3 }}
+              transition={{ duration: 0.4, ease }}
+            />
+          </div>
+        </motion.button>
+
         {/* Menu items */}
         <div
           id="floating-menu-items"
           aria-hidden={!isOpen}
-          className="relative z-10 flex flex-col gap-5 items-center justify-center"
+          className="relative z-10 order-1 flex flex-col gap-5 items-center justify-center"
           style={{
             pointerEvents: isOpen ? 'auto' : 'none',
             opacity: isOpen ? 1 : 0,
@@ -316,59 +368,6 @@ export default function FloatingMenu({ items, hidden = false }) {
             />
           ))}
         </div>
-        {/* Bottom bar: the toggle. It is the control that fills the collapsed
-            pill, so a single real button covers "open" and "close" and stays
-            reachable by keyboard. */}
-        <motion.button
-          type="button"
-          aria-expanded={isOpen}
-          aria-controls="floating-menu-items"
-          tabIndex={hidden ? -1 : 0}
-          onClick={() => setIsOpen((open) => !open)}
-          className="interactive relative z-10 flex items-center justify-between w-full shrink-0 cursor-pointer"
-          animate={{
-            paddingLeft: isOpen ? 22 : 20,
-            paddingRight: isOpen ? 22 : 20,
-            paddingBottom: isOpen ? 22 : 0,
-            height: 48,
-          }}
-          transition={isOpen ? OPEN_SPRING : CLOSE_SPRING}
-          whileTap={{ opacity: 0.72 }}
-          style={{ border: 0, background: 'transparent', appearance: 'none' }}
-        >
-          <motion.span
-            className="leading-none uppercase"
-            animate={{ color: isOpen ? INK_TEXT : INK }}
-            transition={{ duration: 0.3, ease }}
-            style={{
-              fontSize: '13px',
-              letterSpacing: '0.22em',
-              fontWeight: 600,
-            }}
-          >
-            Menu
-          </motion.span>
-          <div className="relative size-6 flex items-center justify-center">
-            <motion.span
-              className="absolute block w-[18px] h-[2px] rounded-full"
-              animate={{
-                rotate: isOpen ? 45 : 0,
-                y: isOpen ? 0 : -3,
-                backgroundColor: isOpen ? INK_TEXT : INK,
-              }}
-              transition={{ duration: 0.4, ease }}
-            />
-            <motion.span
-              className="absolute block w-[18px] h-[2px] rounded-full"
-              animate={{
-                rotate: isOpen ? -45 : 0,
-                y: isOpen ? 0 : 3,
-                backgroundColor: isOpen ? INK_TEXT : INK,
-              }}
-              transition={{ duration: 0.4, ease }}
-            />
-          </div>
-        </motion.button>
       </motion.div>
       </motion.div>
     </>
