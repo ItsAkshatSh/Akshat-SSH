@@ -346,10 +346,14 @@ export default function ASCIICanvas({
     const rebuild = () => {
       setupCanvas();
       const changed = sampleImage();
-      if (changed) {
-        renderBase();
-        drawFrame();
-      }
+      // `setupCanvas` reallocates the bitmap to match the new CSS size, which
+      // clears it. The resting frame therefore has to be repainted on EVERY
+      // rebuild (not only when the grid changed) or a resize (including the
+      // ResizeObserver's first callback) wipes the portrait and leaves it
+      // blank until the cursor happens to move. `!baseCanvas` covers the case
+      // where the image finished loading after the first measurement.
+      if (changed || !baseCanvas) renderBase();
+      drawFrame();
     };
 
     let lastRect = { w: 0, h: 0 };

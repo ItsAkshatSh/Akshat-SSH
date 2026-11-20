@@ -102,7 +102,7 @@ async function captureGif(baseUrl) {
   const frameCount = process.env.GIF_STATIC === '1' ? 1 : FRAME_COUNT;
 
   // Screenshots take far longer than a frame interval, so wall-clock waits
-  // sample the CSS animations at uneven, drifting offsets — the GIF then plays
+  // sample the CSS animations at uneven, drifting offsets; the GIF then plays
   // back too fast and jittery. Pause every animation and drive it to an exact
   // point in the loop for each frame instead.
   const animationCount = await page.evaluate(() => {

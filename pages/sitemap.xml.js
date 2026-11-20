@@ -44,7 +44,7 @@ ${urls}
 </urlset>`;
 };
 
-// Empty page component — the response is streamed via getServerSideProps.
+// Empty page component: the response is streamed via getServerSideProps.
 export default function SiteMap() {
   return null;
 }

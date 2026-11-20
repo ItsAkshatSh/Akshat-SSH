@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 
 /**
- * VoidField — an ocean-like deep-space atmosphere.
+ * VoidField: an ocean-like deep-space atmosphere.
  *
  * The scene is built from slow currents of nebula dust, star motes, and a
  * a small set of high-resolution ASCII worlds and restrained atmospheric

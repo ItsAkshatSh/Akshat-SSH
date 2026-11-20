@@ -4,7 +4,7 @@ const SCRAMBLE_CHARS = '!@#$%^&*()_+-=[]{}|;:,.<>?/~';
 
 /**
  * Scramble-in text effect. By default uses a fixed interval (`speed`).
- * Pass `duration` to finish within a target time regardless of length —
+ * Pass `duration` to finish within a target time regardless of length,
  * useful for long blog titles.
  */
 const ScrambleText = ({ text, active, speed = 30, duration }) => {

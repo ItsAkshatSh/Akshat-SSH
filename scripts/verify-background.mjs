@@ -131,7 +131,7 @@ try {
   await new Promise((r) => setTimeout(r, 900));
   await page.screenshot({ path: 'shots/settings-step4-ocean-reduced.png' });
 
-  // 5. reset — reopen the menu and the panel, click Reset
+  // 5. reset: reopen the menu and the panel, click Reset
   await jsClick('button[aria-controls="floating-menu-items"]');
   await page.waitForSelector('#floating-menu-items button[aria-label="Settings"]', { timeout: 5000 });
   await jsClick('#floating-menu-items button[aria-label="Settings"]');

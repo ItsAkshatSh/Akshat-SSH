@@ -33,3 +33,10 @@ README.md
 
 # Kiro workspace settings (contains MCP server API keys).
 .kiro/settings/mcp.json
+
+# Agent, Claude, and visual tooling artifacts
+.agents/
+.claude/
+.impeccable/
+.orca-visual-pass/
+orca-visualpass/

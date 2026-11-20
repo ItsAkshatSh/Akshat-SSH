@@ -6,9 +6,9 @@ import { MotionConfig } from 'framer-motion';
 const SITE_URL =
   process.env.NEXT_PUBLIC_SITE_URL || 'https://akshaaaat.xyz';
 
-const DEFAULT_TITLE = 'Akshat Sharma — Personal Portfolio';
+const DEFAULT_TITLE = 'Akshat Sharma - Personal Portfolio';
 const DEFAULT_DESCRIPTION =
-  'Akshat Sharma. Aspiring Computer Engineer based in Dubai. Portfolio featuring hardware, mobile apps, games and photography — rendered inside a cursor-reactive ink terrain.';
+  'Akshat Sharma. Aspiring Computer Engineer based in Dubai. Portfolio featuring hardware, mobile apps, games and photography, rendered inside a cursor-reactive ink terrain.';
 const OG_IMAGE = `${SITE_URL}/images/ascii/real_pfp.jpg`;
 
 // Structured data describing Akshat as a Person. Search engines and LLMs
@@ -38,7 +38,7 @@ const WEBSITE_SCHEMA = {
   '@context': 'https://schema.org',
   '@type': 'WebSite',
   name: 'Akshat Sharma',
-  alternateName: 'Akshat Sharma — Personal Portfolio',
+  alternateName: 'Akshat Sharma - Personal Portfolio',
   url: SITE_URL,
   description: DEFAULT_DESCRIPTION,
 };
@@ -66,7 +66,7 @@ export default function MyApp({ Component, pageProps }) {
           name="viewport"
           content="width=device-width, initial-scale=1, viewport-fit=cover"
         />
-        <meta name="theme-color" content="#171110" />
+        <meta name="theme-color" content="#0d0a08" />
         <meta name="color-scheme" content="dark" />
 
         {/* Favicons */}
@@ -105,7 +105,7 @@ export default function MyApp({ Component, pageProps }) {
       {/*
         One switch for the whole app: when the OS asks for reduced motion,
         every framer-motion animation below downgrades from transform/spring
-        motion to a plain cross-fade. Feedback is never removed — only the
+        motion to a plain cross-fade. Feedback is never removed: only the
         movement is. This replaces the need for every component to remember.
       */}
       <MotionConfig reducedMotion="user">

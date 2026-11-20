@@ -611,7 +611,7 @@ export default function ASCIIField({
     // Colour applied to any ASCII cell that falls under a ray.
     const RAY_COLOR_MAIN = [255, 226, 196];
     const RAY_COLOR_MICRO = [255, 241, 220];
-    // Deep-teal for kelp — sits in the cool palette without introducing
+    // Deep-teal for kelp: sits in the cool palette without introducing
     // saturated green.
     const KELP_COLOR = [90, 140, 128];
 

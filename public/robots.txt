@@ -1,4 +1,4 @@
-# robots.txt — Akshat Sharma personal portfolio
+# robots.txt - Akshat Sharma personal portfolio
 # All crawlers welcome. Sitemap is generated dynamically at /sitemap.xml.
 
 User-agent: *
