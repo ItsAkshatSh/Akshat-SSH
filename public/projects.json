@@ -1,5 +1,5 @@
 {
-  "refreshedAt": "2026-11-01T10:34:14.220Z",
+  "refreshedAt": "2026-11-15T11:03:56.116Z",
   "projects": [
     {
       "id": "BatHunt",
@@ -20,7 +20,7 @@
       "id": "thedeck",
       "title": "thedeck",
       "subtitle": "Python project",
-      "date": "Apr 2026",
+      "date": "Nov 2026",
       "link": "https://github.com/ItsAkshatSh/thedeck",
       "stack": [
         "Python"
@@ -103,7 +103,7 @@
         "Dart"
       ],
       "desc": "Log expenses by voice, scan receipts, and let an AI companion help you make sense of where your money goes.",
-      "banner": "/images/projects/hisabipocket.png",
+      "banner": "https://opengraph.githubassets.com/1/ItsAkshatSh/hisabipocket",
       "artworkFallback": true,
       "mark": "HI",
       "accent": 0
