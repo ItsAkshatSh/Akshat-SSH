@@ -4,9 +4,15 @@
  * page through the collection; escape closes. Includes technical corner
  * brackets, a bottom progress bar with dots, and a discreet keyboard
  * hint. Portalled to <body> so it can sit above every other overlay.
+ *
+ * Opening a photo morphs it out of the frame that was clicked (FLIP: the
+ * viewer's image is scaled/translated from the frame's rect to its resting
+ * spot). Both rects share the photo's aspect ratio, so the flight is a clean
+ * uniform scale with no distortion.
  */
-import { useCallback, useEffect } from 'react';
+import { useCallback, useEffect, useLayoutEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
+import { motion, useAnimationControls, useReducedMotion } from 'framer-motion';
 import { PHOTOS } from './photographyPhotos';
 
 const CornerMark = ({ position }) => {
@@ -24,10 +30,47 @@ const CornerMark = ({ position }) => {
   );
 };
 
-const PhotographyLightbox = ({ selectedImg, onClose, onSelect }) => {
+const PhotographyLightbox = ({ selectedImg, originRect, onClose, onSelect }) => {
   const selectedIndex = selectedImg
     ? PHOTOS.findIndex((p) => p.file === selectedImg)
     : -1;
+
+  const imgRef = useRef(null);
+  const imgControls = useAnimationControls();
+  const reducedMotion = useReducedMotion();
+
+  useLayoutEffect(() => {
+    if (!selectedImg) return;
+    const img = imgRef.current;
+    if (!img) return;
+
+    const hasOrigin = originRect?.width > 0 && originRect?.height > 0;
+    if (reducedMotion || !hasOrigin) {
+      imgControls.set({ x: 0, y: 0, scale: 1, opacity: 1, borderRadius: 4 });
+      return;
+    }
+
+    const target = img.getBoundingClientRect();
+    if (!target.width) return;
+
+    const scale = originRect.width / target.width;
+    imgControls.set({
+      x: originRect.left + originRect.width / 2 - (target.left + target.width / 2),
+      y: originRect.top + originRect.height / 2 - (target.top + target.height / 2),
+      scale,
+      opacity: 1,
+      // Radius is drawn under the scale, so divide to land on the frame's
+      // visible 14px corners at the start of the flight.
+      borderRadius: Math.min(48, 14 / scale),
+    });
+    imgControls.start({
+      x: 0,
+      y: 0,
+      scale: 1,
+      borderRadius: 4,
+      transition: { duration: 0.5, ease: [0.16, 1, 0.3, 1] },
+    });
+  }, [selectedImg, originRect, imgControls, reducedMotion]);
 
   const goTo = useCallback(
     (index) => {
@@ -35,6 +78,36 @@ const PhotographyLightbox = ({ selectedImg, onClose, onSelect }) => {
     },
     [onSelect]
   );
+
+  // Close by flying the photo back into the frame it came from, then dismiss.
+  // Without an origin (opened by keyboard paging, reduced motion) it is a
+  // plain dismiss.
+  const closingRef = useRef(false);
+  const requestClose = useCallback(() => {
+    if (closingRef.current) return;
+    const img = imgRef.current;
+    const hasOrigin = originRect?.width > 0 && originRect?.height > 0;
+    if (reducedMotion || !hasOrigin || !img) {
+      onClose?.();
+      return;
+    }
+    const target = img.getBoundingClientRect();
+    if (!target.width) {
+      onClose?.();
+      return;
+    }
+    closingRef.current = true;
+    const scale = originRect.width / target.width;
+    imgControls
+      .start({
+        x: originRect.left + originRect.width / 2 - (target.left + target.width / 2),
+        y: originRect.top + originRect.height / 2 - (target.top + target.height / 2),
+        scale,
+        borderRadius: Math.min(48, 14 / scale),
+        transition: { duration: 0.34, ease: [0.4, 0, 0.2, 1] },
+      })
+      .then(() => onClose?.());
+  }, [originRect, reducedMotion, imgControls, onClose]);
 
   // Lock page scroll while open.
   useEffect(() => {
@@ -52,11 +125,11 @@ const PhotographyLightbox = ({ selectedImg, onClose, onSelect }) => {
     const handleKey = (e) => {
       if (e.key === 'ArrowRight') goTo(selectedIndex + 1);
       else if (e.key === 'ArrowLeft') goTo(selectedIndex - 1);
-      else if (e.key === 'Escape') onClose?.();
+      else if (e.key === 'Escape') requestClose();
     };
     window.addEventListener('keydown', handleKey);
     return () => window.removeEventListener('keydown', handleKey);
-  }, [selectedImg, selectedIndex, goTo, onClose]);
+  }, [selectedImg, selectedIndex, goTo, requestClose]);
 
   if (!selectedImg || selectedIndex < 0 || typeof document === 'undefined') return null;
 
@@ -96,7 +169,7 @@ const PhotographyLightbox = ({ selectedImg, onClose, onSelect }) => {
           <span className="hidden sm:inline text-muted-warm ml-3">Frame</span>
         </div>
         <button
-          onClick={onClose}
+          onClick={requestClose}
           className="interactive press h-10 px-4 rounded-full border border-hair text-bone hover:text-bone hover:border-[color:var(--border-hover)] hover:bg-surface-raised text-[11px] tracking-[0.25em] uppercase"
           aria-label="Close"
           style={{
@@ -122,17 +195,15 @@ const PhotographyLightbox = ({ selectedImg, onClose, onSelect }) => {
           </button>
         )}
 
-        <img
+        <motion.img
           key={selectedImg}
+          ref={imgRef}
           src={`/images/photography/${selectedImg}`}
           alt={`Photo ${selectedIndex + 1}`}
-          className="max-w-full max-h-full object-contain select-none rounded-sm"
+          className="max-w-full max-h-full object-contain select-none"
           draggable={false}
-          style={{
-            opacity: 0,
-            animation:
-              'lightboxImgIn 0.45s cubic-bezier(0.16, 1, 0.3, 1) forwards 0.05s',
-          }}
+          initial={{ opacity: 0 }}
+          animate={imgControls}
         />
 
         {hasNext && (

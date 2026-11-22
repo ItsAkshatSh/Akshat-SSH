@@ -9,6 +9,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 
 import ScrambleText from './utilities/ScrambleText';
 import SectionOverlay from './ui/SectionOverlay';
+import NowPlayingLoop from './ui/NowPlayingLoop';
 import { HERO, SOCIALS } from '../lib/siteContent';
 
 import BackgroundField from './BackgroundField';
@@ -97,6 +98,11 @@ const App = () => {
     return () => window.removeEventListener('hashchange', syncFromHash);
   }, []);
 
+  // Warm the blog route so the click navigates straight in.
+  useEffect(() => {
+    router.prefetch('/blog');
+  }, [router]);
+
   const navItems = [
     { label: 'Projects', onClick: () => setActiveSection('projects') },
     {
@@ -105,7 +111,7 @@ const App = () => {
       onClick: () => setActiveSection('photography'),
     },
     { label: 'Experience', onClick: () => setActiveSection('experience') },
-    { label: 'Blog', onClick: () => router.push('/blog') },
+    { label: 'Blog', route: true, onClick: () => router.push('/blog') },
   ];
 
   const sectionTitle = activeSection
@@ -203,6 +209,9 @@ const App = () => {
               ))}
             </motion.div>
 
+            <motion.div variants={HERO_ITEM} className="flex min-w-0 w-full max-w-[30rem] items-center">
+              <NowPlayingLoop />
+            </motion.div>
           </div>
         </motion.div>
       </main>

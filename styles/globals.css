@@ -496,18 +496,6 @@ body.dg-scroll-lock { overflow: hidden; }
   100% { transform: scaleX(1); opacity: 1; }
 }
 
-/* Photograph fading in when swapping between images in the lightbox. */
-@keyframes lightboxImgIn {
-  0% { opacity: 0; transform: scale(0.985); }
-  100% { opacity: 1; transform: scale(1); }
-}
-
-/* Photoyoshi-style gallery: nudge the scroll-hint rule sideways. */
-@keyframes photoScrollHint {
-  0%, 100% { transform: translateX(0); opacity: 0.35; }
-  50% { transform: translateX(10px); opacity: 0.7; }
-}
-
 @keyframes spin {
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }

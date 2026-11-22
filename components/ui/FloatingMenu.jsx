@@ -1,5 +1,6 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
+import { beginPageTransition } from './PageCurtain';
 
 /**
  * Liquid-morph floating menu.
@@ -159,6 +160,16 @@ export default function FloatingMenu({ items, hidden = false }) {
 
   const navigateTo = useCallback((item) => {
     if (transitionTimerRef.current) clearTimeout(transitionTimerRef.current);
+    // Route changes (Blog) leave this page, so the local curtain would be
+    // unmounted mid-animation. Hand the wipe to PageCurtain, which lives above
+    // the router, and start the navigation at once: the destination loads
+    // underneath the curtain instead of after it.
+    if (item.route) {
+      beginPageTransition({ label: item.label, image: item.images?.[0] });
+      setIsOpen(false);
+      item.onClick?.();
+      return;
+    }
     const image = item.images?.length
       ? item.images[Math.floor(Math.random() * item.images.length)]
       : null;

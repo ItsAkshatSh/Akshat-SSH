@@ -2,6 +2,7 @@ import '../styles/globals.css';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 import { MotionConfig } from 'framer-motion';
+import PageCurtain from '../components/ui/PageCurtain';
 
 const SITE_URL =
   process.env.NEXT_PUBLIC_SITE_URL || 'https://akshaaaat.xyz';
@@ -110,6 +111,9 @@ export default function MyApp({ Component, pageProps }) {
       */}
       <MotionConfig reducedMotion="user">
         <Component {...pageProps} />
+        {/* Above the router so its wipe can outlive the page that started it
+            (the menu is unmounted by a route change). */}
+        <PageCurtain />
       </MotionConfig>
     </>
   );

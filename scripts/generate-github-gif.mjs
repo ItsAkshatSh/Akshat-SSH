@@ -7,6 +7,9 @@
  *
  * Or point at a running dev server:
  *   GIF_BASE_URL=http://localhost:3000 npm run generate:github-gif
+ *
+ * Knobs: GIF_SCALE (raster scale, default 2), GIF_FPS (30),
+ * GIF_DURATION_SEC (6), GIF_DIFF (inter-frame transparency threshold, 2).
  */
 import { spawn } from 'child_process';
 import fs from 'fs';
@@ -28,8 +31,12 @@ const SITE_URL =
   process.env.PROFILE_SITE_URL || process.env.NEXT_PUBLIC_SITE_URL || 'https://www.akshaaaat.xyz';
 
 const BASE_URL = process.env.GIF_BASE_URL || 'http://localhost:3999';
-const FPS = Number(process.env.GIF_FPS || 20);
-const DURATION_SEC = Number(process.env.GIF_DURATION_SEC || 4);
+const FPS = Number(process.env.GIF_FPS || 30);
+const DURATION_SEC = Number(process.env.GIF_DURATION_SEC || 6);
+// Raster scale. The card is vector, so capturing at 2x makes the small mono
+// labels and the ASCII glyphs crisp on high-density screens; the cost is four
+// times the pixels per frame, which GIF pays for in file size.
+const SCALE = Number(process.env.GIF_SCALE || 2);
 const FRAME_COUNT = Math.round(FPS * DURATION_SEC);
 const FRAME_DELAY_CS = Math.round(100 / FPS); // gifenc uses centiseconds
 
@@ -53,16 +60,41 @@ const waitForServer = (url, timeoutMs = 60000) =>
     tick();
   });
 
-const startServer = () =>
-  new Promise((resolve, reject) => {
-    const port = process.env.GIF_PORT || '3999';
-    const base = `http://localhost:${port}`;
-    const child = spawn('npx', ['next', 'start', '-p', port], {
-      cwd: ROOT,
-      shell: true,
-      stdio: 'ignore',
-      env: { ...process.env },
+const isPortFree = (port) =>
+  new Promise((resolve) => {
+    const req = http.get(`http://localhost:${port}/`, (res) => {
+      res.resume();
+      resolve(false);
     });
+    req.on('error', () => resolve(true));
+    req.setTimeout(800, () => {
+      req.destroy();
+      resolve(true);
+    });
+  });
+
+const startServer = async () => {
+  // Reusing a port that already answers would screenshot a stale build, so
+  // walk forward to the first free one.
+  const basePort = Number(process.env.GIF_PORT || 3999);
+  let port = null;
+  for (let i = 0; i < 10 && port === null; i += 1) {
+    if (await isPortFree(basePort + i)) port = basePort + i;
+  }
+  if (port === null) throw new Error(`No free capture port near ${basePort}.`);
+
+  const base = `http://localhost:${port}`;
+  // Spawn Next directly rather than via npx + a shell: on Windows killing a
+  // shell leaves the real server alive, and the next run would then capture
+  // that stale build.
+  const nextBin = path.join(ROOT, 'node_modules', 'next', 'dist', 'bin', 'next');
+  const child = spawn(process.execPath, [nextBin, 'start', '-p', String(port)], {
+    cwd: ROOT,
+    stdio: 'ignore',
+    env: { ...process.env },
+  });
+
+  return new Promise((resolve, reject) => {
     child.on('error', reject);
     waitForServer(base)
       .then(() => resolve({ child, base }))
@@ -71,15 +103,32 @@ const startServer = () =>
         reject(err);
       });
   });
+};
 
 const pngToRgba = (buffer) => {
   const png = PNG.sync.read(buffer);
   return { width: png.width, height: png.height, data: png.data };
 };
 
+// Playwright's bundled browser is not always downloaded (CI images, fresh
+// clones). Fall back to the system Chrome so the generator still runs.
+async function launchBrowser() {
+  const channel = process.env.GIF_CHANNEL;
+  try {
+    return await chromium.launch(channel ? { channel } : {});
+  } catch (err) {
+    if (channel) throw err;
+    console.warn('Bundled Chromium unavailable; using system Chrome.');
+    return chromium.launch({ channel: 'chrome' });
+  }
+}
+
 async function captureGif(baseUrl) {
-  const browser = await chromium.launch();
-  const page = await browser.newPage();
+  const browser = await launchBrowser();
+  const page = await browser.newPage({
+    viewport: { width: 1000, height: 900 },
+    deviceScaleFactor: SCALE,
+  });
   const key = process.env.GITHUB_PROFILE_SECRET
     ? `?key=${encodeURIComponent(process.env.GITHUB_PROFILE_SECRET)}`
     : '';
@@ -123,12 +172,13 @@ async function captureGif(baseUrl) {
       ms
     );
 
+  const cardBox = await capture.boundingBox();
   console.log(
     animationCount === 0
       ? 'No CSS animations found; falling back to timed capture.'
       : frameCount === 1
         ? 'Capturing static frame…'
-        : `Capturing ${frameCount} frames over ${DURATION_SEC}s at ${FPS}fps…`
+        : `Capturing ${frameCount} frames over ${DURATION_SEC}s at ${FPS}fps, ${Math.round(cardBox.width * SCALE)}×${Math.round(cardBox.height * SCALE)}…`
   );
 
   const frames = [];
@@ -157,17 +207,40 @@ async function captureGif(baseUrl) {
     offset += frame.data.length;
   }
 
-  const globalPalette = quantize(combined, 256);
+  // Reserve one palette slot for transparency so each frame can leave the
+  // pixels that did not move to the previous frame. Most of the card (panels,
+  // text, heatmap) is static, so this is where the size actually goes.
+  const globalPalette = quantize(combined, 255);
   const gif = GIFEncoder();
+  // Small enough to keep the slow gradient shimmer and glyph drift, large
+  // enough to leave truly static pixels on the previous frame.
+  const DIFF_THRESHOLD = Number(process.env.GIF_DIFF ?? 2);
+  let previous = null;
 
   frames.forEach((frame, index) => {
     const indexData = applyPalette(frame.data, globalPalette);
+    if (previous) {
+      for (let pixel = 0; pixel < indexData.length; pixel += 1) {
+        const i = pixel * 4;
+        if (
+          Math.abs(frame.data[i] - previous[i]) <= DIFF_THRESHOLD &&
+          Math.abs(frame.data[i + 1] - previous[i + 1]) <= DIFF_THRESHOLD &&
+          Math.abs(frame.data[i + 2] - previous[i + 2]) <= DIFF_THRESHOLD
+        ) {
+          indexData[pixel] = 255;
+        }
+      }
+    }
     gif.writeFrame(indexData, width, height, {
       palette: globalPalette,
       delay: frameCount === 1 ? 100 : FRAME_DELAY_CS,
-      disposal: 2,
+      // gifenc calls this `dispose`; 1 = keep the previous frame underneath.
+      dispose: 1,
+      transparent: true,
+      transparentIndex: 255,
       repeat: index === 0 ? 0 : undefined,
     });
+    previous = frame.data;
   });
 
   gif.finish();
