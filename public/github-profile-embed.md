@@ -1,1 +1,1 @@
-<img src="https://www.akshaaaat.xyz/github.gif?v=1795665703520" alt="GitHub profile" />
+<img src="https://www.akshaaaat.xyz/github.gif?v=1795669322117" alt="GitHub profile" />
